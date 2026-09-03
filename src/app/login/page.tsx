@@ -42,7 +42,7 @@ export default function LoginPage() {
               <GraduationCap aria-hidden className="size-6" />
             </span>
             <span>
-              <span className="block text-lg font-bold tracking-tight text-white">Campus Bridge</span>
+              <span className="block text-lg font-bold tracking-tight text-white">Skill Bridge</span>
               <span className="block text-sm text-slate-400">Academia × Industry</span>
             </span>
           </div>
@@ -89,7 +89,7 @@ export default function LoginPage() {
               <span className="flex size-10 items-center justify-center rounded-xl bg-gradient-to-br from-indigo-500 to-violet-500 text-white">
                 <GraduationCap aria-hidden className="size-5" />
               </span>
-              <span className="text-lg font-bold tracking-tight text-slate-900 dark:text-slate-100">Campus Bridge</span>
+              <span className="text-lg font-bold tracking-tight text-slate-900 dark:text-slate-100">Skill Bridge</span>
             </div>
 
             <h2 className="text-2xl font-bold tracking-tight text-slate-900 dark:text-slate-100">Welcome back</h2>

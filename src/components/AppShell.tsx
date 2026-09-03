@@ -110,7 +110,7 @@ function Brand() {
         <GraduationCap aria-hidden className="size-5" />
       </span>
       <span className="leading-tight">
-        <span className="block text-sm font-bold tracking-tight text-slate-900 dark:text-slate-100">Campus Bridge</span>
+        <span className="block text-sm font-bold tracking-tight text-slate-900 dark:text-slate-100">Skill Bridge</span>
         <span className="block text-[11px] font-medium text-slate-500 dark:text-slate-400">Academia × Industry</span>
       </span>
     </Link>
@@ -173,7 +173,7 @@ export function AppShell({ user, children }: { user: SessionUser; children: Reac
               <span className="flex size-8 items-center justify-center rounded-lg bg-gradient-to-br from-indigo-600 to-violet-600 text-white">
                 <GraduationCap aria-hidden className="size-4.5" />
               </span>
-              <span className="text-sm font-bold text-slate-900 dark:text-slate-100">Campus Bridge</span>
+              <span className="text-sm font-bold text-slate-900 dark:text-slate-100">Skill Bridge</span>
             </div>
           </div>
 
@@ -222,7 +222,7 @@ export function AppShell({ user, children }: { user: SessionUser; children: Reac
         </main>
 
         <footer className="border-t border-border-muted py-5 text-center text-xs text-slate-400 dark:text-slate-500">
-          © {new Date().getFullYear()} Campus Bridge — Academia-Industry Collaboration Portal
+          © {new Date().getFullYear()} Skill Bridge — Academia-Industry Collaboration Portal
         </footer>
       </div>
     </div>

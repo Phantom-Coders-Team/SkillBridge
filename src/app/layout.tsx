@@ -15,8 +15,8 @@ const geistMono = Geist_Mono({
 
 export const metadata: Metadata = {
   title: {
-    default: "Campus Bridge — Academia × Industry Portal",
-    template: "%s · Campus Bridge",
+    default: "Skill Bridge — Academia × Industry Portal",
+    template: "%s · Skill Bridge",
   },
   description: "A unified portal connecting students, faculty, industry, and TPOs for skill development, capstone projects, mentorship, and placements.",
 };

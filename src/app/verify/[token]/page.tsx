@@ -97,7 +97,7 @@ export default async function VerifyBadgePage({ params }: { params: Promise<{ to
         </div>
 
         <p className="mt-4 text-center text-xs text-slate-400 dark:text-slate-500">
-          Verified via Campus Bridge — Academia–Industry Collaboration Portal
+          Verified via Skill Bridge — Academia–Industry Collaboration Portal
         </p>
       </div>
     </div>

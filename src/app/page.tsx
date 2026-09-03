@@ -52,7 +52,7 @@ export default async function Home() {
             <GraduationCap aria-hidden className="size-5" />
           </span>
           <span className="leading-tight">
-            <span className="block text-sm font-bold tracking-tight text-slate-900 dark:text-slate-100">Campus Bridge</span>
+            <span className="block text-sm font-bold tracking-tight text-slate-900 dark:text-slate-100">Skill Bridge</span>
             <span className="block text-[11px] font-medium text-slate-500 dark:text-slate-400">Academia × Industry</span>
           </span>
         </Link>
@@ -190,7 +190,7 @@ export default async function Home() {
       </main>
 
       <footer className="relative z-10 border-t border-border-muted py-6 text-center text-sm text-slate-400 dark:text-slate-500">
-        © {new Date().getFullYear()} Campus Bridge — Academia-Industry Collaboration Portal
+        © {new Date().getFullYear()} Skill Bridge — Academia-Industry Collaboration Portal
       </footer>
     </div>
   );

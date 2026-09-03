@@ -1,4 +1,4 @@
-# Campus Bridge
+# Skill Bridge
 
 A unified collaboration portal connecting students, faculty, industry partners, and Training & Placement Officers (TPOs) for skill development, capstone projects, mentorship, and placements.
 
