@@ -4,7 +4,7 @@ import Link from "next/link";
 import { usePathname } from "next/navigation";
 import { useEffect, useState } from "react";
 import { useTheme } from "next-themes";
-import { GraduationCap, Menu, X, Sun, Moon, Monitor, ChevronLeft, ChevronRight } from "lucide-react";
+import { GraduationCap, Menu, X, Sun, Moon, Monitor, ChevronLeft, ChevronRight, Sparkles, User } from "lucide-react";
 import type { SessionUser } from "@/lib/types";
 import { ROLE_LABELS, ROLE_COLORS } from "@/lib/types";
 import { NAV_ITEMS } from "@/lib/navigation";
@@ -162,24 +162,22 @@ function Sidebar({
       <Brand collapsed={collapsed} onToggle={onToggle} />
       <NavList user={user} pathname={pathname} collapsed={collapsed} />
       <div className="border-t border-border-muted p-2.5">
-        <div
+        <Link
+          href="/profile"
           className={cn(
-            "flex items-center gap-3 rounded-xl py-2",
+            "flex items-center gap-3 rounded-xl py-2 transition-colors hover:bg-slate-100 dark:hover:bg-slate-800/60",
             collapsed ? "justify-center px-0" : "px-2",
           )}
           title={collapsed ? `${user.name} (${ROLE_LABELS[user.role]})` : undefined}
         >
           <UserAvatar user={user} />
           {!collapsed && (
-            <>
-              <div className="min-w-0 flex-1">
-                <p className="truncate text-sm font-semibold text-slate-900 dark:text-slate-100">{user.name}</p>
-                <p className="truncate text-xs text-slate-500 dark:text-slate-400">{ROLE_LABELS[user.role]}</p>
-              </div>
-              <LogoutButton />
-            </>
+            <div className="min-w-0 flex-1">
+              <p className="truncate text-sm font-semibold text-slate-900 dark:text-slate-100">{user.name}</p>
+              <p className="truncate text-xs text-slate-500 dark:text-slate-400">{ROLE_LABELS[user.role]}</p>
+            </div>
           )}
-        </div>
+        </Link>
       </div>
     </div>
   );
@@ -289,13 +287,47 @@ export function AppShell({ user, children }: { user: SessionUser; children: Reac
               {menuOpen && (
                 <>
                   <div className="fixed inset-0 z-10" onClick={() => setMenuOpen(false)} aria-hidden />
-                  <div className="animate-pop-in absolute right-0 z-20 mt-2 w-64 rounded-2xl border border-border-muted bg-surface p-2 shadow-pop">
+                  <div className="animate-pop-in absolute right-0 z-20 mt-2 w-72 rounded-2xl border border-border-muted bg-surface p-2.5 shadow-pop">
                     <div className="px-3 py-2">
                       <p className="truncate text-sm font-semibold text-slate-900 dark:text-slate-100">{user.name}</p>
                       <p className="truncate text-xs text-slate-500 dark:text-slate-400">{user.email}</p>
+                      <span
+                        className={cn(
+                          "mt-2 inline-flex rounded-full px-2.5 py-0.5 text-[10px] font-semibold",
+                          ROLE_COLORS[user.role],
+                        )}
+                      >
+                        {ROLE_LABELS[user.role]}
+                      </span>
                     </div>
-                    <div className="my-1 h-px bg-border-muted" />
-                    <div className="px-3 py-2">
+
+                    <div className="my-1.5 h-px bg-border-muted" />
+
+                    <div className="space-y-1 py-1">
+                      {user.role === "STUDENT" && (
+                        <Link
+                          href="/sync"
+                          onClick={() => setMenuOpen(false)}
+                          className="flex items-center gap-2.5 rounded-xl px-3 py-2 text-sm font-medium text-indigo-600 transition-colors hover:bg-indigo-50 dark:text-indigo-400 dark:hover:bg-indigo-950/40"
+                        >
+                          <Sparkles className="size-4 shrink-0 text-indigo-500" />
+                          <span>Sync Skills (Git & DPI)</span>
+                        </Link>
+                      )}
+
+                      <Link
+                        href="/profile"
+                        onClick={() => setMenuOpen(false)}
+                        className="flex items-center gap-2.5 rounded-xl px-3 py-2 text-sm font-medium text-slate-700 transition-colors hover:bg-slate-100 dark:text-slate-300 dark:hover:bg-slate-800"
+                      >
+                        <User className="size-4 shrink-0 text-slate-400" />
+                        <span>My Profile & Settings</span>
+                      </Link>
+                    </div>
+
+                    <div className="my-1.5 h-px bg-border-muted" />
+
+                    <div className="px-1.5 py-1">
                       <LogoutButton />
                     </div>
                   </div>

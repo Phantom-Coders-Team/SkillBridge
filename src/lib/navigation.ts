@@ -32,7 +32,6 @@ export interface NavItem {
 export const NAV_ITEMS: Record<Role, NavItem[]> = {
   STUDENT: [
     { label: "Dashboard", href: "/dashboard", icon: LayoutDashboard },
-    { label: "Sync Skills & e-KYC", href: "/sync", icon: Sparkles },
     { label: "Skill Radar & Diagnostic", href: "/skills", icon: Radar },
     { label: "Internships & Jobs", href: "/internships", icon: Briefcase },
     { label: "Proof of Work & Badges", href: "/proof-of-work", icon: Award },
