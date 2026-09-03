@@ -1,4 +1,4 @@
-import { PrismaClient } from "@/generated/prisma/client";
+import { PrismaClient } from "@prisma/client";
 
 // If DATABASE_URL is not set directly, fallback to Vercel Postgres environment variables
 if (!process.env.DATABASE_URL) {
