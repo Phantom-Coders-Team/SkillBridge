@@ -1,4 +1,5 @@
 import { redirect } from "next/navigation";
+import Link from "next/link";
 import { Briefcase, Building2, Users, Sparkles } from "lucide-react";
 import { getCurrentUser } from "@/lib/auth";
 import { prisma } from "@/lib/prisma";
@@ -6,6 +7,7 @@ import { Badge, Card, EmptyState, PageHeader, type BadgeTone } from "@/component
 import PostOpportunityForm from "./PostOpportunityForm";
 import ApplyButton from "./ApplyButton";
 import ApplicationActions from "./ApplicationActions";
+import ExportButton from "./ExportButton";
 import MatchBadge from "./MatchBadge";
 
 const TYPE_TONE: Record<string, BadgeTone> = {
@@ -51,16 +53,23 @@ export default async function InternshipsPage() {
         icon={Briefcase}
         actions={
           user.role === "INDUSTRY" ? (
-            <details className="group relative">
-              <summary className="cursor-pointer list-none [&::-webkit-details-marker]:hidden">
-                <span className="inline-flex h-10 items-center gap-2 rounded-xl bg-indigo-600 px-4 text-sm font-semibold text-white hover:bg-indigo-700">
-                  <Sparkles className="size-4" /> Post Opportunity
-                </span>
-              </summary>
-              <div className="animate-pop-in absolute right-0 z-20 mt-2 w-[540px] max-w-[calc(100vw-2rem)] rounded-2xl border border-border-muted bg-surface p-5 shadow-pop">
-                <PostOpportunityForm />
-              </div>
-            </details>
+            <div className="flex flex-wrap items-center gap-2">
+              <ExportButton
+                href={`/api/exports/applications`}
+                label="Export All to Excel"
+                variant="outline"
+              />
+              <details className="group relative">
+                <summary className="cursor-pointer list-none [&::-webkit-details-marker]:hidden">
+                  <span className="inline-flex h-10 items-center gap-2 rounded-xl bg-indigo-600 px-4 text-sm font-semibold text-white hover:bg-indigo-700">
+                    <Sparkles className="size-4" /> Post Opportunity
+                  </span>
+                </summary>
+                <div className="animate-pop-in absolute right-0 z-20 mt-2 w-[540px] max-w-[calc(100vw-2rem)] rounded-2xl border border-border-muted bg-surface p-5 shadow-pop">
+                  <PostOpportunityForm />
+                </div>
+              </details>
+            </div>
           ) : undefined
         }
       />
@@ -134,15 +143,26 @@ export default async function InternshipsPage() {
                         <p className="text-xs text-slate-400 dark:text-slate-500">No applicants yet</p>
                       ) : (
                         <div className="space-y-2">
-                          <span className="inline-flex items-center gap-1 text-xs font-medium text-slate-500 dark:text-slate-400">
-                            <Users className="size-3.5" /> {l.applications.length} applicant{l.applications.length !== 1 ? "s" : ""}
-                          </span>
+                          <div className="flex items-center justify-between gap-2">
+                            <span className="inline-flex items-center gap-1 text-xs font-medium text-slate-500 dark:text-slate-400">
+                              <Users className="size-3.5" /> {l.applications.length} applicant{l.applications.length !== 1 ? "s" : ""}
+                            </span>
+                            <ExportButton
+                              href={`/api/exports/applications?listingId=${l.id}`}
+                              label="Export"
+                              variant="ghost"
+                              small
+                            />
+                          </div>
                           {l.applications.map((app) => (
                             <div key={app.id} className="flex items-center justify-between gap-2 border-t border-slate-200 pt-2 dark:border-slate-700">
                               <div className="min-w-0">
-                                <p className="truncate text-xs font-medium text-slate-700 dark:text-slate-200">
+                                <Link
+                                  href={`/profile/${app.student.id}`}
+                                  className="truncate text-xs font-medium text-indigo-600 hover:text-indigo-700 hover:underline dark:text-indigo-400 dark:hover:text-indigo-300"
+                                >
                                   {app.student.name}
-                                </p>
+                                </Link>
                                 <p className="truncate text-[11px] text-slate-400 dark:text-slate-500">
                                   {app.student.profile?.department ?? "—"} · {app.student.profile?.rollNumber ?? ""}
                                 </p>
