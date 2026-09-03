@@ -32,11 +32,14 @@ export interface NavItem {
 export const NAV_ITEMS: Record<Role, NavItem[]> = {
   STUDENT: [
     { label: "Dashboard", href: "/dashboard", icon: LayoutDashboard },
+    { label: "Sync Skills (DPI/Git)", href: "/sync", icon: Sparkles },
     { label: "Projects", href: "/projects", icon: FolderKanban },
     { label: "Challenge Marketplace", href: "/challenges", icon: Sparkles },
     { label: "Lab Units", href: "/lab-units", icon: FlaskConical },
     { label: "Proof of Work", href: "/proof-of-work", icon: Award },
-    { label: "Skills", href: "/skills", icon: Radar },
+    { label: "Skills Radar", href: "/skills", icon: Radar },
+    { label: "Skill Tokens", href: "/tokens", icon: Coins },
+    { label: "Office Hours", href: "/office-hours", icon: CalendarClock },
     { label: "Internships & Jobs", href: "/internships", icon: Briefcase },
     { label: "Mentors", href: "/mentors", icon: Handshake },
     { label: "Reverse Placement", href: "/reverse-placement", icon: TrendingUp },

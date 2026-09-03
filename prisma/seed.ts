@@ -7,6 +7,8 @@ const prisma = new PrismaClient();
 async function main() {
   console.log("Seeding Academia-Industry Collaboration Portal...");
 
+  await prisma.blockchainTransaction.deleteMany();
+  await prisma.erupiVoucher.deleteMany();
   await prisma.jobPitch.deleteMany();
   await prisma.dualGrading.deleteMany();
   await prisma.challengeApplication.deleteMany();
@@ -321,6 +323,36 @@ async function main() {
         badgeQrCode: `QR-${completedProject.id.slice(0, 8)}-POW-001`,
         publicToken: "a1b2c3-pow-001",
         issuedAt: new Date(Date.now() - 12 * day),
+      },
+    });
+
+    const firstProof = await prisma.proofOfWork.findUnique({ where: { publicToken: "a1b2c3-pow-001" } });
+    if (firstProof) {
+      await prisma.blockchainTransaction.create({
+        data: {
+          proofId: firstProof.id,
+          blockIndex: 1,
+          blockHash: "0x8f43a968b37f2d4e78a2e1732e98c5321528b188c0a5200c92ec17c46a6f1932",
+          prevHash: "0x0000000000000000000000000000000000000000000000000000000000000000",
+          merkleRoot: "0x3b89f2a9e527f3c42817d23e5900b7498c199214e21a8d0554d3e41b9c782103",
+          consensusState: "COMMITTED",
+          nodeSignatures: 4,
+          validatorNodes: JSON.stringify(["node-vit-chennai", "node-infosys-recruit", "node-aicte-gateway", "node-consortium"]),
+        },
+      });
+    }
+
+    const expiry = new Date();
+    expiry.setMonth(expiry.getMonth() + 6);
+    await prisma.erupiVoucher.create({
+      data: {
+        voucherCode: "ERUPI-CERT-7B89",
+        industryId: industryUserIds[0],
+        studentId: studentUserIds[0],
+        amount: 10000,
+        purposeCode: "EDTECH_CERTIFICATION",
+        status: "ACTIVE",
+        expiryDate: expiry,
       },
     });
   }

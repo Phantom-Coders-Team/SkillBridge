@@ -49,7 +49,7 @@ export function DashboardContent({
           <h1 className="mt-3 text-2xl font-bold tracking-tight text-slate-900 dark:text-slate-100 sm:text-3xl">
             Welcome back, {name.split(" ")[0]}
           </h1>
-          <p className="mt-1 text-sm text-slate-500 dark:text-slate-400">{dateLabel} — here&apos;s what&apos;s happening on your campus bridge.</p>
+          <p className="mt-1 text-sm text-slate-500 dark:text-slate-400">{dateLabel} — here&apos;s what&apos;s happening on your skill bridge.</p>
           <div className="mt-6 flex flex-wrap gap-2.5">
             {quickLinks.map((link) => (
               <Link

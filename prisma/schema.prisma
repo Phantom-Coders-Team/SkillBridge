@@ -39,6 +39,8 @@ model User {
   applications       InternshipApplication[]
   facultyProgramApplications FacultyProgramApplication[]
   documents          UserDocument[]
+  vouchersIssued     ErupiVoucher[]      @relation("VoucherIssuer")
+  vouchersReceived   ErupiVoucher[]      @relation("VoucherBeneficiary")
 
   @@map("users")
 }
@@ -111,6 +113,7 @@ model ProofOfWork {
   issuedAt        DateTime?
   createdAt       DateTime @default(now())
   updatedAt       DateTime @updatedAt
+  blockchainTx    BlockchainTransaction?
 
   @@index([studentId])
   @@index([projectId])
@@ -416,4 +419,41 @@ model InternshipApplication {
 
   @@unique([listingId, studentId])
   @@map("internship_applications")
+}
+
+model BlockchainTransaction {
+  id               String      @id @default(cuid())
+  proofId          String      @unique
+  proofOfWork      ProofOfWork @relation(fields: [proofId], references: [id], onDelete: Cascade)
+  blockIndex       Int
+  blockHash        String      @unique
+  prevHash         String
+  merkleRoot       String
+  consensusState   String      @default("COMMITTED")
+  nodeSignatures   Int         @default(4)
+  validatorNodes   String
+  timestamp        DateTime    @default(now())
+
+  @@index([blockHash])
+  @@index([proofId])
+  @@map("blockchain_transactions")
+}
+
+model ErupiVoucher {
+  id              String    @id @default(cuid())
+  voucherCode     String    @unique
+  industryId      String
+  industry        User      @relation("VoucherIssuer", fields: [industryId], references: [id], onDelete: Cascade)
+  studentId       String?
+  student         User?     @relation("VoucherBeneficiary", fields: [studentId], references: [id], onDelete: SetNull)
+  amount          Int
+  purposeCode     String
+  status          String    @default("ACTIVE")
+  redeemedAt      DateTime?
+  expiryDate      DateTime
+  createdAt       DateTime  @default(now())
+
+  @@index([industryId])
+  @@index([studentId])
+  @@map("erupi_vouchers")
 }

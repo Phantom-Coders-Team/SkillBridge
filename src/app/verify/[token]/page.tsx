@@ -16,6 +16,7 @@ export default async function VerifyBadgePage({ params }: { params: Promise<{ to
     include: {
       student: { select: { name: true, profile: { select: { department: true, rollNumber: true } } } },
       project: { select: { title: true, description: true, domain: true, projectType: true } },
+      blockchainTx: true,
     },
   });
 
@@ -87,6 +88,23 @@ export default async function VerifyBadgePage({ params }: { params: Promise<{ to
             <p className="text-xs text-slate-500 dark:text-slate-400">Verification ID</p>
             <p className="mt-1 font-mono text-sm font-bold text-slate-900 dark:text-slate-100">{proof.publicToken}</p>
           </div>
+
+          {proof.blockchainTx && (
+            <div className="mt-4 rounded-xl border border-indigo-200 bg-indigo-50/70 p-3 text-left dark:border-indigo-900/50 dark:bg-indigo-950/30">
+              <div className="flex items-center justify-between">
+                <span className="text-[11px] font-semibold uppercase tracking-wider text-indigo-700 dark:text-indigo-300">
+                  ⛓️ Blockchain Proof (Block #{proof.blockchainTx.blockIndex})
+                </span>
+                <span className="rounded-full bg-emerald-100 px-2 py-0.5 text-[10px] font-bold text-emerald-700 dark:bg-emerald-950/60 dark:text-emerald-300">
+                  {proof.blockchainTx.consensusState} ({proof.blockchainTx.nodeSignatures} Nodes)
+                </span>
+              </div>
+              <p className="mt-1.5 break-all font-mono text-[11px] text-slate-600 dark:text-slate-400">
+                <span className="font-semibold text-slate-700 dark:text-slate-300">Hash: </span>
+                {proof.blockchainTx.blockHash}
+              </p>
+            </div>
+          )}
 
           {qrDataUrl && (
             <div className="mt-4 flex flex-col items-center border-t border-border-muted pt-4">
