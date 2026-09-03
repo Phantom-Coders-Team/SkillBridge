@@ -10,6 +10,8 @@ A unified collaboration portal connecting students, faculty, industry partners, 
 - **ORM:** Prisma
 - **Auth:** JWT + bcrypt (httpOnly cookie)
 - **Styling:** Tailwind CSS v4
+- **Theme:** Dark / Light mode (next-themes)
+- **Icons:** Lucide React
 - **AI (optional):** Google Gemini 1.5 Flash for syllabus audit
 - **Charts:** Recharts
 - **QR Codes:** qrcode (SVG)
@@ -18,20 +20,43 @@ A unified collaboration portal connecting students, faculty, industry partners, 
 
 | Role | Key Features |
 |------|-------------|
-| **Student** | Dashboard, projects, challenges, proof of work, skills, tokens, mentors, reverse placement |
-| **Faculty** | Dashboard, projects, challenges, R&D lab units, dual grading, syllabus audit, sabbaticals |
-| **Industry** | Dashboard, challenges, dual grading, mentor slots, job pitches, reverse placement, sabbaticals |
-| **TPO** | Dashboard, placements, skill heatmap, reverse placement, partners, analytics |
+| **Student** | Dashboard, projects, challenges, proof of work, skills, assessments, tokens, mentors, office hours, portfolio, internships, reverse placement |
+| **Faculty** | Dashboard, projects, challenges, lab units, dual grading, syllabus audit, faculty portal, sabbaticals |
+| **Industry** | Dashboard, challenges, dual grading, mentor slots, job pitches, internships, faculty programs, sabbaticals |
+| **TPO** | Dashboard, placements, skill heatmap, reverse placement, partners, analytics, assessments |
 
 ## Key Features
 
+### Core Mechanics
 - **Placement Readiness Index (PRI):** Composite 0-1000 score aggregating skills, projects, proofs of work, dual grading, tokens, and challenge completions. At 850+ points, reverse placement unlocks where recruiters pitch directly to students.
 - **Verifiable Proof of Work:** Dual sign-off workflow (faculty + industry) with public QR verification badges.
 - **Skill Decay Engine:** Skills tracked with temporal decay (ACTIVE > STALE > EXPIRED) encouraging re-certification.
-- **AI-Powered Syllabus Audit:** Pattern-matching engine detects outdated academic topics, augmented by Gemini LLM when configured.
 - **Dual Grading:** Two-dimensional evaluation of lab unit work (academic marks + job readiness scores).
-- **Token Economy:** Students earn and spend skill tokens for mentorship sessions, code clinics, and other services.
+- **Token Economy:** Students earn and spend skill tokens for mentorship sessions, office hours, code clinics, and other services.
+
+### Collaboration
 - **Challenge Marketplace:** Industry partners post capstone, R&D, and micro-consultancy challenges for student teams.
+- **Lab Units:** Faculty-led student teams formed around industry challenges with structured workflows.
+- **Mentor Slots:** Industry professionals offer time-slotted mentorship sessions bookable by students.
+- **Office Hours:** Token-based 15-minute booking system for student-mentor 1:1 sessions.
+
+### Learning & Development
+- **AI-Powered Syllabus Audit:** Pattern-matching engine detects outdated academic topics, augmented by Gemini LLM when configured.
+- **Skill Assessments:** Student skill evaluations with decay tracking and verification status.
+- **Internship Marketplace:** Industry posts learning programs (internships, apprenticeships, training, certifications, workshops) with skill-match scoring for students.
+- **Faculty Development Programs:** Industry-hosted FDPs, consultancy, and research opportunities for faculty.
+
+### Career & Placement
+- **Reverse Placement:** High-PRI students (>850) are pitched to directly by recruiters instead of traditional campus placement.
+- **Job Pitches:** Industry partners send tailored job offers with stipend and role details to specific students.
+- **Skill Heatmap (TPO):** Department-wise skill gap analysis comparing student scores against hiring benchmarks with bootcamp recommendations.
+- **Placement Tracker:** Real-time status tracking of all job pitches (pitched > shortlisted > offered > accepted).
+- **Digital Portfolio:** Students showcase verified skills, certifications, projects, proofs of work, and uploaded documents.
+
+### Platform
+- **Analytics Dashboard:** Aggregate platform stats -- user distribution, project status, pitch metrics, and average skill scores.
+- **Partner Directory:** Browse registered industry partner companies by department and location.
+- **Dark / Light Mode:** Full theme support via next-themes.
 
 ## Getting Started
 
@@ -43,6 +68,23 @@ npm run dev
 ```
 
 Open [http://localhost:3000](http://localhost:3000). Use the demo login buttons to sign in as any role (password: `Password@123`).
+
+## Project Structure
+
+```
+src/
+  app/
+    (app)/          # Authenticated routes (25 pages)
+    api/            # API routes (PRI computation, syllabus audit)
+    login/          # Login page
+    signup/         # Signup page
+    verify/         # Email verification
+  components/       # Shared UI components (Badge, Button, Card, Avatar, etc.)
+  lib/              # Core logic (auth, PRI engine, QR codes, syllabus audit, Prisma client)
+prisma/
+  schema.prisma     # Database schema (20+ models)
+  seed.ts           # Demo data seeder
+```
 
 ## Environment Variables
 
