@@ -2,7 +2,7 @@
 
 import Link from "next/link";
 import { usePathname } from "next/navigation";
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { useTheme } from "next-themes";
 import { GraduationCap, Menu, X, Sun, Moon, Monitor } from "lucide-react";
 import type { SessionUser } from "@/lib/types";
@@ -18,14 +18,22 @@ function isActive(href: string, pathname: string): boolean {
 }
 
 function ThemeToggle() {
-  const { theme, setTheme } = useTheme();
+  const { theme, resolvedTheme, setTheme } = useTheme();
+  const [mounted, setMounted] = useState(false);
+  useEffect(() => {
+    const id = requestAnimationFrame(() => setMounted(true));
+    return () => cancelAnimationFrame(id);
+  }, []);
+
+  const current = resolvedTheme ?? theme ?? "light";
+
   return (
     <button
-      onClick={() => setTheme(theme === "dark" ? "light" : theme === "light" ? "system" : "dark")}
+      onClick={() => setTheme(current === "dark" ? "light" : current === "light" ? "system" : "dark")}
       aria-label="Toggle theme"
       className="flex size-8 items-center justify-center rounded-lg text-slate-500 transition-colors hover:bg-slate-100 dark:text-slate-400 dark:hover:bg-slate-700"
     >
-      {theme === "dark" ? <Sun className="size-4" /> : theme === "light" ? <Moon className="size-4" /> : <Monitor className="size-4" />}
+      {!mounted ? <Monitor className="size-4" /> : current === "dark" ? <Sun className="size-4" /> : <Moon className="size-4" />}
     </button>
   );
 }
