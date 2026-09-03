@@ -4,7 +4,7 @@ import Link from "next/link";
 import { usePathname } from "next/navigation";
 import { useEffect, useState } from "react";
 import { useTheme } from "next-themes";
-import { GraduationCap, Menu, X, Sun, Moon, Monitor, PanelLeftClose, PanelLeftOpen } from "lucide-react";
+import { GraduationCap, Menu, X, Sun, Moon, Monitor, ChevronLeft, ChevronRight } from "lucide-react";
 import type { SessionUser } from "@/lib/types";
 import { ROLE_LABELS, ROLE_COLORS } from "@/lib/types";
 import { NAV_ITEMS } from "@/lib/navigation";
@@ -131,9 +131,9 @@ function Brand({ collapsed = false, onToggle }: { collapsed?: boolean; onToggle?
           onClick={onToggle}
           aria-label="Collapse sidebar"
           title="Collapse sidebar"
-          className="flex size-8 items-center justify-center rounded-lg text-slate-400 transition-colors hover:bg-slate-100 hover:text-slate-700 dark:hover:bg-slate-800 dark:hover:text-slate-200"
+          className="flex size-7 items-center justify-center rounded-md text-slate-400 transition-colors hover:bg-slate-100 hover:text-slate-700 dark:hover:bg-slate-800 dark:hover:text-slate-200"
         >
-          <PanelLeftClose className="size-4.5" />
+          <ChevronLeft className="size-4.5" />
         </button>
       )}
     </div>
@@ -234,14 +234,14 @@ export function AppShell({ user, children }: { user: SessionUser; children: Reac
               <Menu aria-hidden className="size-5" />
             </button>
 
-            {/* Desktop Expand & Merge / Collapse Sidebar Button */}
+            {/* Desktop Expand & Merge / Collapse Sidebar Button (< and >) */}
             <button
               onClick={() => setCollapsed(!collapsed)}
               aria-label={collapsed ? "Expand sidebar" : "Collapse sidebar"}
               title={collapsed ? "Expand sidebar" : "Collapse sidebar"}
-              className="hidden size-9 shrink-0 items-center justify-center rounded-lg text-slate-500 transition-colors hover:bg-slate-100 hover:text-slate-800 dark:text-slate-400 dark:hover:bg-slate-800 dark:hover:text-slate-100 lg:flex"
+              className="hidden size-8 shrink-0 items-center justify-center rounded-lg text-slate-500 transition-colors hover:bg-slate-100 hover:text-slate-800 dark:text-slate-400 dark:hover:bg-slate-800 dark:hover:text-slate-100 lg:flex"
             >
-              {collapsed ? <PanelLeftOpen className="size-5" /> : <PanelLeftClose className="size-5" />}
+              {collapsed ? <ChevronRight className="size-5" /> : <ChevronLeft className="size-5" />}
             </button>
 
             <div className="hidden min-w-0 lg:block">
