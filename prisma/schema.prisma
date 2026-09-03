@@ -1,0 +1,419 @@
+generator client {
+  provider = "prisma-client"
+  output   = "../src/generated/prisma"
+}
+
+datasource db {
+  provider = "sqlite"
+  url      = env("DATABASE_URL")
+}
+
+model User {
+  id           String   @id @default(cuid())
+  email        String   @unique
+  passwordHash String
+  name         String
+  role         String
+  isActive     Boolean  @default(true)
+  createdAt    DateTime @default(now())
+  updatedAt    DateTime @updatedAt
+
+  profile          Profile?
+  projects         Project[]           @relation("ProjectOwner")
+  proofsOfWork     ProofOfWork[]       @relation("StudentProofs")
+  assessments      SkillAssessment[]
+  ledger           TokenLedger[]
+  mentorSlots      MentorSlot[]        @relation("MentorIndustry")
+  studentSlots     MentorSlot[]        @relation("MentorStudent")
+  jobPitches       JobPitch[]          @relation("PitchIndustry")
+  studentPitches   JobPitch[]          @relation("PitchStudent")
+  challenges       IndustryChallenge[] @relation("ChallengeIndustry")
+  labUnitsLed      LabUnit[]           @relation("LabUnitFaculty")
+  labMemberships   LabUnitMember[]
+  gradings         DualGrading[]       @relation("GradingFaculty")
+  industryGradings DualGrading[]       @relation("GradingIndustry")
+  sabbaticalListings SabbaticalListing[]
+  learningPrograms   LearningProgram[]
+  facultyPrograms    FacultyProgramListing[]
+  portfolioItems     PortfolioItem[]
+  applications       InternshipApplication[]
+  facultyProgramApplications FacultyProgramApplication[]
+  documents          UserDocument[]
+
+  @@map("users")
+}
+
+model Profile {
+  id          String   @id @default(cuid())
+  userId      String   @unique
+  user        User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  bio         String?
+  department  String?
+  companyName String?
+  designation String?
+  skills      String?
+  location    String?
+  phone       String?
+  avatarUrl   String?
+  year        Int?
+  rollNumber  String?
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+
+  @@map("profiles")
+}
+
+model Syllabus {
+  id                String    @id @default(cuid())
+  title             String
+  department        String
+  topicsJson        String
+  obsolescenceScore Float     @default(0)
+  reviewCount       Int       @default(0)
+  lastReviewedAt    DateTime?
+  createdAt         DateTime  @default(now())
+  updatedAt         DateTime  @updatedAt
+
+  @@map("syllabi")
+}
+
+model Project {
+  id          String   @id @default(cuid())
+  title       String
+  description String
+  status      String   @default("DRAFT")
+  projectType String
+  ownerId     String
+  owner       User     @relation("ProjectOwner", fields: [ownerId], references: [id], onDelete: Cascade)
+  domain      String?
+  techStack   String?
+  objectives  String?
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+
+  proofsOfWork ProofOfWork[]
+
+  @@map("projects")
+}
+
+model ProofOfWork {
+  id              String   @id @default(cuid())
+  studentId       String
+  student         User     @relation("StudentProofs", fields: [studentId], references: [id], onDelete: Cascade)
+  projectId       String
+  project         Project  @relation(fields: [projectId], references: [id], onDelete: Cascade)
+  artifactUrl     String?
+  description     String?
+  facultySignOff  String   @default("PENDING")
+  industrySignOff String   @default("PENDING")
+  badgeQrCode     String?
+  publicToken     String?  @unique
+  issuedAt        DateTime?
+  createdAt       DateTime @default(now())
+  updatedAt       DateTime @updatedAt
+
+  @@index([studentId])
+  @@index([projectId])
+  @@map("proofs_of_work")
+}
+
+model SkillAssessment {
+  id             String   @id @default(cuid())
+  studentId      String
+  student        User     @relation(fields: [studentId], references: [id], onDelete: Cascade)
+  skillName      String
+  score          Int
+  verifiedAt     DateTime?
+  decayStatus    String   @default("ACTIVE")
+  lastAssessedAt DateTime @default(now())
+  createdAt      DateTime @default(now())
+  updatedAt      DateTime @updatedAt
+
+  @@index([studentId])
+  @@map("skill_assessments")
+}
+
+model TokenLedger {
+  id        String   @id @default(cuid())
+  studentId String
+  student   User     @relation(fields: [studentId], references: [id], onDelete: Cascade)
+  balance   Int      @default(0)
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  transactions TokenTransaction[]
+
+  @@map("token_ledgers")
+}
+
+model TokenTransaction {
+  id        String      @id @default(cuid())
+  ledgerId  String
+  ledger    TokenLedger @relation(fields: [ledgerId], references: [id], onDelete: Cascade)
+  amount    Int
+  type      String
+  reason    String?
+  createdAt DateTime    @default(now())
+
+  @@map("token_transactions")
+}
+
+model MentorSlot {
+  id           String   @id @default(cuid())
+  industryId   String
+  industry     User     @relation("MentorIndustry", fields: [industryId], references: [id], onDelete: Cascade)
+  studentId    String?
+  student      User?    @relation("MentorStudent", fields: [studentId], references: [id], onDelete: SetNull)
+  timeSlot     DateTime
+  durationMins Int      @default(30)
+  topic        String?
+  status       String   @default("AVAILABLE")
+  createdAt    DateTime @default(now())
+  updatedAt    DateTime @updatedAt
+
+  @@index([industryId])
+  @@index([studentId])
+  @@map("mentor_slots")
+}
+
+model JobPitch {
+  id          String   @id @default(cuid())
+  industryId  String
+  industry    User     @relation("PitchIndustry", fields: [industryId], references: [id], onDelete: Cascade)
+  studentId   String
+  student     User     @relation("PitchStudent", fields: [studentId], references: [id], onDelete: Cascade)
+  priScore    Float    @default(0)
+  status      String   @default("PITCHED")
+  stipend     Int?
+  roleDetails String?
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+
+  @@index([industryId])
+  @@index([studentId])
+  @@map("job_pitches")
+}
+
+model IndustryChallenge {
+  id            String   @id @default(cuid())
+  industryId    String
+  industry      User     @relation("ChallengeIndustry", fields: [industryId], references: [id], onDelete: Cascade)
+  title         String
+  description   String
+  challengeType String
+  domain        String?
+  techStack     String?
+  objectives    String?
+  stipend       Int?
+  status        String   @default("OPEN")
+  deadline      DateTime?
+  rndOnly       Boolean  @default(false)
+  createdAt     DateTime @default(now())
+  updatedAt     DateTime @updatedAt
+
+  labUnits     LabUnit[]
+  applications ChallengeApplication[]
+  gradings     DualGrading[]
+
+  @@index([industryId])
+  @@map("challenges")
+}
+
+model ChallengeApplication {
+  id          String            @id @default(cuid())
+  challengeId String
+  challenge   IndustryChallenge @relation(fields: [challengeId], references: [id], onDelete: Cascade)
+  labUnitId   String
+  labUnit     LabUnit           @relation(fields: [labUnitId], references: [id], onDelete: Cascade)
+  proposal    String?
+  status      String            @default("SUBMITTED")
+  createdAt   DateTime          @default(now())
+  updatedAt   DateTime          @updatedAt
+
+  @@unique([challengeId, labUnitId])
+  @@map("challenge_applications")
+}
+
+model LabUnit {
+  id          String             @id @default(cuid())
+  name        String
+  facultyId   String
+  faculty     User               @relation("LabUnitFaculty", fields: [facultyId], references: [id], onDelete: Cascade)
+  challengeId String?
+  challenge   IndustryChallenge? @relation(fields: [challengeId], references: [id], onDelete: SetNull)
+  status      String             @default("FORMING")
+  createdAt   DateTime           @default(now())
+  updatedAt   DateTime           @updatedAt
+
+  members      LabUnitMember[]
+  applications ChallengeApplication[]
+  gradings     DualGrading[]
+
+  @@index([facultyId])
+  @@map("lab_units")
+}
+
+model LabUnitMember {
+  id        String   @id @default(cuid())
+  labUnitId String
+  labUnit   LabUnit  @relation(fields: [labUnitId], references: [id], onDelete: Cascade)
+  studentId String
+  student   User     @relation(fields: [studentId], references: [id], onDelete: Cascade)
+  createdAt DateTime @default(now())
+
+  @@unique([labUnitId, studentId])
+  @@map("lab_unit_members")
+}
+
+model DualGrading {
+  id                 String            @id @default(cuid())
+  challengeId        String
+  challenge          IndustryChallenge @relation(fields: [challengeId], references: [id], onDelete: Cascade)
+  labUnitId          String
+  labUnit            LabUnit           @relation(fields: [labUnitId], references: [id], onDelete: Cascade)
+  academicMarks      Int?
+  jobReadinessScore  Int?
+  facultyRemarks     String?
+  industryRemarks    String?
+  gradedByFacultyId  String?
+  gradedByFaculty    User?             @relation("GradingFaculty", fields: [gradedByFacultyId], references: [id], onDelete: SetNull)
+  gradedByIndustryId String?
+  gradedByIndustry   User?             @relation("GradingIndustry", fields: [gradedByIndustryId], references: [id], onDelete: SetNull)
+  submittedAt        DateTime?
+  createdAt          DateTime          @default(now())
+  updatedAt          DateTime          @updatedAt
+
+  @@unique([challengeId, labUnitId])
+  @@map("dual_gradings")
+}
+
+model HiringBenchmark {
+  id            String   @id @default(cuid())
+  department    String
+  year          Int
+  skillName     String
+  requiredScore Int
+  createdAt     DateTime @default(now())
+  updatedAt     DateTime @updatedAt
+
+  @@unique([department, year, skillName])
+  @@index([department])
+  @@map("hiring_benchmarks")
+}
+
+model SabbaticalListing {
+  id           String   @id @default(cuid())
+  companyId    String
+  company      User     @relation(fields: [companyId], references: [id], onDelete: Cascade)
+  title        String
+  description  String
+  domain       String?
+  duration     String?
+  location     String?
+  compensation String?
+  status       String   @default("OPEN")
+  createdAt    DateTime @default(now())
+  updatedAt    DateTime @updatedAt
+
+  @@index([companyId])
+  @@map("sabbatical_listings")
+}
+
+model LearningProgram {
+  id          String   @id @default(cuid())
+  companyId   String
+  company     User     @relation(fields: [companyId], references: [id], onDelete: Cascade)
+  title       String
+  description String
+  programType String
+  skills      String?
+  duration    String?
+  mode        String?
+  certification Boolean @default(false)
+  status      String   @default("OPEN")
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+  applications InternshipApplication[]
+
+  @@index([companyId])
+  @@map("learning_programs")
+}
+
+model FacultyProgramListing {
+  id           String   @id @default(cuid())
+  companyId    String
+  company      User     @relation(fields: [companyId], references: [id], onDelete: Cascade)
+  title        String
+  description  String
+  programType  String
+  domain       String?
+  duration     String?
+  location     String?
+  compensation String?
+  status       String   @default("OPEN")
+  createdAt    DateTime @default(now())
+  updatedAt    DateTime @updatedAt
+  applications FacultyProgramApplication[]
+
+  @@index([companyId])
+  @@map("faculty_program_listings")
+}
+
+model FacultyProgramApplication {
+  id               String                @id @default(cuid())
+  listingId        String
+  listing          FacultyProgramListing @relation(fields: [listingId], references: [id], onDelete: Cascade)
+  facultyId        String
+  faculty          User                  @relation(fields: [facultyId], references: [id], onDelete: Cascade)
+  message          String?
+  status           String                @default("APPLIED")
+  createdAt        DateTime              @default(now())
+  updatedAt        DateTime              @updatedAt
+
+  @@unique([listingId, facultyId])
+  @@map("faculty_program_applications")
+}
+
+model PortfolioItem {
+  id          String   @id @default(cuid())
+  studentId   String
+  student     User     @relation(fields: [studentId], references: [id], onDelete: Cascade)
+  type        String
+  title       String
+  description String?
+  issuer      String?
+  year        Int?
+  verified    Boolean  @default(false)
+  createdAt   DateTime @default(now())
+
+  @@index([studentId])
+  @@map("portfolio_items")
+}
+
+model UserDocument {
+  id        String   @id @default(cuid())
+  userId    String
+  user      User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  name      String
+  type      String
+  dataUrl   String
+  createdAt DateTime @default(now())
+
+  @@index([userId])
+  @@map("user_documents")
+}
+
+model InternshipApplication {
+  id         String   @id @default(cuid())
+  listingId  String
+  listing    LearningProgram @relation(fields: [listingId], references: [id], onDelete: Cascade)
+  studentId  String
+  student    User     @relation(fields: [studentId], references: [id], onDelete: Cascade)
+  message    String?
+  status     String   @default("APPLIED")
+  createdAt  DateTime @default(now())
+  updatedAt  DateTime @updatedAt
+
+  @@unique([listingId, studentId])
+  @@map("internship_applications")
+}

@@ -1,0 +1,390 @@
+"use client";
+
+import { useRef, useState, useTransition } from "react";
+import { Camera, CheckCircle, FileText, Loader2, Trash2, Upload, User, X } from "lucide-react";
+import { updateProfileAction, uploadDocumentAction, deleteDocumentAction, type ProfileState } from "./actions";
+import { Avatar, Card, CardHeader } from "@/components/ui";
+
+interface ProfileDoc {
+  id: string;
+  name: string;
+  type: string;
+  dataUrl: string;
+}
+
+interface ProfileData {
+  name: string;
+  email: string;
+  role: string;
+  bio: string;
+  phone: string;
+  location: string;
+  department: string;
+  year: number | null;
+  rollNumber: string;
+  skills: string;
+  avatarUrl: string | null;
+  documents: ProfileDoc[];
+}
+
+export default function ProfileClient({ profile }: { profile: ProfileData }) {
+  const [state, setState] = useState<ProfileState | null>(null);
+  const [pending, startTransition] = useTransition();
+  const [preview, setPreview] = useState<string | null>(profile.avatarUrl);
+  const [hasRemoved, setHasRemoved] = useState(false);
+  const [docState, setDocState] = useState<ProfileState | null>(null);
+  const [docPending, setDocPending] = useState(false);
+  const [deletePending, setDeletePending] = useState<string | null>(null);
+  const fileRef = useRef<HTMLInputElement>(null);
+  const docFormRef = useRef<HTMLFormElement>(null);
+
+  function handleFileChange(e: React.ChangeEvent<HTMLInputElement>) {
+    const file = e.target.files?.[0];
+    if (!file) return;
+    if (file.size > 2 * 1024 * 1024) return;
+    const reader = new FileReader();
+    reader.onload = () => setPreview(reader.result as string);
+    reader.readAsDataURL(file);
+    setHasRemoved(false);
+  }
+
+  function handleRemovePhoto() {
+    setPreview(null);
+    setHasRemoved(true);
+    if (fileRef.current) fileRef.current.value = "";
+  }
+
+  function handleSubmit(e: React.FormEvent<HTMLFormElement>) {
+    e.preventDefault();
+    const formData = new FormData(e.currentTarget);
+    if (hasRemoved) {
+      formData.set("avatar", "");
+    }
+    startTransition(async () => {
+      try {
+        const result = await updateProfileAction(null, formData);
+        setState(result);
+      } catch {
+        setState({ error: "Profile update failed. Please try again." });
+      }
+    });
+  }
+
+  function handleDocUpload(e: React.FormEvent<HTMLFormElement>) {
+    e.preventDefault();
+    const formData = new FormData(e.currentTarget);
+    setDocPending(true);
+    uploadDocumentAction(null, formData)
+      .then((result) => {
+        setDocState(result);
+        if (docFormRef.current) docFormRef.current.reset();
+      })
+      .catch(() => {
+        setDocState({ error: "Upload failed. Please try a smaller file." });
+      })
+      .finally(() => {
+        setDocPending(false);
+      });
+  }
+
+  function handleDeleteDoc(id: string) {
+    setDeletePending(id);
+    deleteDocumentAction(id).finally(() => setDeletePending(null));
+  }
+
+  return (
+    <div>
+      <div className="mb-6 flex flex-wrap items-end justify-between gap-4">
+        <div className="flex items-start gap-3">
+          <div className="mt-0.5 flex size-10 shrink-0 items-center justify-center rounded-xl bg-indigo-50 text-indigo-600 dark:bg-indigo-500/15 dark:text-indigo-400">
+            <User aria-hidden className="size-5" />
+          </div>
+          <div>
+            <h1 className="text-2xl font-bold tracking-tight text-slate-900 dark:text-slate-100">My Profile</h1>
+            <p className="mt-1 max-w-2xl text-sm text-slate-500 dark:text-slate-400">View and edit your personal information and documents.</p>
+          </div>
+        </div>
+      </div>
+
+      <div className="grid gap-6 lg:grid-cols-[1fr_2fr]">
+        {/* Avatar card */}
+        <Card className="flex flex-col items-center px-6 py-8">
+          {preview ? (
+            <img
+              src={preview}
+              alt={profile.name}
+              className="size-28 rounded-full object-cover ring-4 ring-white shadow-lg dark:ring-slate-900"
+            />
+          ) : (
+            <Avatar name={profile.name} size="lg" />
+          )}
+          <h2 className="mt-4 text-lg font-bold text-slate-900 dark:text-slate-100">{profile.name}</h2>
+          <p className="mt-1 text-sm text-slate-500 dark:text-slate-400">{profile.email}</p>
+          <span className="mt-3 inline-flex items-center rounded-full bg-blue-100 px-3 py-1 text-xs font-semibold text-blue-700 dark:bg-blue-500/15 dark:text-blue-300">
+            {profile.role}
+          </span>
+          {profile.department && (
+            <p className="mt-4 text-sm text-slate-600 dark:text-slate-300">
+              {profile.department}
+              {profile.year ? ` - Year ${profile.year}` : ""}
+            </p>
+          )}
+          {profile.rollNumber && (
+            <p className="mt-1 text-xs text-slate-400 dark:text-slate-500">Roll: {profile.rollNumber}</p>
+          )}
+        </Card>
+
+        <div className="space-y-6">
+          {/* Edit form */}
+          <Card>
+            <CardHeader title="Edit Profile" subtitle="Update your details below." icon={User} />
+            <form onSubmit={handleSubmit} className="space-y-5 p-5">
+              {/* Profile photo */}
+              <div>
+                <label className="mb-1.5 block text-sm font-medium text-slate-700 dark:text-slate-300">
+                  Profile Photo
+                </label>
+                <div className="flex items-center gap-4">
+                  <div className="relative">
+                    {preview ? (
+                      <img src={preview} alt="Preview" className="size-16 rounded-full object-cover ring-2 ring-slate-200 dark:ring-slate-600" />
+                    ) : (
+                      <div className="flex size-16 items-center justify-center rounded-full bg-slate-100 dark:bg-slate-800">
+                        <Camera aria-hidden className="size-6 text-slate-400" />
+                      </div>
+                    )}
+                  </div>
+                  <div className="flex flex-col gap-2">
+                    <label
+                      htmlFor="avatar"
+                      className="inline-flex h-9 cursor-pointer items-center justify-center gap-1.5 rounded-lg border border-slate-300 bg-white px-3 text-xs font-semibold text-slate-700 transition-all hover:border-slate-400 hover:bg-slate-50 dark:border-slate-600 dark:bg-surface dark:text-slate-300 dark:hover:border-slate-500"
+                    >
+                      <Camera aria-hidden className="size-3.5" />
+                      Choose photo
+                    </label>
+                    {preview && (
+                      <button
+                        type="button"
+                        onClick={handleRemovePhoto}
+                        className="inline-flex h-9 items-center justify-center gap-1.5 rounded-lg border border-slate-300 bg-white px-3 text-xs font-semibold text-slate-500 transition-all hover:border-red-300 hover:text-red-600 dark:border-slate-600 dark:bg-surface dark:text-slate-400 dark:hover:border-red-500/50 dark:hover:text-red-400"
+                      >
+                        <X aria-hidden className="size-3.5" />
+                        Remove
+                      </button>
+                    )}
+                  </div>
+                  <input
+                    ref={fileRef}
+                    id="avatar"
+                    name="avatar"
+                    type="file"
+                    accept="image/*"
+                    onChange={handleFileChange}
+                    className="sr-only"
+                  />
+                </div>
+                <p className="mt-2 text-xs text-slate-400 dark:text-slate-500">JPG or PNG, max 2 MB.</p>
+              </div>
+
+              <div className="grid gap-4 sm:grid-cols-2">
+                <div>
+                  <label htmlFor="name" className="mb-1.5 block text-sm font-medium text-slate-700 dark:text-slate-300">
+                    Full name
+                  </label>
+                  <input
+                    id="name"
+                    name="name"
+                    type="text"
+                    defaultValue={profile.name}
+                    required
+                    className="h-10 w-full rounded-xl border border-slate-300 bg-white px-3 text-sm text-slate-900 transition-colors focus:border-indigo-500 focus:ring-2 focus:ring-indigo-500/30 focus:outline-none dark:border-slate-600 dark:bg-surface dark:text-slate-100"
+                  />
+                </div>
+                <div>
+                  <label htmlFor="phone" className="mb-1.5 block text-sm font-medium text-slate-700 dark:text-slate-300">
+                    Phone
+                  </label>
+                  <input
+                    id="phone"
+                    name="phone"
+                    type="tel"
+                    defaultValue={profile.phone}
+                    placeholder="Optional"
+                    className="h-10 w-full rounded-xl border border-slate-300 bg-white px-3 text-sm text-slate-900 placeholder:text-slate-400 transition-colors focus:border-indigo-500 focus:ring-2 focus:ring-indigo-500/30 focus:outline-none dark:border-slate-600 dark:bg-surface dark:text-slate-100 dark:placeholder:text-slate-500"
+                  />
+                </div>
+              </div>
+
+              <div>
+                <label htmlFor="location" className="mb-1.5 block text-sm font-medium text-slate-700 dark:text-slate-300">
+                  Location
+                </label>
+                <input
+                  id="location"
+                  name="location"
+                  type="text"
+                  defaultValue={profile.location}
+                  placeholder="e.g. Bengaluru, India"
+                  className="h-10 w-full rounded-xl border border-slate-300 bg-white px-3 text-sm text-slate-900 placeholder:text-slate-400 transition-colors focus:border-indigo-500 focus:ring-2 focus:ring-indigo-500/30 focus:outline-none dark:border-slate-600 dark:bg-surface dark:text-slate-100 dark:placeholder:text-slate-500"
+                />
+              </div>
+
+              <div className="grid gap-4 sm:grid-cols-2">
+                <div>
+                  <label htmlFor="department" className="mb-1.5 block text-sm font-medium text-slate-700 dark:text-slate-300">
+                    Department
+                  </label>
+                  <input
+                    id="department"
+                    name="department"
+                    type="text"
+                    defaultValue={profile.department}
+                    placeholder="e.g. Computer Science"
+                    className="h-10 w-full rounded-xl border border-slate-300 bg-white px-3 text-sm text-slate-900 placeholder:text-slate-400 transition-colors focus:border-indigo-500 focus:ring-2 focus:ring-indigo-500/30 focus:outline-none dark:border-slate-600 dark:bg-surface dark:text-slate-100 dark:placeholder:text-slate-500"
+                  />
+                </div>
+                <div>
+                  <label htmlFor="year" className="mb-1.5 block text-sm font-medium text-slate-700 dark:text-slate-300">
+                    Year
+                  </label>
+                  <input
+                    id="year"
+                    name="year"
+                    type="number"
+                    min={1}
+                    max={5}
+                    defaultValue={profile.year ?? ""}
+                    placeholder="e.g. 4"
+                    className="h-10 w-full rounded-xl border border-slate-300 bg-white px-3 text-sm text-slate-900 placeholder:text-slate-400 transition-colors focus:border-indigo-500 focus:ring-2 focus:ring-indigo-500/30 focus:outline-none dark:border-slate-600 dark:bg-surface dark:text-slate-100 dark:placeholder:text-slate-500"
+                  />
+                </div>
+              </div>
+
+              <div>
+                <label htmlFor="rollNumber" className="mb-1.5 block text-sm font-medium text-slate-700 dark:text-slate-300">
+                  Roll Number
+                </label>
+                <input
+                  id="rollNumber"
+                  name="rollNumber"
+                  type="text"
+                  defaultValue={profile.rollNumber}
+                  placeholder="e.g. CS21B001"
+                  className="h-10 w-full rounded-xl border border-slate-300 bg-white px-3 text-sm text-slate-900 placeholder:text-slate-400 transition-colors focus:border-indigo-500 focus:ring-2 focus:ring-indigo-500/30 focus:outline-none dark:border-slate-600 dark:bg-surface dark:text-slate-100 dark:placeholder:text-slate-500"
+                />
+              </div>
+
+              <div>
+                <label htmlFor="skills" className="mb-1.5 block text-sm font-medium text-slate-700 dark:text-slate-300">
+                  Skills
+                </label>
+                <input
+                  id="skills"
+                  name="skills"
+                  type="text"
+                  defaultValue={profile.skills}
+                  placeholder="e.g. React, Python, Machine Learning"
+                  className="h-10 w-full rounded-xl border border-slate-300 bg-white px-3 text-sm text-slate-900 placeholder:text-slate-400 transition-colors focus:border-indigo-500 focus:ring-2 focus:ring-indigo-500/30 focus:outline-none dark:border-slate-600 dark:bg-surface dark:text-slate-100 dark:placeholder:text-slate-500"
+                />
+              </div>
+
+              <div>
+                <label htmlFor="bio" className="mb-1.5 block text-sm font-medium text-slate-700 dark:text-slate-300">
+                  Bio
+                </label>
+                <textarea
+                  id="bio"
+                  name="bio"
+                  rows={3}
+                  defaultValue={profile.bio}
+                  placeholder="Tell us about yourself…"
+                  className="w-full rounded-xl border border-slate-300 bg-white px-3 py-2.5 text-sm text-slate-900 placeholder:text-slate-400 transition-colors focus:border-indigo-500 focus:ring-2 focus:ring-indigo-500/30 focus:outline-none dark:border-slate-600 dark:bg-surface dark:text-slate-100 dark:placeholder:text-slate-500"
+                />
+              </div>
+
+              {state?.error && (
+                <p className="rounded-xl bg-red-50 px-3 py-2.5 text-sm text-red-600 dark:bg-red-500/15 dark:text-red-300" role="alert">
+                  {state.error}
+                </p>
+              )}
+
+              {state?.success && (
+                <p className="flex items-center gap-2 rounded-xl bg-emerald-50 px-3 py-2.5 text-sm text-emerald-600 dark:bg-emerald-500/15 dark:text-emerald-300">
+                  <CheckCircle aria-hidden className="size-4" />
+                  Profile updated successfully.
+                </p>
+              )}
+
+              <button
+                type="submit"
+                disabled={pending}
+                className="flex h-10 items-center justify-center gap-2 rounded-xl bg-indigo-600 px-5 text-sm font-semibold text-white shadow-sm transition-all hover:bg-indigo-700 active:scale-[0.98] disabled:opacity-60"
+              >
+                {pending && <Loader2 aria-hidden className="size-4 animate-spin" />}
+                {pending ? "Saving…" : "Save changes"}
+              </button>
+            </form>
+          </Card>
+
+          {/* Documents */}
+          <Card>
+            <CardHeader title="My Documents" subtitle="Upload your resume, certificates, and academic records." icon={FileText} />
+            <div className="p-5">
+              <form ref={docFormRef} onSubmit={handleDocUpload} className="flex flex-wrap items-end gap-3">
+                <div className="min-w-[140px] flex-1">
+                  <label htmlFor="docType" className="mb-1 block text-xs font-medium text-slate-600 dark:text-slate-300">Type</label>
+                  <select id="docType" name="type"
+                    className="h-10 w-full rounded-xl border border-slate-300 bg-white px-3 text-sm text-slate-900 focus:border-indigo-500 focus:outline-none dark:border-slate-600 dark:bg-surface dark:text-slate-100">
+                    <option value="Resume">Resume</option>
+                    <option value="Certificate">Certificate</option>
+                    <option value="Internship Report">Internship Report</option>
+                    <option value="Academic Record">Academic Record</option>
+                    <option value="Other">Other</option>
+                  </select>
+                </div>
+                <div className="min-w-[140px] flex-1">
+                  <label htmlFor="docFile" className="mb-1 block text-xs font-medium text-slate-600 dark:text-slate-300">File</label>
+                  <input id="docFile" name="file" type="file" required
+                    className="h-10 w-full text-sm text-slate-500 file:mr-2 file:h-9 file:rounded-lg file:border-0 file:bg-indigo-50 file:px-3 file:text-xs file:font-semibold file:text-indigo-700 file:hover:bg-indigo-100 dark:text-slate-400 dark:file:bg-indigo-500/15 dark:file:text-indigo-300" />
+                </div>
+                <button type="submit" disabled={docPending}
+                  className="inline-flex h-10 items-center justify-center gap-2 rounded-xl bg-indigo-600 px-4 text-sm font-semibold text-white hover:bg-indigo-700 disabled:opacity-60">
+                  {docPending ? <Loader2 className="size-4 animate-spin" /> : <Upload className="size-4" />} Upload
+                </button>
+              </form>
+              {docState?.success && <p className="mt-2 text-xs font-semibold text-emerald-600 dark:text-emerald-400">Document uploaded.</p>}
+              {docState?.error && <p className="mt-2 text-xs text-red-600 dark:text-red-400">{docState.error}</p>}
+
+              {profile.documents.length > 0 && (
+                <ul className="mt-4 space-y-2">
+                  {profile.documents.map((d) => (
+                    <li key={d.id} className="flex items-center justify-between rounded-xl border border-border-muted px-3 py-2">
+                      <a href={d.dataUrl} download={d.name} className="inline-flex min-w-0 items-center gap-2 text-sm font-medium text-slate-700 hover:text-indigo-600 dark:text-slate-300 dark:hover:text-indigo-400">
+                        <FileText className="size-4 shrink-0 text-slate-400" />
+                        <span className="truncate">{d.name}</span>
+                      </a>
+                      <div className="flex shrink-0 items-center gap-2">
+                        <span className="text-xs text-slate-400">{d.type}</span>
+                        <button
+                          onClick={() => handleDeleteDoc(d.id)}
+                          disabled={deletePending === d.id}
+                          aria-label="Delete document"
+                          className="flex size-7 items-center justify-center rounded-lg text-slate-300 transition-colors hover:bg-red-50 hover:text-red-600 disabled:opacity-50 dark:text-slate-600 dark:hover:bg-red-500/15 dark:hover:text-red-400"
+                        >
+                          <Trash2 className="size-3.5" />
+                        </button>
+                      </div>
+                    </li>
+                  ))}
+                </ul>
+              )}
+              {profile.documents.length === 0 && (
+                <p className="mt-4 text-sm text-slate-400 dark:text-slate-500">No documents uploaded yet.</p>
+              )}
+            </div>
+          </Card>
+        </div>
+      </div>
+    </div>
+  );
+}
