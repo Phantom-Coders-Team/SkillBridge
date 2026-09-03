@@ -111,20 +111,13 @@ function Brand({ collapsed = false, onToggle }: { collapsed?: boolean; onToggle?
   if (collapsed) {
     return (
       <div className="flex h-16 shrink-0 items-center justify-center border-b border-border-muted px-2">
-        {onToggle ? (
-          <button
-            onClick={onToggle}
-            aria-label="Expand sidebar"
-            title="Expand sidebar"
-            className="flex size-9 items-center justify-center rounded-xl text-slate-500 transition-colors hover:bg-slate-100 hover:text-slate-900 dark:text-slate-400 dark:hover:bg-slate-800 dark:hover:text-slate-100"
-          >
-            <ChevronRight className="size-5" />
-          </button>
-        ) : (
-          <span className="flex size-9 items-center justify-center rounded-xl bg-gradient-to-br from-indigo-600 to-violet-600 text-white shadow-sm">
-            <GraduationCap aria-hidden className="size-5" />
-          </span>
-        )}
+        <Link
+          href="/dashboard"
+          className="flex size-9 items-center justify-center rounded-xl bg-gradient-to-br from-indigo-600 to-violet-600 text-white shadow-sm transition-transform hover:scale-105"
+          title="Skill Bridge"
+        >
+          <GraduationCap aria-hidden className="size-5" />
+        </Link>
       </div>
     );
   }
@@ -247,6 +240,18 @@ export function AppShell({ user, children }: { user: SessionUser; children: Reac
             >
               <Menu aria-hidden className="size-5" />
             </button>
+
+            {/* Outside Expand Button: Only visible when sidebar is collapsed */}
+            {collapsed && (
+              <button
+                onClick={() => setCollapsed(false)}
+                aria-label="Expand sidebar"
+                title="Expand sidebar"
+                className="hidden size-8 shrink-0 items-center justify-center rounded-lg text-slate-500 transition-colors hover:bg-slate-100 hover:text-slate-800 dark:text-slate-400 dark:hover:bg-slate-800 dark:hover:text-slate-100 lg:flex"
+              >
+                <ChevronRight className="size-5" />
+              </button>
+            )}
 
             <div className="hidden min-w-0 lg:block">
               <p className="truncate text-sm font-semibold text-slate-900 dark:text-slate-100">{currentItem?.label ?? "Dashboard"}</p>
