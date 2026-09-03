@@ -4,7 +4,7 @@ import Link from "next/link";
 import { usePathname } from "next/navigation";
 import { useEffect, useState } from "react";
 import { useTheme } from "next-themes";
-import { GraduationCap, Menu, X, Sun, Moon, Monitor, ChevronLeft, ChevronRight, Sparkles, User } from "lucide-react";
+import { GraduationCap, Menu, X, Sun, Moon, Monitor, ChevronLeft, ChevronRight, Sparkles, User, Settings } from "lucide-react";
 import type { SessionUser } from "@/lib/types";
 import { ROLE_LABELS, ROLE_COLORS } from "@/lib/types";
 import { NAV_ITEMS } from "@/lib/navigation";
@@ -304,6 +304,17 @@ export function AppShell({ user, children }: { user: SessionUser; children: Reac
                     <div className="my-1.5 h-px bg-border-muted" />
 
                     <div className="space-y-1 py-1">
+                      {/* 1. My Profile at the top */}
+                      <Link
+                        href="/profile"
+                        onClick={() => setMenuOpen(false)}
+                        className="flex items-center gap-2.5 rounded-xl px-3 py-2 text-sm font-medium text-slate-700 transition-colors hover:bg-slate-100 dark:text-slate-300 dark:hover:bg-slate-800"
+                      >
+                        <User className="size-4 shrink-0 text-slate-400" />
+                        <span>My Profile</span>
+                      </Link>
+
+                      {/* 2. Skill Sync in the middle (for students) */}
                       {user.role === "STUDENT" && (
                         <Link
                           href="/sync"
@@ -315,13 +326,14 @@ export function AppShell({ user, children }: { user: SessionUser; children: Reac
                         </Link>
                       )}
 
+                      {/* 3. Settings below */}
                       <Link
                         href="/profile"
                         onClick={() => setMenuOpen(false)}
                         className="flex items-center gap-2.5 rounded-xl px-3 py-2 text-sm font-medium text-slate-700 transition-colors hover:bg-slate-100 dark:text-slate-300 dark:hover:bg-slate-800"
                       >
-                        <User className="size-4 shrink-0 text-slate-400" />
-                        <span>My Profile & Settings</span>
+                        <Settings className="size-4 shrink-0 text-slate-400" />
+                        <span>Settings</span>
                       </Link>
                     </div>
 
