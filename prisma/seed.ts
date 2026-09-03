@@ -106,6 +106,7 @@ async function main() {
     ["Wipro", "talent@wipro.com", "Technical Recruiter", "Talent Acquisition", "Wipro Limited, Bengaluru"],
     ["Zoho", "campus@zohocorp.com", "Engineering Manager", "Platform Engineering", "Zoho Corporation, Chennai"],
     ["HCLTech", "careers@hcltech.com", "Program Manager", "Innovation Labs", "HCL Technologies, Noida"],
+    ["All India Institute of Ayurveda (AIIA)", "research@aiia.gov.in", "Head of Digital Health & Innovation", "Ayush Bio-Informatics", "All India Institute of Ayurveda, New Delhi"],
   ];
 
   const industryUserIds: string[] = [];
@@ -405,6 +406,12 @@ async function main() {
       domain: "IoT / Digital Twin", tech: "Simulation, IoT", objs: "Real-time simulation, optimization algorithms",
       stipend: 10000, rnd: false, status: "OPEN", deadlineOffset: 40,
     },
+    {
+      ind: 5, title: "AyurVision: AI Botanical Identification & Adulteration Screening", type: "R_AND_D",
+      desc: "Develop a computer-vision and deep-learning pipeline to classify medicinal plants and detect commercial adulterants in raw herbal supplies for standard testing.",
+      domain: "AI / Ayush Informatics", tech: "PyTorch, OpenCV, FastAPI", objs: "Multi-class herb classification, mobile camera inference",
+      stipend: 22000, rnd: true, status: "OPEN", deadlineOffset: 35,
+    },
   ] as const;
 
   const createdChallenges: string[] = [];
@@ -643,6 +650,7 @@ async function main() {
     { ind: 3, title: "Cloud Foundations Training", type: "TRAINING", skills: "AWS,Docker,Linux", desc: "12-week sponsored training program covering cloud fundamentals with a guaranteed project placement.", duration: "12 weeks", mode: "Online", cert: true },
     { ind: 4, title: "Edge AI Professional Certification", type: "CERTIFICATION", skills: "TensorFlow,Computer Vision,C++", desc: "Industry-validated certification on deploying computer-vision models to edge devices.", duration: "8 weeks", mode: "Online", cert: true },
     { ind: 0, title: "Frontend Engineer Intake 2026", type: "ENTRY_JOB", skills: "React,TypeScript,HTML/CSS", desc: "New-grad frontend role crafting design systems and high-traffic customer experiences.", duration: "Full-time", mode: "Hybrid", cert: false },
+    { ind: 5, title: "Ayush Bio-Informatics & Quality Standardization Internship", type: "INTERNSHIP", skills: "Botanical AI Identification,Bioinformatics,Python", desc: "Collaborative research internship analyzing digitized herbal databases, pharmacovigilance reports, and clinical analytics under Ministry of Ayush guidelines.", duration: "6 months", mode: "Hybrid (New Delhi)", cert: true },
   ] as const;
 
   for (const lp of learningProgramDefs) {

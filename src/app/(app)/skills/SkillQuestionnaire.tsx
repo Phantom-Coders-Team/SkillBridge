@@ -22,6 +22,10 @@ const SKILL_GROUPS: { group: string; skills: string[] }[] = [
     skills: ["UI/UX Design", "Figma", "Product Management", "Wireframing", "Design Thinking"],
   },
   {
+    group: "Ayush & Health Informatics",
+    skills: ["Botanical AI Identification", "Clinical Trial Analytics", "Bioinformatics", "Digital Health Records (ABDM)", "Pharmacovigilance"],
+  },
+  {
     group: "Business & Soft Skills",
     skills: ["Communication", "Leadership", "Problem Solving", "Teamwork", "Project Management", "Public Speaking", "Writing"],
   },
