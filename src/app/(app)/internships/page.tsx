@@ -1,10 +1,11 @@
 import { redirect } from "next/navigation";
-import { Briefcase, Building2, GraduationCap, Sparkles } from "lucide-react";
+import { Briefcase, Building2, Users, Sparkles } from "lucide-react";
 import { getCurrentUser } from "@/lib/auth";
 import { prisma } from "@/lib/prisma";
 import { Badge, Card, EmptyState, PageHeader, type BadgeTone } from "@/components/ui";
 import PostOpportunityForm from "./PostOpportunityForm";
 import ApplyButton from "./ApplyButton";
+import ApplicationActions from "./ApplicationActions";
 import MatchBadge from "./MatchBadge";
 
 const TYPE_TONE: Record<string, BadgeTone> = {
@@ -25,7 +26,11 @@ export default async function InternshipsPage() {
     prisma.learningProgram.findMany({
       include: {
         company: { select: { name: true, profile: { select: { companyName: true } } } },
-        applications: { select: { studentId: true, status: true } },
+        applications: {
+          include: {
+            student: { select: { id: true, name: true, profile: { select: { department: true, rollNumber: true, skills: true } } } },
+          },
+        },
       },
       orderBy: { createdAt: "desc" },
     }),
@@ -124,10 +129,29 @@ export default async function InternshipsPage() {
                       <ApplyButton listingId={l.id} />
                     ))}
                   {user.role === "INDUSTRY" && (
-                    <div className="rounded-xl bg-slate-50 px-3 py-2 text-xs text-slate-500 dark:bg-slate-800 dark:text-slate-400">
-                      <span className="inline-flex items-center gap-1 font-medium">
-                        <GraduationCap className="size-3.5" /> {l.applications.length} applicant{l.applications.length !== 1 ? "s" : ""}
-                      </span>
+                    <div className="rounded-xl bg-slate-50 px-3 py-2 dark:bg-slate-800">
+                      {l.applications.length === 0 ? (
+                        <p className="text-xs text-slate-400 dark:text-slate-500">No applicants yet</p>
+                      ) : (
+                        <div className="space-y-2">
+                          <span className="inline-flex items-center gap-1 text-xs font-medium text-slate-500 dark:text-slate-400">
+                            <Users className="size-3.5" /> {l.applications.length} applicant{l.applications.length !== 1 ? "s" : ""}
+                          </span>
+                          {l.applications.map((app) => (
+                            <div key={app.id} className="flex items-center justify-between gap-2 border-t border-slate-200 pt-2 dark:border-slate-700">
+                              <div className="min-w-0">
+                                <p className="truncate text-xs font-medium text-slate-700 dark:text-slate-200">
+                                  {app.student.name}
+                                </p>
+                                <p className="truncate text-[11px] text-slate-400 dark:text-slate-500">
+                                  {app.student.profile?.department ?? "—"} · {app.student.profile?.rollNumber ?? ""}
+                                </p>
+                              </div>
+                              <ApplicationActions appId={app.id} currentStatus={app.status} />
+                            </div>
+                          ))}
+                        </div>
+                      )}
                     </div>
                   )}
                 </div>
