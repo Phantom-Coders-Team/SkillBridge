@@ -4,7 +4,7 @@ import Link from "next/link";
 import { usePathname } from "next/navigation";
 import { useEffect, useState } from "react";
 import { useTheme } from "next-themes";
-import { GraduationCap, Menu, X, Sun, Moon, Monitor } from "lucide-react";
+import { GraduationCap, Menu, X, Sun, Moon, Monitor, PanelLeftClose, PanelLeftOpen } from "lucide-react";
 import type { SessionUser } from "@/lib/types";
 import { ROLE_LABELS, ROLE_COLORS } from "@/lib/types";
 import { NAV_ITEMS } from "@/lib/navigation";
@@ -38,13 +38,25 @@ function ThemeToggle() {
   );
 }
 
-function NavList({ user, pathname, onNavigate }: { user: SessionUser; pathname: string; onNavigate?: () => void }) {
+function NavList({
+  user,
+  pathname,
+  collapsed = false,
+  onNavigate,
+}: {
+  user: SessionUser;
+  pathname: string;
+  collapsed?: boolean;
+  onNavigate?: () => void;
+}) {
   const items = NAV_ITEMS[user.role];
   return (
-    <nav className="flex-1 space-y-1 overflow-y-auto px-3 py-4">
-      <p className="px-3 pb-2 text-[11px] font-semibold uppercase tracking-wider text-slate-400 dark:text-slate-500">
-        Workspace
-      </p>
+    <nav className={cn("flex-1 space-y-1 overflow-y-auto py-4", collapsed ? "px-2" : "px-3")}>
+      {!collapsed && (
+        <p className="px-3 pb-2 text-[11px] font-semibold uppercase tracking-wider text-slate-400 dark:text-slate-500">
+          Workspace
+        </p>
+      )}
       {items.map((item) => {
         const active = isActive(item.href, pathname);
         const Icon = item.icon;
@@ -53,23 +65,27 @@ function NavList({ user, pathname, onNavigate }: { user: SessionUser; pathname: 
             key={item.href}
             href={item.href}
             onClick={onNavigate}
+            title={collapsed ? item.label : undefined}
             aria-current={active ? "page" : undefined}
             className={cn(
-              "group flex items-center gap-3 rounded-xl px-3 py-2.5 text-sm font-medium transition-colors",
+              "group flex items-center rounded-xl text-sm font-medium transition-all",
+              collapsed ? "justify-center p-2.5" : "gap-3 px-3 py-2.5",
               active
-                ? "bg-indigo-50 text-indigo-700 dark:bg-indigo-500/15 dark:text-indigo-400"
-                : "text-slate-600 hover:bg-slate-100 hover:text-slate-900 dark:text-slate-400 dark:hover:bg-slate-700 dark:hover:text-slate-200",
+                ? "bg-indigo-50 text-indigo-700 shadow-xs dark:bg-indigo-500/15 dark:text-indigo-400"
+                : "text-slate-600 hover:bg-slate-100 hover:text-slate-900 dark:text-slate-400 dark:hover:bg-slate-800 dark:hover:text-slate-200",
             )}
           >
             <Icon
               aria-hidden
               className={cn(
-                "size-4.5 shrink-0 transition-colors",
-                active ? "text-indigo-600 dark:text-indigo-400" : "text-slate-400 group-hover:text-slate-600 dark:text-slate-500 dark:group-hover:text-slate-300",
+                "size-5 shrink-0 transition-colors",
+                active
+                  ? "text-indigo-600 dark:text-indigo-400"
+                  : "text-slate-400 group-hover:text-slate-600 dark:text-slate-500 dark:group-hover:text-slate-300",
               )}
             />
-            <span className="truncate">{item.label}</span>
-            {active && <span className="ml-auto size-1.5 rounded-full bg-indigo-500 dark:bg-indigo-400" />}
+            {!collapsed && <span className="truncate">{item.label}</span>}
+            {!collapsed && active && <span className="ml-auto size-1.5 rounded-full bg-indigo-500 dark:bg-indigo-400" />}
           </Link>
         );
       })}
@@ -91,42 +107,80 @@ function UserAvatar({ user, size = "sm" }: { user: SessionUser; size?: "sm" | "m
   return <Avatar name={user.name} size={size} />;
 }
 
-function Sidebar({ user }: { user: SessionUser }) {
+function Brand({ collapsed = false, onToggle }: { collapsed?: boolean; onToggle?: () => void }) {
+  return (
+    <div
+      className={cn(
+        "flex h-16 shrink-0 items-center border-b border-border-muted transition-all",
+        collapsed ? "justify-center px-2" : "justify-between px-4",
+      )}
+    >
+      <Link href="/dashboard" className="flex items-center gap-3 overflow-hidden">
+        <span className="flex size-9 shrink-0 items-center justify-center rounded-xl bg-gradient-to-br from-indigo-600 to-violet-600 text-white shadow-sm">
+          <GraduationCap aria-hidden className="size-5" />
+        </span>
+        {!collapsed && (
+          <span className="leading-tight">
+            <span className="block text-sm font-bold tracking-tight text-slate-900 dark:text-slate-100">Skill Bridge</span>
+            <span className="block text-[11px] font-medium text-slate-500 dark:text-slate-400">Academia × Industry</span>
+          </span>
+        )}
+      </Link>
+      {onToggle && !collapsed && (
+        <button
+          onClick={onToggle}
+          aria-label="Collapse sidebar"
+          title="Collapse sidebar"
+          className="flex size-8 items-center justify-center rounded-lg text-slate-400 transition-colors hover:bg-slate-100 hover:text-slate-700 dark:hover:bg-slate-800 dark:hover:text-slate-200"
+        >
+          <PanelLeftClose className="size-4.5" />
+        </button>
+      )}
+    </div>
+  );
+}
+
+function Sidebar({
+  user,
+  collapsed = false,
+  onToggle,
+}: {
+  user: SessionUser;
+  collapsed?: boolean;
+  onToggle?: () => void;
+}) {
   const pathname = usePathname();
   return (
     <div className="flex h-full flex-col">
-      <Brand />
-      <NavList user={user} pathname={pathname} />
-      <div className="border-t border-border-muted p-3">
-        <div className="flex items-center gap-3 rounded-xl px-2 py-2">
-                <UserAvatar user={user} />
-          <div className="min-w-0 flex-1">
-            <p className="truncate text-sm font-semibold text-slate-900 dark:text-slate-100">{user.name}</p>
-            <p className="truncate text-xs text-slate-500 dark:text-slate-400">{ROLE_LABELS[user.role]}</p>
-          </div>
-          <LogoutButton />
+      <Brand collapsed={collapsed} onToggle={onToggle} />
+      <NavList user={user} pathname={pathname} collapsed={collapsed} />
+      <div className="border-t border-border-muted p-2.5">
+        <div
+          className={cn(
+            "flex items-center gap-3 rounded-xl py-2",
+            collapsed ? "justify-center px-0" : "px-2",
+          )}
+          title={collapsed ? `${user.name} (${ROLE_LABELS[user.role]})` : undefined}
+        >
+          <UserAvatar user={user} />
+          {!collapsed && (
+            <>
+              <div className="min-w-0 flex-1">
+                <p className="truncate text-sm font-semibold text-slate-900 dark:text-slate-100">{user.name}</p>
+                <p className="truncate text-xs text-slate-500 dark:text-slate-400">{ROLE_LABELS[user.role]}</p>
+              </div>
+              <LogoutButton />
+            </>
+          )}
         </div>
       </div>
     </div>
   );
 }
 
-function Brand() {
-  return (
-    <Link href="/dashboard" className="flex h-16 shrink-0 items-center gap-3 border-b border-border-muted px-5">
-      <span className="flex size-9 items-center justify-center rounded-xl bg-gradient-to-br from-indigo-600 to-violet-600 text-white shadow-sm">
-        <GraduationCap aria-hidden className="size-5" />
-      </span>
-      <span className="leading-tight">
-        <span className="block text-sm font-bold tracking-tight text-slate-900 dark:text-slate-100">Skill Bridge</span>
-        <span className="block text-[11px] font-medium text-slate-500 dark:text-slate-400">Academia × Industry</span>
-      </span>
-    </Link>
-  );
-}
-
 export function AppShell({ user, children }: { user: SessionUser; children: React.ReactNode }) {
   const pathname = usePathname();
+  const [collapsed, setCollapsed] = useState(false);
   const [drawerOpen, setDrawerOpen] = useState(false);
   const [menuOpen, setMenuOpen] = useState(false);
 
@@ -134,9 +188,14 @@ export function AppShell({ user, children }: { user: SessionUser; children: Reac
 
   return (
     <div className="flex min-h-screen bg-[--background]">
-      {/* Desktop sidebar */}
-      <aside className="sticky top-0 hidden h-screen w-60 shrink-0 border-r border-border-muted bg-surface lg:block">
-        <Sidebar user={user} />
+      {/* Desktop sidebar with collapse/expand */}
+      <aside
+        className={cn(
+          "sticky top-0 hidden h-screen shrink-0 border-r border-border-muted bg-surface transition-all duration-300 ease-in-out lg:block",
+          collapsed ? "w-20" : "w-64",
+        )}
+      >
+        <Sidebar user={user} collapsed={collapsed} onToggle={() => setCollapsed(!collapsed)} />
       </aside>
 
       {/* Mobile drawer */}
@@ -157,7 +216,7 @@ export function AppShell({ user, children }: { user: SessionUser; children: Reac
                 <X aria-hidden className="size-5" />
               </button>
             </div>
-            <Sidebar user={user} />
+            <Sidebar user={user} collapsed={false} />
           </aside>
         </div>
       )}
@@ -166,6 +225,7 @@ export function AppShell({ user, children }: { user: SessionUser; children: Reac
         {/* Top bar */}
         <header className="sticky top-0 z-20 flex h-16 items-center justify-between gap-3 border-b border-border-muted bg-surface/85 px-4 backdrop-blur-md sm:px-6 dark:bg-surface/90">
           <div className="flex min-w-0 items-center gap-3">
+            {/* Mobile hamburger menu */}
             <button
               onClick={() => setDrawerOpen(true)}
               aria-label="Open menu"
@@ -173,6 +233,17 @@ export function AppShell({ user, children }: { user: SessionUser; children: Reac
             >
               <Menu aria-hidden className="size-5" />
             </button>
+
+            {/* Desktop Expand & Merge / Collapse Sidebar Button */}
+            <button
+              onClick={() => setCollapsed(!collapsed)}
+              aria-label={collapsed ? "Expand sidebar" : "Collapse sidebar"}
+              title={collapsed ? "Expand sidebar" : "Collapse sidebar"}
+              className="hidden size-9 shrink-0 items-center justify-center rounded-lg text-slate-500 transition-colors hover:bg-slate-100 hover:text-slate-800 dark:text-slate-400 dark:hover:bg-slate-800 dark:hover:text-slate-100 lg:flex"
+            >
+              {collapsed ? <PanelLeftOpen className="size-5" /> : <PanelLeftClose className="size-5" />}
+            </button>
+
             <div className="hidden min-w-0 lg:block">
               <p className="truncate text-sm font-semibold text-slate-900 dark:text-slate-100">{currentItem?.label ?? "Dashboard"}</p>
               <p className="text-xs text-slate-500 dark:text-slate-400">Welcome back, {user.name.split(" ")[0]}</p>
@@ -203,7 +274,7 @@ export function AppShell({ user, children }: { user: SessionUser; children: Reac
                 aria-expanded={menuOpen}
                 className="flex items-center gap-2 rounded-full border border-transparent p-1 transition-colors hover:border-border-muted"
               >
-          <UserAvatar user={user} />
+                <UserAvatar user={user} />
               </button>
 
               {menuOpen && (
