@@ -107,12 +107,12 @@ function UserAvatar({ user, size = "sm" }: { user: SessionUser; size?: "sm" | "m
   return <Avatar name={user.name} size={size} />;
 }
 
-function Brand({ collapsed = false, onToggle }: { collapsed?: boolean; onToggle?: () => void }) {
+function Brand({ collapsed = false }: { collapsed?: boolean }) {
   return (
     <div
       className={cn(
         "flex h-16 shrink-0 items-center border-b border-border-muted transition-all",
-        collapsed ? "justify-center px-2" : "justify-between px-4",
+        collapsed ? "justify-center px-2" : "px-4",
       )}
     >
       <Link href="/dashboard" className="flex items-center gap-3 overflow-hidden">
@@ -126,16 +126,6 @@ function Brand({ collapsed = false, onToggle }: { collapsed?: boolean; onToggle?
           </span>
         )}
       </Link>
-      {onToggle && !collapsed && (
-        <button
-          onClick={onToggle}
-          aria-label="Collapse sidebar"
-          title="Collapse sidebar"
-          className="flex size-7 items-center justify-center rounded-md text-slate-400 transition-colors hover:bg-slate-100 hover:text-slate-700 dark:hover:bg-slate-800 dark:hover:text-slate-200"
-        >
-          <ChevronLeft className="size-4.5" />
-        </button>
-      )}
     </div>
   );
 }
@@ -143,16 +133,14 @@ function Brand({ collapsed = false, onToggle }: { collapsed?: boolean; onToggle?
 function Sidebar({
   user,
   collapsed = false,
-  onToggle,
 }: {
   user: SessionUser;
   collapsed?: boolean;
-  onToggle?: () => void;
 }) {
   const pathname = usePathname();
   return (
     <div className="flex h-full flex-col">
-      <Brand collapsed={collapsed} onToggle={onToggle} />
+      <Brand collapsed={collapsed} />
       <NavList user={user} pathname={pathname} collapsed={collapsed} />
       <div className="border-t border-border-muted p-2.5">
         <div
@@ -195,7 +183,7 @@ export function AppShell({ user, children }: { user: SessionUser; children: Reac
           collapsed ? "w-20" : "w-64",
         )}
       >
-        <Sidebar user={user} collapsed={collapsed} onToggle={() => setCollapsed(!collapsed)} />
+        <Sidebar user={user} collapsed={collapsed} />
       </aside>
 
       {/* Mobile drawer */}
