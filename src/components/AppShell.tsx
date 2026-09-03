@@ -107,25 +107,49 @@ function UserAvatar({ user, size = "sm" }: { user: SessionUser; size?: "sm" | "m
   return <Avatar name={user.name} size={size} />;
 }
 
-function Brand({ collapsed = false }: { collapsed?: boolean }) {
+function Brand({ collapsed = false, onToggle }: { collapsed?: boolean; onToggle?: () => void }) {
+  if (collapsed) {
+    return (
+      <div className="flex h-16 shrink-0 items-center justify-center border-b border-border-muted px-2">
+        {onToggle ? (
+          <button
+            onClick={onToggle}
+            aria-label="Expand sidebar"
+            title="Expand sidebar"
+            className="flex size-9 items-center justify-center rounded-xl text-slate-500 transition-colors hover:bg-slate-100 hover:text-slate-900 dark:text-slate-400 dark:hover:bg-slate-800 dark:hover:text-slate-100"
+          >
+            <ChevronRight className="size-5" />
+          </button>
+        ) : (
+          <span className="flex size-9 items-center justify-center rounded-xl bg-gradient-to-br from-indigo-600 to-violet-600 text-white shadow-sm">
+            <GraduationCap aria-hidden className="size-5" />
+          </span>
+        )}
+      </div>
+    );
+  }
+
   return (
-    <div
-      className={cn(
-        "flex h-16 shrink-0 items-center border-b border-border-muted transition-all",
-        collapsed ? "justify-center px-2" : "px-4",
-      )}
-    >
+    <div className="flex h-16 shrink-0 items-center justify-between border-b border-border-muted px-4">
       <Link href="/dashboard" className="flex items-center gap-3 overflow-hidden">
         <span className="flex size-9 shrink-0 items-center justify-center rounded-xl bg-gradient-to-br from-indigo-600 to-violet-600 text-white shadow-sm">
           <GraduationCap aria-hidden className="size-5" />
         </span>
-        {!collapsed && (
-          <span className="leading-tight">
-            <span className="block text-sm font-bold tracking-tight text-slate-900 dark:text-slate-100">Skill Bridge</span>
-            <span className="block text-[11px] font-medium text-slate-500 dark:text-slate-400">Academia × Industry</span>
-          </span>
-        )}
+        <span className="leading-tight">
+          <span className="block text-sm font-bold tracking-tight text-slate-900 dark:text-slate-100">Skill Bridge</span>
+          <span className="block text-[11px] font-medium text-slate-500 dark:text-slate-400">Academia × Industry</span>
+        </span>
       </Link>
+      {onToggle && (
+        <button
+          onClick={onToggle}
+          aria-label="Collapse sidebar"
+          title="Collapse sidebar"
+          className="flex size-7 items-center justify-center rounded-md text-slate-400 transition-colors hover:bg-slate-100 hover:text-slate-700 dark:hover:bg-slate-800 dark:hover:text-slate-200"
+        >
+          <ChevronLeft className="size-4.5" />
+        </button>
+      )}
     </div>
   );
 }
@@ -133,14 +157,16 @@ function Brand({ collapsed = false }: { collapsed?: boolean }) {
 function Sidebar({
   user,
   collapsed = false,
+  onToggle,
 }: {
   user: SessionUser;
   collapsed?: boolean;
+  onToggle?: () => void;
 }) {
   const pathname = usePathname();
   return (
     <div className="flex h-full flex-col">
-      <Brand collapsed={collapsed} />
+      <Brand collapsed={collapsed} onToggle={onToggle} />
       <NavList user={user} pathname={pathname} collapsed={collapsed} />
       <div className="border-t border-border-muted p-2.5">
         <div
@@ -183,7 +209,7 @@ export function AppShell({ user, children }: { user: SessionUser; children: Reac
           collapsed ? "w-20" : "w-64",
         )}
       >
-        <Sidebar user={user} collapsed={collapsed} />
+        <Sidebar user={user} collapsed={collapsed} onToggle={() => setCollapsed(!collapsed)} />
       </aside>
 
       {/* Mobile drawer */}
@@ -220,16 +246,6 @@ export function AppShell({ user, children }: { user: SessionUser; children: Reac
               className="flex size-9 shrink-0 items-center justify-center rounded-lg text-slate-600 hover:bg-slate-100 dark:text-slate-400 dark:hover:bg-slate-700 lg:hidden"
             >
               <Menu aria-hidden className="size-5" />
-            </button>
-
-            {/* Desktop Expand & Merge / Collapse Sidebar Button (< and >) */}
-            <button
-              onClick={() => setCollapsed(!collapsed)}
-              aria-label={collapsed ? "Expand sidebar" : "Collapse sidebar"}
-              title={collapsed ? "Expand sidebar" : "Collapse sidebar"}
-              className="hidden size-8 shrink-0 items-center justify-center rounded-lg text-slate-500 transition-colors hover:bg-slate-100 hover:text-slate-800 dark:text-slate-400 dark:hover:bg-slate-800 dark:hover:text-slate-100 lg:flex"
-            >
-              {collapsed ? <ChevronRight className="size-5" /> : <ChevronLeft className="size-5" />}
             </button>
 
             <div className="hidden min-w-0 lg:block">
