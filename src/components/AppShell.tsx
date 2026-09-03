@@ -328,7 +328,7 @@ export function AppShell({ user, children }: { user: SessionUser; children: Reac
 
                       {/* 3. Settings below */}
                       <Link
-                        href="/profile"
+                        href="/settings"
                         onClick={() => setMenuOpen(false)}
                         className="flex items-center gap-2.5 rounded-xl px-3 py-2 text-sm font-medium text-slate-700 transition-colors hover:bg-slate-100 dark:text-slate-300 dark:hover:bg-slate-800"
                       >

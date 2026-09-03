@@ -29,6 +29,7 @@ const PROTECTED_PREFIXES = [
   "/partners",
   "/analytics",
   "/sync",
+  "/settings",
 ];
 
 const AUTH_PAGES = ["/login", "/signup"];
