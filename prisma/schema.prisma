@@ -4,7 +4,7 @@ generator client {
 }
 
 datasource db {
-  provider = "sqlite"
+  provider = "postgresql"
   url      = env("DATABASE_URL")
 }
 
@@ -18,29 +18,29 @@ model User {
   createdAt    DateTime @default(now())
   updatedAt    DateTime @updatedAt
 
-  profile          Profile?
-  projects         Project[]           @relation("ProjectOwner")
-  proofsOfWork     ProofOfWork[]       @relation("StudentProofs")
-  assessments      SkillAssessment[]
-  ledger           TokenLedger[]
-  mentorSlots      MentorSlot[]        @relation("MentorIndustry")
-  studentSlots     MentorSlot[]        @relation("MentorStudent")
-  jobPitches       JobPitch[]          @relation("PitchIndustry")
-  studentPitches   JobPitch[]          @relation("PitchStudent")
-  challenges       IndustryChallenge[] @relation("ChallengeIndustry")
-  labUnitsLed      LabUnit[]           @relation("LabUnitFaculty")
-  labMemberships   LabUnitMember[]
-  gradings         DualGrading[]       @relation("GradingFaculty")
-  industryGradings DualGrading[]       @relation("GradingIndustry")
-  sabbaticalListings SabbaticalListing[]
-  learningPrograms   LearningProgram[]
-  facultyPrograms    FacultyProgramListing[]
-  portfolioItems     PortfolioItem[]
-  applications       InternshipApplication[]
+  profile                    Profile?
+  projects                   Project[]                   @relation("ProjectOwner")
+  proofsOfWork               ProofOfWork[]               @relation("StudentProofs")
+  assessments                SkillAssessment[]
+  ledger                     TokenLedger[]
+  mentorSlots                MentorSlot[]                @relation("MentorIndustry")
+  studentSlots               MentorSlot[]                @relation("MentorStudent")
+  jobPitches                 JobPitch[]                  @relation("PitchIndustry")
+  studentPitches             JobPitch[]                  @relation("PitchStudent")
+  challenges                 IndustryChallenge[]         @relation("ChallengeIndustry")
+  labUnitsLed                LabUnit[]                   @relation("LabUnitFaculty")
+  labMemberships             LabUnitMember[]
+  gradings                   DualGrading[]               @relation("GradingFaculty")
+  industryGradings           DualGrading[]               @relation("GradingIndustry")
+  sabbaticalListings         SabbaticalListing[]
+  learningPrograms           LearningProgram[]
+  facultyPrograms            FacultyProgramListing[]
+  portfolioItems             PortfolioItem[]
+  applications               InternshipApplication[]
   facultyProgramApplications FacultyProgramApplication[]
-  documents          UserDocument[]
-  vouchersIssued     ErupiVoucher[]      @relation("VoucherIssuer")
-  vouchersReceived   ErupiVoucher[]      @relation("VoucherBeneficiary")
+  documents                  UserDocument[]
+  vouchersIssued             ErupiVoucher[]              @relation("VoucherIssuer")
+  vouchersReceived           ErupiVoucher[]              @relation("VoucherBeneficiary")
 
   @@map("users")
 }
@@ -99,20 +99,20 @@ model Project {
 }
 
 model ProofOfWork {
-  id              String   @id @default(cuid())
+  id              String                 @id @default(cuid())
   studentId       String
-  student         User     @relation("StudentProofs", fields: [studentId], references: [id], onDelete: Cascade)
+  student         User                   @relation("StudentProofs", fields: [studentId], references: [id], onDelete: Cascade)
   projectId       String
-  project         Project  @relation(fields: [projectId], references: [id], onDelete: Cascade)
+  project         Project                @relation(fields: [projectId], references: [id], onDelete: Cascade)
   artifactUrl     String?
   description     String?
-  facultySignOff  String   @default("PENDING")
-  industrySignOff String   @default("PENDING")
+  facultySignOff  String                 @default("PENDING")
+  industrySignOff String                 @default("PENDING")
   badgeQrCode     String?
-  publicToken     String?  @unique
+  publicToken     String?                @unique
   issuedAt        DateTime?
-  createdAt       DateTime @default(now())
-  updatedAt       DateTime @updatedAt
+  createdAt       DateTime               @default(now())
+  updatedAt       DateTime               @updatedAt
   blockchainTx    BlockchainTransaction?
 
   @@index([studentId])
@@ -121,16 +121,16 @@ model ProofOfWork {
 }
 
 model SkillAssessment {
-  id             String   @id @default(cuid())
+  id             String    @id @default(cuid())
   studentId      String
-  student        User     @relation(fields: [studentId], references: [id], onDelete: Cascade)
+  student        User      @relation(fields: [studentId], references: [id], onDelete: Cascade)
   skillName      String
   score          Int
   verifiedAt     DateTime?
-  decayStatus    String   @default("ACTIVE")
-  lastAssessedAt DateTime @default(now())
-  createdAt      DateTime @default(now())
-  updatedAt      DateTime @updatedAt
+  decayStatus    String    @default("ACTIVE")
+  lastAssessedAt DateTime  @default(now())
+  createdAt      DateTime  @default(now())
+  updatedAt      DateTime  @updatedAt
 
   @@index([studentId])
   @@map("skill_assessments")
@@ -198,9 +198,9 @@ model JobPitch {
 }
 
 model IndustryChallenge {
-  id            String   @id @default(cuid())
+  id            String    @id @default(cuid())
   industryId    String
-  industry      User     @relation("ChallengeIndustry", fields: [industryId], references: [id], onDelete: Cascade)
+  industry      User      @relation("ChallengeIndustry", fields: [industryId], references: [id], onDelete: Cascade)
   title         String
   description   String
   challengeType String
@@ -208,11 +208,11 @@ model IndustryChallenge {
   techStack     String?
   objectives    String?
   stipend       Int?
-  status        String   @default("OPEN")
+  status        String    @default("OPEN")
   deadline      DateTime?
-  rndOnly       Boolean  @default(false)
-  createdAt     DateTime @default(now())
-  updatedAt     DateTime @updatedAt
+  rndOnly       Boolean   @default(false)
+  createdAt     DateTime  @default(now())
+  updatedAt     DateTime  @updatedAt
 
   labUnits     LabUnit[]
   applications ChallengeApplication[]
@@ -323,29 +323,29 @@ model SabbaticalListing {
 }
 
 model LearningProgram {
-  id          String   @id @default(cuid())
-  companyId   String
-  company     User     @relation(fields: [companyId], references: [id], onDelete: Cascade)
-  title       String
-  description String
-  programType String
-  skills      String?
-  duration    String?
-  mode        String?
-  certification Boolean @default(false)
-  status      String   @default("OPEN")
-  createdAt   DateTime @default(now())
-  updatedAt   DateTime @updatedAt
-  applications InternshipApplication[]
+  id            String                  @id @default(cuid())
+  companyId     String
+  company       User                    @relation(fields: [companyId], references: [id], onDelete: Cascade)
+  title         String
+  description   String
+  programType   String
+  skills        String?
+  duration      String?
+  mode          String?
+  certification Boolean                 @default(false)
+  status        String                  @default("OPEN")
+  createdAt     DateTime                @default(now())
+  updatedAt     DateTime                @updatedAt
+  applications  InternshipApplication[]
 
   @@index([companyId])
   @@map("learning_programs")
 }
 
 model FacultyProgramListing {
-  id           String   @id @default(cuid())
+  id           String                      @id @default(cuid())
   companyId    String
-  company      User     @relation(fields: [companyId], references: [id], onDelete: Cascade)
+  company      User                        @relation(fields: [companyId], references: [id], onDelete: Cascade)
   title        String
   description  String
   programType  String
@@ -353,9 +353,9 @@ model FacultyProgramListing {
   duration     String?
   location     String?
   compensation String?
-  status       String   @default("OPEN")
-  createdAt    DateTime @default(now())
-  updatedAt    DateTime @updatedAt
+  status       String                      @default("OPEN")
+  createdAt    DateTime                    @default(now())
+  updatedAt    DateTime                    @updatedAt
   applications FacultyProgramApplication[]
 
   @@index([companyId])
@@ -363,15 +363,15 @@ model FacultyProgramListing {
 }
 
 model FacultyProgramApplication {
-  id               String                @id @default(cuid())
-  listingId        String
-  listing          FacultyProgramListing @relation(fields: [listingId], references: [id], onDelete: Cascade)
-  facultyId        String
-  faculty          User                  @relation(fields: [facultyId], references: [id], onDelete: Cascade)
-  message          String?
-  status           String                @default("APPLIED")
-  createdAt        DateTime              @default(now())
-  updatedAt        DateTime              @updatedAt
+  id        String                @id @default(cuid())
+  listingId String
+  listing   FacultyProgramListing @relation(fields: [listingId], references: [id], onDelete: Cascade)
+  facultyId String
+  faculty   User                  @relation(fields: [facultyId], references: [id], onDelete: Cascade)
+  message   String?
+  status    String                @default("APPLIED")
+  createdAt DateTime              @default(now())
+  updatedAt DateTime              @updatedAt
 
   @@unique([listingId, facultyId])
   @@map("faculty_program_applications")
@@ -407,32 +407,32 @@ model UserDocument {
 }
 
 model InternshipApplication {
-  id         String   @id @default(cuid())
-  listingId  String
-  listing    LearningProgram @relation(fields: [listingId], references: [id], onDelete: Cascade)
-  studentId  String
-  student    User     @relation(fields: [studentId], references: [id], onDelete: Cascade)
-  message    String?
-  status     String   @default("APPLIED")
-  createdAt  DateTime @default(now())
-  updatedAt  DateTime @updatedAt
+  id        String          @id @default(cuid())
+  listingId String
+  listing   LearningProgram @relation(fields: [listingId], references: [id], onDelete: Cascade)
+  studentId String
+  student   User            @relation(fields: [studentId], references: [id], onDelete: Cascade)
+  message   String?
+  status    String          @default("APPLIED")
+  createdAt DateTime        @default(now())
+  updatedAt DateTime        @updatedAt
 
   @@unique([listingId, studentId])
   @@map("internship_applications")
 }
 
 model BlockchainTransaction {
-  id               String      @id @default(cuid())
-  proofId          String      @unique
-  proofOfWork      ProofOfWork @relation(fields: [proofId], references: [id], onDelete: Cascade)
-  blockIndex       Int
-  blockHash        String      @unique
-  prevHash         String
-  merkleRoot       String
-  consensusState   String      @default("COMMITTED")
-  nodeSignatures   Int         @default(4)
-  validatorNodes   String
-  timestamp        DateTime    @default(now())
+  id             String      @id @default(cuid())
+  proofId        String      @unique
+  proofOfWork    ProofOfWork @relation(fields: [proofId], references: [id], onDelete: Cascade)
+  blockIndex     Int
+  blockHash      String      @unique
+  prevHash       String
+  merkleRoot     String
+  consensusState String      @default("COMMITTED")
+  nodeSignatures Int         @default(4)
+  validatorNodes String
+  timestamp      DateTime    @default(now())
 
   @@index([blockHash])
   @@index([proofId])
@@ -440,18 +440,18 @@ model BlockchainTransaction {
 }
 
 model ErupiVoucher {
-  id              String    @id @default(cuid())
-  voucherCode     String    @unique
-  industryId      String
-  industry        User      @relation("VoucherIssuer", fields: [industryId], references: [id], onDelete: Cascade)
-  studentId       String?
-  student         User?     @relation("VoucherBeneficiary", fields: [studentId], references: [id], onDelete: SetNull)
-  amount          Int
-  purposeCode     String
-  status          String    @default("ACTIVE")
-  redeemedAt      DateTime?
-  expiryDate      DateTime
-  createdAt       DateTime  @default(now())
+  id          String    @id @default(cuid())
+  voucherCode String    @unique
+  industryId  String
+  industry    User      @relation("VoucherIssuer", fields: [industryId], references: [id], onDelete: Cascade)
+  studentId   String?
+  student     User?     @relation("VoucherBeneficiary", fields: [studentId], references: [id], onDelete: SetNull)
+  amount      Int
+  purposeCode String
+  status      String    @default("ACTIVE")
+  redeemedAt  DateTime?
+  expiryDate  DateTime
+  createdAt   DateTime  @default(now())
 
   @@index([industryId])
   @@index([studentId])

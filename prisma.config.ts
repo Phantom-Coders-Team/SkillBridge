@@ -5,7 +5,11 @@ function getEnv(name: string): string | undefined {
   return process.env[name];
 }
 
-const databaseUrl = getEnv("DATABASE_URL") ?? "file:./dev.db";
+const databaseUrl =
+  getEnv("DATABASE_URL") ??
+  getEnv("POSTGRES_PRISMA_URL") ??
+  getEnv("POSTGRES_URL") ??
+  "postgresql://localhost:5432/skillbridge";
 
 export default defineConfig({
   schema: "prisma/schema.prisma",
