@@ -306,7 +306,7 @@ export function AppShell({ user, children }: { user: SessionUser; children: Reac
                           className="flex items-center gap-2.5 rounded-xl px-3 py-2 text-sm font-medium text-indigo-600 transition-colors hover:bg-indigo-50 dark:text-indigo-400 dark:hover:bg-indigo-950/40"
                         >
                           <Sparkles className="size-4 shrink-0 text-indigo-500" />
-                          <span>Sync Skills (Git & DPI)</span>
+                          <span>GitHub Skill Sync</span>
                         </Link>
                       )}
 

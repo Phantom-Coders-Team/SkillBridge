@@ -12,34 +12,28 @@ export default async function SyncPage() {
   if (user.role !== "STUDENT") {
     return (
       <div className="mx-auto max-w-3xl rounded-2xl border border-border-muted bg-surface p-8 text-center text-sm text-slate-500 shadow-card">
-        The Skill & DPI Sync Center is designated for students to connect external code repositories and national e-KYC.
+        The GitHub Skill Sync Center is designated for students to connect external code repositories.
       </div>
     );
   }
 
-  const [assessments, apaarItem] = await Promise.all([
-    prisma.skillAssessment.findMany({
-      where: { studentId: user.id },
-      select: { skillName: true, score: true },
-      orderBy: { score: "desc" },
-      take: 20,
-    }),
-    prisma.portfolioItem.findFirst({
-      where: { studentId: user.id, title: { contains: "APAAR" }, verified: true },
-    }),
-  ]);
+  const assessments = await prisma.skillAssessment.findMany({
+    where: { studentId: user.id },
+    select: { skillName: true, score: true },
+    orderBy: { score: "desc" },
+    take: 20,
+  });
 
   return (
-    <div className="mx-auto max-w-6xl">
+    <div className="mx-auto max-w-4xl">
       <PageHeader
         icon={Sparkles}
-        title="Sync Your Skills & DPI Verification"
-        subtitle="Connect your GitHub repositories to auto-verify programming skills and link your 12-digit APAAR ID under the National Credit Framework (NCrF)."
+        title="Sync Your Skills with GitHub"
+        subtitle="Connect your GitHub repositories to auto-verify programming skills, language footprints, and commit metrics into your live profile."
       />
 
       <SyncClient
         existingSkills={assessments.map((a) => ({ skillName: a.skillName, score: a.score }))}
-        apaarVerified={Boolean(apaarItem)}
       />
     </div>
   );
