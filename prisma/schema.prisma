@@ -63,6 +63,23 @@ model Profile {
   createdAt   DateTime @default(now())
   updatedAt   DateTime @updatedAt
 
+  institutionType String?
+  establishedYear Int?
+  websiteUrl      String?
+  address         String?
+  city            String?
+  state           String?
+  pincode         String?
+  naacGrade       String?
+  nbaAccredited   Boolean  @default(false)
+  aicteApproved   Boolean  @default(false)
+  principalName   String?
+  tpoName         String?
+  tpoPhone        String?
+  totalStudents   Int?
+  totalFaculty    Int?
+  departments     String?
+
   @@map("profiles")
 }
 

@@ -23,6 +23,7 @@ export default async function FacultyPortalPage() {
 
   const [listings, myApps] = await Promise.all([
     prisma.facultyProgramListing.findMany({
+      where: isIndustry ? { companyId: user.id } : undefined,
       include: {
         company: { select: { name: true, profile: { select: { companyName: true } } } },
         applications: { select: { facultyId: true, status: true } },
@@ -82,7 +83,7 @@ export default async function FacultyPortalPage() {
       )}
 
       <h2 className="mb-3 text-sm font-semibold uppercase tracking-wide text-slate-400 dark:text-slate-500">
-        {isAcademician ? "Available programs" : "All programs"}
+        {isIndustry ? "My programs" : isAcademician ? "Available programs" : "All programs"}
       </h2>
 
       <div className="grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-3">
@@ -134,7 +135,9 @@ export default async function FacultyPortalPage() {
 
       {listings.length === 0 && (
         <div className="rounded-2xl border border-border-muted bg-surface px-6 py-14 text-center">
-          <p className="text-sm text-slate-500 dark:text-slate-400">No programs posted yet.</p>
+          <p className="text-sm text-slate-500 dark:text-slate-400">
+            {isIndustry ? "No programs posted yet. Post your first program to get started." : "No programs posted yet."}
+          </p>
         </div>
       )}
     </div>

@@ -30,6 +30,23 @@ export async function updateProfileAction(_prevState: ProfileState | null, formD
   const rollNumber = String(formData.get("rollNumber") || "").trim() || null;
   const skills = String(formData.get("skills") || "").trim() || null;
 
+  const institutionType = String(formData.get("institutionType") || "").trim() || null;
+  const establishedYear = formData.get("establishedYear") ? Number(formData.get("establishedYear")) : null;
+  const websiteUrl = String(formData.get("websiteUrl") || "").trim() || null;
+  const address = String(formData.get("address") || "").trim() || null;
+  const city = String(formData.get("city") || "").trim() || null;
+  const state = String(formData.get("state") || "").trim() || null;
+  const pincode = String(formData.get("pincode") || "").trim() || null;
+  const naacGrade = String(formData.get("naacGrade") || "").trim() || null;
+  const nbaAccredited = formData.get("nbaAccredited") === "on";
+  const aicteApproved = formData.get("aicteApproved") === "on";
+  const principalName = String(formData.get("principalName") || "").trim() || null;
+  const tpoName = String(formData.get("tpoName") || "").trim() || null;
+  const tpoPhone = String(formData.get("tpoPhone") || "").trim() || null;
+  const totalStudents = formData.get("totalStudents") ? Number(formData.get("totalStudents")) : null;
+  const totalFaculty = formData.get("totalFaculty") ? Number(formData.get("totalFaculty")) : null;
+  const departments = String(formData.get("departments") || "").trim() || null;
+
   if (!name || name.length < 2) {
     return { error: "Name must be at least 2 characters." };
   }
@@ -66,6 +83,22 @@ export async function updateProfileAction(_prevState: ProfileState | null, formD
       year,
       rollNumber,
       skills,
+      institutionType,
+      establishedYear,
+      websiteUrl,
+      address,
+      city,
+      state,
+      pincode,
+      naacGrade,
+      nbaAccredited,
+      aicteApproved,
+      principalName,
+      tpoName,
+      tpoPhone,
+      totalStudents,
+      totalFaculty,
+      departments,
       ...(avatarUrl ? { avatarUrl } : clearAvatar ? { avatarUrl: null } : {}),
     },
     create: {
@@ -78,6 +111,22 @@ export async function updateProfileAction(_prevState: ProfileState | null, formD
       year,
       rollNumber,
       skills,
+      institutionType,
+      establishedYear,
+      websiteUrl,
+      address,
+      city,
+      state,
+      pincode,
+      naacGrade,
+      nbaAccredited,
+      aicteApproved,
+      principalName,
+      tpoName,
+      tpoPhone,
+      totalStudents,
+      totalFaculty,
+      departments,
       ...(avatarUrl ? { avatarUrl } : {}),
     },
   });

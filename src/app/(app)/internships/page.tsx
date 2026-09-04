@@ -23,8 +23,11 @@ export default async function InternshipsPage() {
   const user = await getCurrentUser();
   if (!user) redirect("/login");
 
+  const isIndustry = user.role === "INDUSTRIES" || user.role === "INDUSTRY";
+
   const [listings, studentProfile] = await Promise.all([
     prisma.learningProgram.findMany({
+      where: isIndustry ? { companyId: user.id } : undefined,
       include: {
         company: { select: { name: true, profile: { select: { companyName: true } } } },
         applications: {
@@ -76,8 +79,8 @@ export default async function InternshipsPage() {
       {listings.length === 0 ? (
         <EmptyState
           icon={Briefcase}
-          title="No opportunities posted yet"
-          description="When industry partners post internships and learning programs, they'll appear here."
+          title={isIndustry ? "No opportunities posted yet" : "No opportunities posted yet"}
+          description={isIndustry ? "Post your first internship or learning program to get started." : "When industry partners post internships and learning programs, they'll appear here."}
         />
       ) : (
         <div className="grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-3">

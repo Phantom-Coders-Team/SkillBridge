@@ -1,5 +1,5 @@
 import { redirect, notFound } from "next/navigation";
-import { User, Mail, MapPin, Phone, GraduationCap, Hash, Sparkles, Building2 } from "lucide-react";
+import { User, Mail, MapPin, Phone, GraduationCap, Hash, Sparkles, Building2, Globe, Calendar, Award, Users, BookOpen } from "lucide-react";
 import { getCurrentUser } from "@/lib/auth";
 import { prisma } from "@/lib/prisma";
 import { ROLE_LABELS, ROLE_COLORS, type Role } from "@/lib/types";
@@ -32,6 +32,22 @@ export default async function PublicProfilePage({ params }: { params: Promise<{ 
           avatarUrl: true,
           year: true,
           rollNumber: true,
+          institutionType: true,
+          establishedYear: true,
+          websiteUrl: true,
+          address: true,
+          city: true,
+          state: true,
+          pincode: true,
+          naacGrade: true,
+          nbaAccredited: true,
+          aicteApproved: true,
+          principalName: true,
+          tpoName: true,
+          tpoPhone: true,
+          totalStudents: true,
+          totalFaculty: true,
+          departments: true,
         },
       },
     },
@@ -40,6 +56,7 @@ export default async function PublicProfilePage({ params }: { params: Promise<{ 
   if (!user) notFound();
 
   const p = user.profile;
+  const isInstitution = user.role === "INSTITUTIONS" || user.role === "INSTITUTION";
 
   return (
     <div className="mx-auto max-w-3xl">
@@ -116,6 +133,119 @@ export default async function PublicProfilePage({ params }: { params: Promise<{ 
               <Badge key={i} tone="indigo">{s.trim()}</Badge>
             ))}
           </div>
+        </Card>
+      )}
+
+      {isInstitution && p && (
+        <Card className="mt-6 p-5">
+          <h3 className="mb-4 flex items-center gap-2 text-sm font-semibold text-slate-900 dark:text-slate-100">
+            <Building2 aria-hidden className="size-4 text-amber-500" /> Institution Details
+          </h3>
+          <dl className="grid grid-cols-1 gap-4 sm:grid-cols-2">
+            {p.institutionType && (
+              <div>
+                <dt className="text-xs font-medium text-slate-400 dark:text-slate-500">Type</dt>
+                <dd className="text-sm font-medium text-slate-700 dark:text-slate-200">{p.institutionType}</dd>
+              </div>
+            )}
+            {p.establishedYear && (
+              <div>
+                <dt className="text-xs font-medium text-slate-400 dark:text-slate-500">Established</dt>
+                <dd className="text-sm font-medium text-slate-700 dark:text-slate-200">{p.establishedYear}</dd>
+              </div>
+            )}
+            {p.websiteUrl && (
+              <div>
+                <dt className="text-xs font-medium text-slate-400 dark:text-slate-500">Website</dt>
+                <dd className="text-sm font-medium text-slate-700 dark:text-slate-200">
+                  <a href={p.websiteUrl} target="_blank" rel="noopener noreferrer" className="text-indigo-600 hover:underline dark:text-indigo-400">
+                    {p.websiteUrl}
+                  </a>
+                </dd>
+              </div>
+            )}
+            {p.address && (
+              <div className="sm:col-span-2">
+                <dt className="text-xs font-medium text-slate-400 dark:text-slate-500">Address</dt>
+                <dd className="text-sm font-medium text-slate-700 dark:text-slate-200">
+                  {p.address}
+                  {p.city ? `, ${p.city}` : ""}
+                  {p.state ? `, ${p.state}` : ""}
+                  {p.pincode ? ` - ${p.pincode}` : ""}
+                </dd>
+              </div>
+            )}
+            {p.naacGrade && (
+              <div>
+                <dt className="text-xs font-medium text-slate-400 dark:text-slate-500">NAAC Grade</dt>
+                <dd className="text-sm font-medium text-slate-700 dark:text-slate-200">{p.naacGrade}</dd>
+              </div>
+            )}
+            <div className="flex gap-4">
+              {p.nbaAccredited && (
+                <div>
+                  <dt className="text-xs font-medium text-slate-400 dark:text-slate-500">NBA</dt>
+                  <dd className="text-sm font-medium text-emerald-600 dark:text-emerald-400">Accredited</dd>
+                </div>
+              )}
+              {p.aicteApproved && (
+                <div>
+                  <dt className="text-xs font-medium text-slate-400 dark:text-slate-500">AICTE</dt>
+                  <dd className="text-sm font-medium text-emerald-600 dark:text-emerald-400">Approved</dd>
+                </div>
+              )}
+            </div>
+            {p.principalName && (
+              <div>
+                <dt className="text-xs font-medium text-slate-400 dark:text-slate-500">Principal / Director</dt>
+                <dd className="text-sm font-medium text-slate-700 dark:text-slate-200">{p.principalName}</dd>
+              </div>
+            )}
+          </dl>
+        </Card>
+      )}
+
+      {isInstitution && p && (p.tpoName || p.tpoPhone || p.totalStudents || p.totalFaculty || p.departments) && (
+        <Card className="mt-6 p-5">
+          <h3 className="mb-4 flex items-center gap-2 text-sm font-semibold text-slate-900 dark:text-slate-100">
+            <Users aria-hidden className="size-4 text-indigo-500" /> Placement & Departments
+          </h3>
+          <dl className="grid grid-cols-1 gap-4 sm:grid-cols-2">
+            {p.tpoName && (
+              <div>
+                <dt className="text-xs font-medium text-slate-400 dark:text-slate-500">TPO Name</dt>
+                <dd className="text-sm font-medium text-slate-700 dark:text-slate-200">{p.tpoName}</dd>
+              </div>
+            )}
+            {p.tpoPhone && (
+              <div>
+                <dt className="text-xs font-medium text-slate-400 dark:text-slate-500">TPO Phone</dt>
+                <dd className="text-sm font-medium text-slate-700 dark:text-slate-200">{p.tpoPhone}</dd>
+              </div>
+            )}
+            {p.totalStudents && (
+              <div>
+                <dt className="text-xs font-medium text-slate-400 dark:text-slate-500">Total Students</dt>
+                <dd className="text-sm font-medium text-slate-700 dark:text-slate-200">{p.totalStudents.toLocaleString()}</dd>
+              </div>
+            )}
+            {p.totalFaculty && (
+              <div>
+                <dt className="text-xs font-medium text-slate-400 dark:text-slate-500">Total Faculty</dt>
+                <dd className="text-sm font-medium text-slate-700 dark:text-slate-200">{p.totalFaculty.toLocaleString()}</dd>
+              </div>
+            )}
+            {p.departments && (
+              <div className="sm:col-span-2">
+                <dt className="text-xs font-medium text-slate-400 dark:text-slate-500">Departments</dt>
+                <dd className="mt-1 flex flex-wrap gap-2">
+                  {p.departments.split(",").map((d: string, i: number) => (
+                    <Badge key={i} tone="amber">{d.trim()}</Badge>
+                  ))}
+                </dd>
+              </div>
+            )}
+          </dl>
         </Card>
       )}
     </div>

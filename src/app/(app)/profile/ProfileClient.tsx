@@ -26,6 +26,22 @@ interface ProfileData {
   skills: string;
   avatarUrl: string | null;
   documents: ProfileDoc[];
+  institutionType: string;
+  establishedYear: number | null;
+  websiteUrl: string;
+  address: string;
+  city: string;
+  state: string;
+  pincode: string;
+  naacGrade: string;
+  nbaAccredited: boolean;
+  aicteApproved: boolean;
+  principalName: string;
+  tpoName: string;
+  tpoPhone: string;
+  totalStudents: number | null;
+  totalFaculty: number | null;
+  departments: string;
 }
 
 export default function ProfileClient({ profile }: { profile: ProfileData }) {
@@ -38,6 +54,8 @@ export default function ProfileClient({ profile }: { profile: ProfileData }) {
   const [deletePending, setDeletePending] = useState<string | null>(null);
   const fileRef = useRef<HTMLInputElement>(null);
   const docFormRef = useRef<HTMLFormElement>(null);
+
+  const isInstitution = profile.role === "Institutions";
 
   function handleFileChange(e: React.ChangeEvent<HTMLInputElement>) {
     const file = e.target.files?.[0];
@@ -133,6 +151,11 @@ export default function ProfileClient({ profile }: { profile: ProfileData }) {
           {profile.collegeName && (
             <p className="mt-1 text-sm text-slate-600 dark:text-slate-300">
               {profile.collegeName}
+            </p>
+          )}
+          {isInstitution && profile.institutionType && (
+            <p className="mt-1 text-xs text-slate-500 dark:text-slate-400">
+              {profile.institutionType}
             </p>
           )}
           {profile.rollNumber && (
@@ -322,6 +345,257 @@ export default function ProfileClient({ profile }: { profile: ProfileData }) {
                   className="w-full rounded-xl border border-slate-300 bg-white px-3 py-2.5 text-sm text-slate-900 placeholder:text-slate-400 transition-colors focus:border-indigo-500 focus:ring-2 focus:ring-indigo-500/30 focus:outline-none dark:border-slate-600 dark:bg-surface dark:text-slate-100 dark:placeholder:text-slate-500"
                 />
               </div>
+
+              {isInstitution && (
+                <>
+                  <div className="border-t border-slate-200 pt-5 dark:border-slate-700">
+                    <h3 className="mb-4 text-sm font-semibold text-slate-900 dark:text-slate-100">Institution Details</h3>
+                  </div>
+
+                  <div className="grid gap-4 sm:grid-cols-2">
+                    <div>
+                      <label htmlFor="institutionType" className="mb-1.5 block text-sm font-medium text-slate-700 dark:text-slate-300">
+                        Institution Type
+                      </label>
+                      <select
+                        id="institutionType"
+                        name="institutionType"
+                        defaultValue={profile.institutionType}
+                        className="h-10 w-full rounded-xl border border-slate-300 bg-white px-3 text-sm text-slate-900 transition-colors focus:border-indigo-500 focus:ring-2 focus:ring-indigo-500/30 focus:outline-none dark:border-slate-600 dark:bg-surface dark:text-slate-100"
+                      >
+                        <option value="">Select type</option>
+                        <option value="University">University</option>
+                        <option value="Autonomous College">Autonomous College</option>
+                        <option value="AICTE Approved">AICTE Approved</option>
+                        <option value="Deemed University">Deemed University</option>
+                        <option value="Government College">Government College</option>
+                        <option value="Private College">Private College</option>
+                      </select>
+                    </div>
+                    <div>
+                      <label htmlFor="establishedYear" className="mb-1.5 block text-sm font-medium text-slate-700 dark:text-slate-300">
+                        Established Year
+                      </label>
+                      <input
+                        id="establishedYear"
+                        name="establishedYear"
+                        type="number"
+                        min={1900}
+                        max={2025}
+                        defaultValue={profile.establishedYear ?? ""}
+                        placeholder="e.g. 1995"
+                        className="h-10 w-full rounded-xl border border-slate-300 bg-white px-3 text-sm text-slate-900 placeholder:text-slate-400 transition-colors focus:border-indigo-500 focus:ring-2 focus:ring-indigo-500/30 focus:outline-none dark:border-slate-600 dark:bg-surface dark:text-slate-100 dark:placeholder:text-slate-500"
+                      />
+                    </div>
+                  </div>
+
+                  <div>
+                    <label htmlFor="websiteUrl" className="mb-1.5 block text-sm font-medium text-slate-700 dark:text-slate-300">
+                      Website URL
+                    </label>
+                    <input
+                      id="websiteUrl"
+                      name="websiteUrl"
+                      type="url"
+                      defaultValue={profile.websiteUrl}
+                      placeholder="https://www.example.edu"
+                      className="h-10 w-full rounded-xl border border-slate-300 bg-white px-3 text-sm text-slate-900 placeholder:text-slate-400 transition-colors focus:border-indigo-500 focus:ring-2 focus:ring-indigo-500/30 focus:outline-none dark:border-slate-600 dark:bg-surface dark:text-slate-100 dark:placeholder:text-slate-500"
+                    />
+                  </div>
+
+                  <div>
+                    <label htmlFor="address" className="mb-1.5 block text-sm font-medium text-slate-700 dark:text-slate-300">
+                      Address
+                    </label>
+                    <input
+                      id="address"
+                      name="address"
+                      type="text"
+                      defaultValue={profile.address}
+                      placeholder="Full address"
+                      className="h-10 w-full rounded-xl border border-slate-300 bg-white px-3 text-sm text-slate-900 placeholder:text-slate-400 transition-colors focus:border-indigo-500 focus:ring-2 focus:ring-indigo-500/30 focus:outline-none dark:border-slate-600 dark:bg-surface dark:text-slate-100 dark:placeholder:text-slate-500"
+                    />
+                  </div>
+
+                  <div className="grid gap-4 sm:grid-cols-3">
+                    <div>
+                      <label htmlFor="city" className="mb-1.5 block text-sm font-medium text-slate-700 dark:text-slate-300">
+                        City
+                      </label>
+                      <input
+                        id="city"
+                        name="city"
+                        type="text"
+                        defaultValue={profile.city}
+                        placeholder="e.g. Mumbai"
+                        className="h-10 w-full rounded-xl border border-slate-300 bg-white px-3 text-sm text-slate-900 placeholder:text-slate-400 transition-colors focus:border-indigo-500 focus:ring-2 focus:ring-indigo-500/30 focus:outline-none dark:border-slate-600 dark:bg-surface dark:text-slate-100 dark:placeholder:text-slate-500"
+                      />
+                    </div>
+                    <div>
+                      <label htmlFor="state" className="mb-1.5 block text-sm font-medium text-slate-700 dark:text-slate-300">
+                        State
+                      </label>
+                      <input
+                        id="state"
+                        name="state"
+                        type="text"
+                        defaultValue={profile.state}
+                        placeholder="e.g. Maharashtra"
+                        className="h-10 w-full rounded-xl border border-slate-300 bg-white px-3 text-sm text-slate-900 placeholder:text-slate-400 transition-colors focus:border-indigo-500 focus:ring-2 focus:ring-indigo-500/30 focus:outline-none dark:border-slate-600 dark:bg-surface dark:text-slate-100 dark:placeholder:text-slate-500"
+                      />
+                    </div>
+                    <div>
+                      <label htmlFor="pincode" className="mb-1.5 block text-sm font-medium text-slate-700 dark:text-slate-300">
+                        Pincode
+                      </label>
+                      <input
+                        id="pincode"
+                        name="pincode"
+                        type="text"
+                        defaultValue={profile.pincode}
+                        placeholder="e.g. 400001"
+                        className="h-10 w-full rounded-xl border border-slate-300 bg-white px-3 text-sm text-slate-900 placeholder:text-slate-400 transition-colors focus:border-indigo-500 focus:ring-2 focus:ring-indigo-500/30 focus:outline-none dark:border-slate-600 dark:bg-surface dark:text-slate-100 dark:placeholder:text-slate-500"
+                      />
+                    </div>
+                  </div>
+
+                  <div className="grid gap-4 sm:grid-cols-2">
+                    <div>
+                      <label htmlFor="naacGrade" className="mb-1.5 block text-sm font-medium text-slate-700 dark:text-slate-300">
+                        NAAC Grade
+                      </label>
+                      <select
+                        id="naacGrade"
+                        name="naacGrade"
+                        defaultValue={profile.naacGrade}
+                        className="h-10 w-full rounded-xl border border-slate-300 bg-white px-3 text-sm text-slate-900 transition-colors focus:border-indigo-500 focus:ring-2 focus:ring-indigo-500/30 focus:outline-none dark:border-slate-600 dark:bg-surface dark:text-slate-100"
+                      >
+                        <option value="">Select grade</option>
+                        <option value="A++">A++</option>
+                        <option value="A+">A+</option>
+                        <option value="A">A</option>
+                        <option value="B++">B++</option>
+                        <option value="B+">B+</option>
+                        <option value="B">B</option>
+                        <option value="C">C</option>
+                        <option value="D">D</option>
+                      </select>
+                    </div>
+                    <div className="flex items-end gap-6 pb-1">
+                      <label className="flex items-center gap-2">
+                        <input
+                          type="checkbox"
+                          name="nbaAccredited"
+                          defaultChecked={profile.nbaAccredited}
+                          className="size-4 rounded border-slate-300 text-indigo-600 focus:ring-indigo-500"
+                        />
+                        <span className="text-sm text-slate-700 dark:text-slate-300">NBA Accredited</span>
+                      </label>
+                      <label className="flex items-center gap-2">
+                        <input
+                          type="checkbox"
+                          name="aicteApproved"
+                          defaultChecked={profile.aicteApproved}
+                          className="size-4 rounded border-slate-300 text-indigo-600 focus:ring-indigo-500"
+                        />
+                        <span className="text-sm text-slate-700 dark:text-slate-300">AICTE Approved</span>
+                      </label>
+                    </div>
+                  </div>
+
+                  <div>
+                    <label htmlFor="principalName" className="mb-1.5 block text-sm font-medium text-slate-700 dark:text-slate-300">
+                      Principal / Director Name
+                    </label>
+                    <input
+                      id="principalName"
+                      name="principalName"
+                      type="text"
+                      defaultValue={profile.principalName}
+                      placeholder="e.g. Dr. Ramesh Kumar"
+                      className="h-10 w-full rounded-xl border border-slate-300 bg-white px-3 text-sm text-slate-900 placeholder:text-slate-400 transition-colors focus:border-indigo-500 focus:ring-2 focus:ring-indigo-500/30 focus:outline-none dark:border-slate-600 dark:bg-surface dark:text-slate-100 dark:placeholder:text-slate-500"
+                    />
+                  </div>
+
+                  <div className="border-t border-slate-200 pt-5 dark:border-slate-700">
+                    <h3 className="mb-4 text-sm font-semibold text-slate-900 dark:text-slate-100">Placement Cell</h3>
+                  </div>
+
+                  <div className="grid gap-4 sm:grid-cols-2">
+                    <div>
+                      <label htmlFor="tpoName" className="mb-1.5 block text-sm font-medium text-slate-700 dark:text-slate-300">
+                        TPO Name
+                      </label>
+                      <input
+                        id="tpoName"
+                        name="tpoName"
+                        type="text"
+                        defaultValue={profile.tpoName}
+                        placeholder="Training & Placement Officer"
+                        className="h-10 w-full rounded-xl border border-slate-300 bg-white px-3 text-sm text-slate-900 placeholder:text-slate-400 transition-colors focus:border-indigo-500 focus:ring-2 focus:ring-indigo-500/30 focus:outline-none dark:border-slate-600 dark:bg-surface dark:text-slate-100 dark:placeholder:text-slate-500"
+                      />
+                    </div>
+                    <div>
+                      <label htmlFor="tpoPhone" className="mb-1.5 block text-sm font-medium text-slate-700 dark:text-slate-300">
+                        TPO Phone
+                      </label>
+                      <input
+                        id="tpoPhone"
+                        name="tpoPhone"
+                        type="tel"
+                        defaultValue={profile.tpoPhone}
+                        placeholder="e.g. 9876543210"
+                        className="h-10 w-full rounded-xl border border-slate-300 bg-white px-3 text-sm text-slate-900 placeholder:text-slate-400 transition-colors focus:border-indigo-500 focus:ring-2 focus:ring-indigo-500/30 focus:outline-none dark:border-slate-600 dark:bg-surface dark:text-slate-100 dark:placeholder:text-slate-500"
+                      />
+                    </div>
+                  </div>
+
+                  <div className="grid gap-4 sm:grid-cols-2">
+                    <div>
+                      <label htmlFor="totalStudents" className="mb-1.5 block text-sm font-medium text-slate-700 dark:text-slate-300">
+                        Total Students
+                      </label>
+                      <input
+                        id="totalStudents"
+                        name="totalStudents"
+                        type="number"
+                        min={0}
+                        defaultValue={profile.totalStudents ?? ""}
+                        placeholder="e.g. 2000"
+                        className="h-10 w-full rounded-xl border border-slate-300 bg-white px-3 text-sm text-slate-900 placeholder:text-slate-400 transition-colors focus:border-indigo-500 focus:ring-2 focus:ring-indigo-500/30 focus:outline-none dark:border-slate-600 dark:bg-surface dark:text-slate-100 dark:placeholder:text-slate-500"
+                      />
+                    </div>
+                    <div>
+                      <label htmlFor="totalFaculty" className="mb-1.5 block text-sm font-medium text-slate-700 dark:text-slate-300">
+                        Total Faculty
+                      </label>
+                      <input
+                        id="totalFaculty"
+                        name="totalFaculty"
+                        type="number"
+                        min={0}
+                        defaultValue={profile.totalFaculty ?? ""}
+                        placeholder="e.g. 150"
+                        className="h-10 w-full rounded-xl border border-slate-300 bg-white px-3 text-sm text-slate-900 placeholder:text-slate-400 transition-colors focus:border-indigo-500 focus:ring-2 focus:ring-indigo-500/30 focus:outline-none dark:border-slate-600 dark:bg-surface dark:text-slate-100 dark:placeholder:text-slate-500"
+                      />
+                    </div>
+                  </div>
+
+                  <div>
+                    <label htmlFor="departments" className="mb-1.5 block text-sm font-medium text-slate-700 dark:text-slate-300">
+                      Departments
+                    </label>
+                    <textarea
+                      id="departments"
+                      name="departments"
+                      rows={3}
+                      defaultValue={profile.departments}
+                      placeholder="e.g. Computer Science, Electronics, Mechanical, Civil"
+                      className="w-full rounded-xl border border-slate-300 bg-white px-3 py-2.5 text-sm text-slate-900 placeholder:text-slate-400 transition-colors focus:border-indigo-500 focus:ring-2 focus:ring-indigo-500/30 focus:outline-none dark:border-slate-600 dark:bg-surface dark:text-slate-100 dark:placeholder:text-slate-500"
+                    />
+                  </div>
+                </>
+              )}
 
               {state?.error && (
                 <p className="rounded-xl bg-red-50 px-3 py-2.5 text-sm text-red-600 dark:bg-red-500/15 dark:text-red-300" role="alert">
