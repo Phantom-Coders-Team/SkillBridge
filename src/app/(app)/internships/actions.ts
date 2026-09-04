@@ -78,13 +78,17 @@ export async function applyToOpportunity(
 
     // Send email notification to recruiter
     if (listing?.company?.email) {
-      notifyNewApplicationSubmitted({
-        recruiterId: listing.company.id,
-        recruiterEmail: listing.company.email,
-        recruiterName: listing.company.name,
-        studentName: user.name,
-        listingTitle: listing.title,
-      }).catch((err) => console.error("Failed to notify recruiter of new application:", err));
+      try {
+        await notifyNewApplicationSubmitted({
+          recruiterId: listing.company.id,
+          recruiterEmail: listing.company.email,
+          recruiterName: listing.company.name,
+          studentName: user.name,
+          listingTitle: listing.title,
+        });
+      } catch (err) {
+        console.error("Failed to notify recruiter of new application:", err);
+      }
     }
 
     revalidatePath("/internships");

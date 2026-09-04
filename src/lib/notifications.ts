@@ -95,6 +95,20 @@ export async function createNotification({
   return newNotification;
 }
 
+export function updateNotificationEmailStatus(
+  id: string,
+  emailSent: boolean,
+  emailSimulated?: boolean
+) {
+  const all = loadNotifications();
+  const item = all.find((n) => n.id === id);
+  if (item) {
+    item.emailSent = emailSent;
+    item.emailSimulated = emailSimulated;
+    saveNotifications(all);
+  }
+}
+
 /**
  * Get recent notifications for a user
  */
@@ -195,7 +209,7 @@ export async function notifyApplicationStatusChange({
 
   notif.emailSent = emailResult.success;
   notif.emailSimulated = emailResult.simulated;
-  saveNotifications(loadNotifications());
+  updateNotificationEmailStatus(notif.id, emailResult.success, emailResult.simulated);
 
   return { notification: notif, emailResult };
 }
@@ -238,7 +252,7 @@ export async function notifyRecruiterPitch({
 
   notif.emailSent = emailResult.success;
   notif.emailSimulated = emailResult.simulated;
-  saveNotifications(loadNotifications());
+  updateNotificationEmailStatus(notif.id, emailResult.success, emailResult.simulated);
 
   return { notification: notif, emailResult };
 }
@@ -281,7 +295,7 @@ export async function notifyNewApplicationSubmitted({
 
   notif.emailSent = emailResult.success;
   notif.emailSimulated = emailResult.simulated;
-  saveNotifications(loadNotifications());
+  updateNotificationEmailStatus(notif.id, emailResult.success, emailResult.simulated);
 
   return { notification: notif, emailResult };
 }
@@ -350,7 +364,8 @@ export async function notifyMentorBooking({
   studentNotif.emailSimulated = studentEmailRes.simulated;
   mentorNotif.emailSent = mentorEmailRes.success;
   mentorNotif.emailSimulated = mentorEmailRes.simulated;
-  saveNotifications(loadNotifications());
+  updateNotificationEmailStatus(studentNotif.id, studentEmailRes.success, studentEmailRes.simulated);
+  updateNotificationEmailStatus(mentorNotif.id, mentorEmailRes.success, mentorEmailRes.simulated);
 
   return { studentNotif, mentorNotif };
 }
@@ -381,7 +396,7 @@ export async function notifyTestEmail({
 
   notif.emailSent = emailResult.success;
   notif.emailSimulated = emailResult.simulated;
-  saveNotifications(loadNotifications());
+  updateNotificationEmailStatus(notif.id, emailResult.success, emailResult.simulated);
 
   return { notification: notif, emailResult };
 }
@@ -437,7 +452,8 @@ export async function notifyPitchAccepted({
   recruiterNotif.emailSimulated = emailResult.simulated;
   studentNotif.emailSent = emailResult.success;
   studentNotif.emailSimulated = emailResult.simulated;
-  saveNotifications(loadNotifications());
+  updateNotificationEmailStatus(recruiterNotif.id, emailResult.success, emailResult.simulated);
+  updateNotificationEmailStatus(studentNotif.id, emailResult.success, emailResult.simulated);
 
   return { recruiterNotif, studentNotif, emailResult };
 }

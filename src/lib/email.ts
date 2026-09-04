@@ -55,17 +55,23 @@ export async function sendEmail({
     : `"SkillBridge Notifications" <notifications@skillbridge.edu>`;
   const from = process.env.SMTP_FROM || defaultFrom;
 
-  // If the target is a demo mock domain like .edu and real SMTP is configured,
-  // reroute to SMTP_USER so the tester receives the actual email in their inbox!
+  // If the target is a demo mock domain (student/faculty .edu or demo corporate accounts)
+  // and real SMTP is configured, route to SMTP_USER so the tester receives the email in their inbox!
   let effectiveTo = to;
   let effectiveSubject = subject;
-  if (
-    (to.endsWith(".edu") || to.includes("@example.com")) &&
-    smtpUser &&
-    smtpUser.includes("@")
-  ) {
+  const isDemoRecipient =
+    to.endsWith(".edu") ||
+    to.includes("@example.com") ||
+    to.includes("@infosys.com") ||
+    to.includes("@tcs.com") ||
+    to.includes("@wipro.com") ||
+    to.includes("@aiia.gov.in") ||
+    to.includes("@zohocorp.com") ||
+    to.includes("@hcltech.com");
+
+  if (isDemoRecipient && smtpUser && smtpUser.includes("@") && to !== smtpUser) {
     effectiveTo = smtpUser;
-    effectiveSubject = `[Demo for ${to}] ${subject}`;
+    effectiveSubject = `[Notification for ${to}] ${subject}`;
   }
 
   const transporter = getTransporter();
