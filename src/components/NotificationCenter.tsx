@@ -1,7 +1,7 @@
 "use client";
 
 import { useState, useEffect, useRef } from "react";
-import Link from "next/link";
+import { useRouter } from "next/navigation";
 import {
   Bell,
   CheckCheck,
@@ -17,6 +17,7 @@ import {
 import type { AppNotification } from "@/lib/notifications";
 
 export function NotificationCenter({ userEmail }: { userEmail: string }) {
+  const router = useRouter();
   const [open, setOpen] = useState(false);
   const [notifications, setNotifications] = useState<AppNotification[]>([]);
   const [unreadCount, setUnreadCount] = useState(0);
@@ -24,6 +25,16 @@ export function NotificationCenter({ userEmail }: { userEmail: string }) {
   const [sendingTest, setSendingTest] = useState(false);
   const [feedback, setFeedback] = useState<string | null>(null);
   const popoverRef = useRef<HTMLDivElement>(null);
+
+  const handleNotificationClick = (notif: AppNotification) => {
+    if (!notif.read) {
+      handleMarkAsRead(notif.id);
+    }
+    setOpen(false);
+    if (notif.link) {
+      router.push(notif.link);
+    }
+  };
 
   const fetchNotifications = async () => {
     try {
@@ -210,9 +221,9 @@ export function NotificationCenter({ userEmail }: { userEmail: string }) {
               notifications.map((notif) => (
                 <div
                   key={notif.id}
-                  onClick={() => !notif.read && handleMarkAsRead(notif.id)}
-                  className={`flex items-start gap-3 p-3.5 transition hover:bg-surface-elevated ${
-                    !notif.read ? "bg-indigo-50/20 dark:bg-indigo-950/10" : ""
+                  onClick={() => handleNotificationClick(notif)}
+                  className={`flex cursor-pointer items-start gap-3 p-3.5 transition hover:bg-slate-50 dark:hover:bg-slate-800/60 ${
+                    !notif.read ? "bg-indigo-50/30 dark:bg-indigo-950/20" : ""
                   }`}
                 >
                   <div className="mt-0.5 flex size-8 shrink-0 items-center justify-center rounded-lg bg-surface-elevated border border-border-muted shadow-xs">
@@ -248,13 +259,17 @@ export function NotificationCenter({ userEmail }: { userEmail: string }) {
                         })}
                       </span>
                       {notif.link && (
-                        <Link
-                          href={notif.link}
-                          onClick={() => setOpen(false)}
-                          className="ml-auto inline-flex items-center gap-0.5 text-[10px] font-medium text-indigo-600 hover:underline dark:text-indigo-400"
+                        <button
+                          type="button"
+                          onClick={(e) => {
+                            e.stopPropagation();
+                            handleNotificationClick(notif);
+                          }}
+                          className="ml-auto inline-flex items-center gap-1 rounded-lg bg-indigo-50 px-2.5 py-0.5 text-[11px] font-semibold text-indigo-700 transition hover:bg-indigo-100 hover:text-indigo-900 dark:bg-indigo-950/60 dark:text-indigo-300 dark:hover:bg-indigo-900/80"
                         >
-                          View <ExternalLink className="size-2.5" />
-                        </Link>
+                          <span>View</span>
+                          <ExternalLink className="size-2.5" />
+                        </button>
                       )}
                     </div>
                   </div>
