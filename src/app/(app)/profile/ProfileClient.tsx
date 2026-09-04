@@ -42,6 +42,17 @@ interface ProfileData {
   totalStudents: number | null;
   totalFaculty: number | null;
   departments: string;
+  affiliatedUniversity: string;
+  coursesOffered: string;
+  ugcRecognized: boolean;
+  admissionContact: string;
+  admissionPhone: string;
+  averagePlacementRate: number | null;
+  highestPackage: string;
+  averagePackage: string;
+  facilities: string;
+  motto: string;
+  vision: string;
 }
 
 export default function ProfileClient({ profile }: { profile: ProfileData }) {
@@ -481,40 +492,19 @@ export default function ProfileClient({ profile }: { profile: ProfileData }) {
                         <option value="D">D</option>
                       </select>
                     </div>
-                    <div className="flex items-end gap-6 pb-1">
-                      <label className="flex items-center gap-2">
-                        <input
-                          type="checkbox"
-                          name="nbaAccredited"
-                          defaultChecked={profile.nbaAccredited}
-                          className="size-4 rounded border-slate-300 text-indigo-600 focus:ring-indigo-500"
-                        />
-                        <span className="text-sm text-slate-700 dark:text-slate-300">NBA Accredited</span>
+                    <div>
+                      <label htmlFor="principalName" className="mb-1.5 block text-sm font-medium text-slate-700 dark:text-slate-300">
+                        Principal / Director Name
                       </label>
-                      <label className="flex items-center gap-2">
-                        <input
-                          type="checkbox"
-                          name="aicteApproved"
-                          defaultChecked={profile.aicteApproved}
-                          className="size-4 rounded border-slate-300 text-indigo-600 focus:ring-indigo-500"
-                        />
-                        <span className="text-sm text-slate-700 dark:text-slate-300">AICTE Approved</span>
-                      </label>
+                      <input
+                        id="principalName"
+                        name="principalName"
+                        type="text"
+                        defaultValue={profile.principalName}
+                        placeholder="e.g. Dr. Ramesh Kumar"
+                        className="h-10 w-full rounded-xl border border-slate-300 bg-white px-3 text-sm text-slate-900 placeholder:text-slate-400 transition-colors focus:border-indigo-500 focus:ring-2 focus:ring-indigo-500/30 focus:outline-none dark:border-slate-600 dark:bg-surface dark:text-slate-100 dark:placeholder:text-slate-500"
+                      />
                     </div>
-                  </div>
-
-                  <div>
-                    <label htmlFor="principalName" className="mb-1.5 block text-sm font-medium text-slate-700 dark:text-slate-300">
-                      Principal / Director Name
-                    </label>
-                    <input
-                      id="principalName"
-                      name="principalName"
-                      type="text"
-                      defaultValue={profile.principalName}
-                      placeholder="e.g. Dr. Ramesh Kumar"
-                      className="h-10 w-full rounded-xl border border-slate-300 bg-white px-3 text-sm text-slate-900 placeholder:text-slate-400 transition-colors focus:border-indigo-500 focus:ring-2 focus:ring-indigo-500/30 focus:outline-none dark:border-slate-600 dark:bg-surface dark:text-slate-100 dark:placeholder:text-slate-500"
-                    />
                   </div>
 
                   <div className="border-t border-slate-200 pt-5 dark:border-slate-700">
@@ -591,6 +581,192 @@ export default function ProfileClient({ profile }: { profile: ProfileData }) {
                       rows={3}
                       defaultValue={profile.departments}
                       placeholder="e.g. Computer Science, Electronics, Mechanical, Civil"
+                      className="w-full rounded-xl border border-slate-300 bg-white px-3 py-2.5 text-sm text-slate-900 placeholder:text-slate-400 transition-colors focus:border-indigo-500 focus:ring-2 focus:ring-indigo-500/30 focus:outline-none dark:border-slate-600 dark:bg-surface dark:text-slate-100 dark:placeholder:text-slate-500"
+                    />
+                  </div>
+
+                  <div className="border-t border-slate-200 pt-5 dark:border-slate-700">
+                    <h3 className="mb-4 text-sm font-semibold text-slate-900 dark:text-slate-100">Accreditation & Affiliation</h3>
+                  </div>
+
+                  <div>
+                    <label htmlFor="affiliatedUniversity" className="mb-1.5 block text-sm font-medium text-slate-700 dark:text-slate-300">
+                      Affiliated University
+                    </label>
+                    <input
+                      id="affiliatedUniversity"
+                      name="affiliatedUniversity"
+                      type="text"
+                      defaultValue={profile.affiliatedUniversity}
+                      placeholder="e.g. Anna University, Mumbai University"
+                      className="h-10 w-full rounded-xl border border-slate-300 bg-white px-3 text-sm text-slate-900 placeholder:text-slate-400 transition-colors focus:border-indigo-500 focus:ring-2 focus:ring-indigo-500/30 focus:outline-none dark:border-slate-600 dark:bg-surface dark:text-slate-100 dark:placeholder:text-slate-500"
+                    />
+                  </div>
+
+                  <div className="flex items-center gap-6">
+                    <label className="flex items-center gap-2">
+                      <input
+                        type="checkbox"
+                        name="ugcRecognized"
+                        defaultChecked={profile.ugcRecognized}
+                        className="size-4 rounded border-slate-300 text-indigo-600 focus:ring-indigo-500"
+                      />
+                      <span className="text-sm text-slate-700 dark:text-slate-300">UGC Recognized</span>
+                    </label>
+                    <label className="flex items-center gap-2">
+                      <input
+                        type="checkbox"
+                        name="aicteApproved"
+                        defaultChecked={profile.aicteApproved}
+                        className="size-4 rounded border-slate-300 text-indigo-600 focus:ring-indigo-500"
+                      />
+                      <span className="text-sm text-slate-700 dark:text-slate-300">AICTE Approved</span>
+                    </label>
+                    <label className="flex items-center gap-2">
+                      <input
+                        type="checkbox"
+                        name="nbaAccredited"
+                        defaultChecked={profile.nbaAccredited}
+                        className="size-4 rounded border-slate-300 text-indigo-600 focus:ring-indigo-500"
+                      />
+                      <span className="text-sm text-slate-700 dark:text-slate-300">NBA Accredited</span>
+                    </label>
+                  </div>
+
+                  <div>
+                    <label htmlFor="coursesOffered" className="mb-1.5 block text-sm font-medium text-slate-700 dark:text-slate-300">
+                      Courses Offered
+                    </label>
+                    <textarea
+                      id="coursesOffered"
+                      name="coursesOffered"
+                      rows={3}
+                      defaultValue={profile.coursesOffered}
+                      placeholder="e.g. B.Tech CSE, B.Tech ECE, M.Tech, MBA, BCA"
+                      className="w-full rounded-xl border border-slate-300 bg-white px-3 py-2.5 text-sm text-slate-900 placeholder:text-slate-400 transition-colors focus:border-indigo-500 focus:ring-2 focus:ring-indigo-500/30 focus:outline-none dark:border-slate-600 dark:bg-surface dark:text-slate-100 dark:placeholder:text-slate-500"
+                    />
+                  </div>
+
+                  <div className="border-t border-slate-200 pt-5 dark:border-slate-700">
+                    <h3 className="mb-4 text-sm font-semibold text-slate-900 dark:text-slate-100">Placement Statistics</h3>
+                  </div>
+
+                  <div className="grid gap-4 sm:grid-cols-3">
+                    <div>
+                      <label htmlFor="averagePlacementRate" className="mb-1.5 block text-sm font-medium text-slate-700 dark:text-slate-300">
+                        Placement Rate (%)
+                      </label>
+                      <input
+                        id="averagePlacementRate"
+                        name="averagePlacementRate"
+                        type="number"
+                        min={0}
+                        max={100}
+                        step={0.1}
+                        defaultValue={profile.averagePlacementRate ?? ""}
+                        placeholder="e.g. 85"
+                        className="h-10 w-full rounded-xl border border-slate-300 bg-white px-3 text-sm text-slate-900 placeholder:text-slate-400 transition-colors focus:border-indigo-500 focus:ring-2 focus:ring-indigo-500/30 focus:outline-none dark:border-slate-600 dark:bg-surface dark:text-slate-100 dark:placeholder:text-slate-500"
+                      />
+                    </div>
+                    <div>
+                      <label htmlFor="highestPackage" className="mb-1.5 block text-sm font-medium text-slate-700 dark:text-slate-300">
+                        Highest Package
+                      </label>
+                      <input
+                        id="highestPackage"
+                        name="highestPackage"
+                        type="text"
+                        defaultValue={profile.highestPackage}
+                        placeholder="e.g. ₹45 LPA"
+                        className="h-10 w-full rounded-xl border border-slate-300 bg-white px-3 text-sm text-slate-900 placeholder:text-slate-400 transition-colors focus:border-indigo-500 focus:ring-2 focus:ring-indigo-500/30 focus:outline-none dark:border-slate-600 dark:bg-surface dark:text-slate-100 dark:placeholder:text-slate-500"
+                      />
+                    </div>
+                    <div>
+                      <label htmlFor="averagePackage" className="mb-1.5 block text-sm font-medium text-slate-700 dark:text-slate-300">
+                        Average Package
+                      </label>
+                      <input
+                        id="averagePackage"
+                        name="averagePackage"
+                        type="text"
+                        defaultValue={profile.averagePackage}
+                        placeholder="e.g. ₹8 LPA"
+                        className="h-10 w-full rounded-xl border border-slate-300 bg-white px-3 text-sm text-slate-900 placeholder:text-slate-400 transition-colors focus:border-indigo-500 focus:ring-2 focus:ring-indigo-500/30 focus:outline-none dark:border-slate-600 dark:bg-surface dark:text-slate-100 dark:placeholder:text-slate-500"
+                      />
+                    </div>
+                  </div>
+
+                  <div className="border-t border-slate-200 pt-5 dark:border-slate-700">
+                    <h3 className="mb-4 text-sm font-semibold text-slate-900 dark:text-slate-100">Admissions & Facilities</h3>
+                  </div>
+
+                  <div className="grid gap-4 sm:grid-cols-2">
+                    <div>
+                      <label htmlFor="admissionContact" className="mb-1.5 block text-sm font-medium text-slate-700 dark:text-slate-300">
+                        Admission Contact Person
+                      </label>
+                      <input
+                        id="admissionContact"
+                        name="admissionContact"
+                        type="text"
+                        defaultValue={profile.admissionContact}
+                        placeholder="e.g. Prof. S. Sharma"
+                        className="h-10 w-full rounded-xl border border-slate-300 bg-white px-3 text-sm text-slate-900 placeholder:text-slate-400 transition-colors focus:border-indigo-500 focus:ring-2 focus:ring-indigo-500/30 focus:outline-none dark:border-slate-600 dark:bg-surface dark:text-slate-100 dark:placeholder:text-slate-500"
+                      />
+                    </div>
+                    <div>
+                      <label htmlFor="admissionPhone" className="mb-1.5 block text-sm font-medium text-slate-700 dark:text-slate-300">
+                        Admission Phone
+                      </label>
+                      <input
+                        id="admissionPhone"
+                        name="admissionPhone"
+                        type="tel"
+                        defaultValue={profile.admissionPhone}
+                        placeholder="e.g. 022-12345678"
+                        className="h-10 w-full rounded-xl border border-slate-300 bg-white px-3 text-sm text-slate-900 placeholder:text-slate-400 transition-colors focus:border-indigo-500 focus:ring-2 focus:ring-indigo-500/30 focus:outline-none dark:border-slate-600 dark:bg-surface dark:text-slate-100 dark:placeholder:text-slate-500"
+                      />
+                    </div>
+                  </div>
+
+                  <div>
+                    <label htmlFor="facilities" className="mb-1.5 block text-sm font-medium text-slate-700 dark:text-slate-300">
+                      Facilities
+                    </label>
+                    <textarea
+                      id="facilities"
+                      name="facilities"
+                      rows={3}
+                      defaultValue={profile.facilities}
+                      placeholder="e.g. Library, Labs, Hostel, Sports, Wi-Fi, Placement Cell"
+                      className="w-full rounded-xl border border-slate-300 bg-white px-3 py-2.5 text-sm text-slate-900 placeholder:text-slate-400 transition-colors focus:border-indigo-500 focus:ring-2 focus:ring-indigo-500/30 focus:outline-none dark:border-slate-600 dark:bg-surface dark:text-slate-100 dark:placeholder:text-slate-500"
+                    />
+                  </div>
+
+                  <div>
+                    <label htmlFor="motto" className="mb-1.5 block text-sm font-medium text-slate-700 dark:text-slate-300">
+                      College Motto
+                    </label>
+                    <input
+                      id="motto"
+                      name="motto"
+                      type="text"
+                      defaultValue={profile.motto}
+                      placeholder="e.g. Knowledge is Power"
+                      className="h-10 w-full rounded-xl border border-slate-300 bg-white px-3 text-sm text-slate-900 placeholder:text-slate-400 transition-colors focus:border-indigo-500 focus:ring-2 focus:ring-indigo-500/30 focus:outline-none dark:border-slate-600 dark:bg-surface dark:text-slate-100 dark:placeholder:text-slate-500"
+                    />
+                  </div>
+
+                  <div>
+                    <label htmlFor="vision" className="mb-1.5 block text-sm font-medium text-slate-700 dark:text-slate-300">
+                      Vision
+                    </label>
+                    <textarea
+                      id="vision"
+                      name="vision"
+                      rows={3}
+                      defaultValue={profile.vision}
+                      placeholder="Describe your institution's vision…"
                       className="w-full rounded-xl border border-slate-300 bg-white px-3 py-2.5 text-sm text-slate-900 placeholder:text-slate-400 transition-colors focus:border-indigo-500 focus:ring-2 focus:ring-indigo-500/30 focus:outline-none dark:border-slate-600 dark:bg-surface dark:text-slate-100 dark:placeholder:text-slate-500"
                     />
                   </div>

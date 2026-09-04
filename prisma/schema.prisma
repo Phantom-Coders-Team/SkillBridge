@@ -80,6 +80,18 @@ model Profile {
   totalFaculty    Int?
   departments     String?
 
+  affiliatedUniversity String?
+  coursesOffered       String?
+  ugcRecognized        Boolean @default(false)
+  admissionContact     String?
+  admissionPhone       String?
+  averagePlacementRate Float?
+  highestPackage       String?
+  averagePackage       String?
+  facilities           String?
+  motto                String?
+  vision               String?
+
   @@map("profiles")
 }
 

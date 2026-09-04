@@ -48,6 +48,17 @@ export default async function PublicProfilePage({ params }: { params: Promise<{ 
           totalStudents: true,
           totalFaculty: true,
           departments: true,
+          affiliatedUniversity: true,
+          coursesOffered: true,
+          ugcRecognized: true,
+          admissionContact: true,
+          admissionPhone: true,
+          averagePlacementRate: true,
+          highestPackage: true,
+          averagePackage: true,
+          facilities: true,
+          motto: true,
+          vision: true,
         },
       },
     },
@@ -194,7 +205,19 @@ export default async function PublicProfilePage({ params }: { params: Promise<{ 
                   <dd className="text-sm font-medium text-emerald-600 dark:text-emerald-400">Approved</dd>
                 </div>
               )}
+              {p.ugcRecognized && (
+                <div>
+                  <dt className="text-xs font-medium text-slate-400 dark:text-slate-500">UGC</dt>
+                  <dd className="text-sm font-medium text-emerald-600 dark:text-emerald-400">Recognized</dd>
+                </div>
+              )}
             </div>
+            {p.affiliatedUniversity && (
+              <div>
+                <dt className="text-xs font-medium text-slate-400 dark:text-slate-500">Affiliated University</dt>
+                <dd className="text-sm font-medium text-slate-700 dark:text-slate-200">{p.affiliatedUniversity}</dd>
+              </div>
+            )}
             {p.principalName && (
               <div>
                 <dt className="text-xs font-medium text-slate-400 dark:text-slate-500">Principal / Director</dt>
@@ -246,6 +269,90 @@ export default async function PublicProfilePage({ params }: { params: Promise<{ 
               </div>
             )}
           </dl>
+        </Card>
+      )}
+
+      {isInstitution && p && (p.averagePlacementRate || p.highestPackage || p.averagePackage) && (
+        <Card className="mt-6 p-5">
+          <h3 className="mb-4 flex items-center gap-2 text-sm font-semibold text-slate-900 dark:text-slate-100">
+            <Award aria-hidden className="size-4 text-emerald-500" /> Placement Statistics
+          </h3>
+          <dl className="grid grid-cols-1 gap-4 sm:grid-cols-3">
+            {p.averagePlacementRate && (
+              <div>
+                <dt className="text-xs font-medium text-slate-400 dark:text-slate-500">Placement Rate</dt>
+                <dd className="text-sm font-semibold text-slate-800 dark:text-slate-100">{p.averagePlacementRate}%</dd>
+              </div>
+            )}
+            {p.highestPackage && (
+              <div>
+                <dt className="text-xs font-medium text-slate-400 dark:text-slate-500">Highest Package</dt>
+                <dd className="text-sm font-semibold text-emerald-600 dark:text-emerald-400">{p.highestPackage}</dd>
+              </div>
+            )}
+            {p.averagePackage && (
+              <div>
+                <dt className="text-xs font-medium text-slate-400 dark:text-slate-500">Average Package</dt>
+                <dd className="text-sm font-semibold text-emerald-600 dark:text-emerald-400">{p.averagePackage}</dd>
+              </div>
+            )}
+          </dl>
+        </Card>
+      )}
+
+      {isInstitution && p && (p.coursesOffered || p.admissionContact || p.admissionPhone || p.facilities) && (
+        <Card className="mt-6 p-5">
+          <h3 className="mb-4 flex items-center gap-2 text-sm font-semibold text-slate-900 dark:text-slate-100">
+            <BookOpen aria-hidden className="size-4 text-sky-500" /> Courses & Admissions
+          </h3>
+          <dl className="grid grid-cols-1 gap-4 sm:grid-cols-2">
+            {p.coursesOffered && (
+              <div className="sm:col-span-2">
+                <dt className="text-xs font-medium text-slate-400 dark:text-slate-500">Courses Offered</dt>
+                <dd className="mt-1 flex flex-wrap gap-2">
+                  {p.coursesOffered.split(",").map((c: string, i: number) => (
+                    <Badge key={i} tone="blue">{c.trim()}</Badge>
+                  ))}
+                </dd>
+              </div>
+            )}
+            {p.admissionContact && (
+              <div>
+                <dt className="text-xs font-medium text-slate-400 dark:text-slate-500">Admission Contact</dt>
+                <dd className="text-sm font-medium text-slate-700 dark:text-slate-200">{p.admissionContact}</dd>
+              </div>
+            )}
+            {p.admissionPhone && (
+              <div>
+                <dt className="text-xs font-medium text-slate-400 dark:text-slate-500">Admission Phone</dt>
+                <dd className="text-sm font-medium text-slate-700 dark:text-slate-200">{p.admissionPhone}</dd>
+              </div>
+            )}
+            {p.facilities && (
+              <div className="sm:col-span-2">
+                <dt className="text-xs font-medium text-slate-400 dark:text-slate-500">Facilities</dt>
+                <dd className="mt-1 flex flex-wrap gap-2">
+                  {p.facilities.split(",").map((f: string, i: number) => (
+                    <Badge key={i} tone="cyan">{f.trim()}</Badge>
+                  ))}
+                </dd>
+              </div>
+            )}
+          </dl>
+        </Card>
+      )}
+
+      {isInstitution && p && (p.motto || p.vision) && (
+        <Card className="mt-6 p-5">
+          <h3 className="mb-4 flex items-center gap-2 text-sm font-semibold text-slate-900 dark:text-slate-100">
+            <Sparkles aria-hidden className="size-4 text-amber-500" /> About the Institution
+          </h3>
+          {p.motto && (
+            <p className="text-sm italic text-slate-500 dark:text-slate-400">“{p.motto}”</p>
+          )}
+          {p.vision && (
+            <p className="mt-3 text-sm leading-relaxed text-slate-600 dark:text-slate-300">{p.vision}</p>
+          )}
         </Card>
       )}
     </div>

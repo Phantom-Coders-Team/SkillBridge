@@ -47,6 +47,18 @@ export async function updateProfileAction(_prevState: ProfileState | null, formD
   const totalFaculty = formData.get("totalFaculty") ? Number(formData.get("totalFaculty")) : null;
   const departments = String(formData.get("departments") || "").trim() || null;
 
+  const affiliatedUniversity = String(formData.get("affiliatedUniversity") || "").trim() || null;
+  const coursesOffered = String(formData.get("coursesOffered") || "").trim() || null;
+  const ugcRecognized = formData.get("ugcRecognized") === "on";
+  const admissionContact = String(formData.get("admissionContact") || "").trim() || null;
+  const admissionPhone = String(formData.get("admissionPhone") || "").trim() || null;
+  const averagePlacementRate = formData.get("averagePlacementRate") ? Number(formData.get("averagePlacementRate")) : null;
+  const highestPackage = String(formData.get("highestPackage") || "").trim() || null;
+  const averagePackage = String(formData.get("averagePackage") || "").trim() || null;
+  const facilities = String(formData.get("facilities") || "").trim() || null;
+  const motto = String(formData.get("motto") || "").trim() || null;
+  const vision = String(formData.get("vision") || "").trim() || null;
+
   if (!name || name.length < 2) {
     return { error: "Name must be at least 2 characters." };
   }
@@ -99,6 +111,17 @@ export async function updateProfileAction(_prevState: ProfileState | null, formD
       totalStudents,
       totalFaculty,
       departments,
+      affiliatedUniversity,
+      coursesOffered,
+      ugcRecognized,
+      admissionContact,
+      admissionPhone,
+      averagePlacementRate,
+      highestPackage,
+      averagePackage,
+      facilities,
+      motto,
+      vision,
       ...(avatarUrl ? { avatarUrl } : clearAvatar ? { avatarUrl: null } : {}),
     },
     create: {
@@ -127,6 +150,17 @@ export async function updateProfileAction(_prevState: ProfileState | null, formD
       totalStudents,
       totalFaculty,
       departments,
+      affiliatedUniversity,
+      coursesOffered,
+      ugcRecognized,
+      admissionContact,
+      admissionPhone,
+      averagePlacementRate,
+      highestPackage,
+      averagePackage,
+      facilities,
+      motto,
+      vision,
       ...(avatarUrl ? { avatarUrl } : {}),
     },
   });
