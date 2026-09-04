@@ -37,17 +37,17 @@ export default function LandingNav({ user }: { user: SessionUser | null }) {
 
         {/* Section anchor links for quick navigation */}
         <div className="hidden md:flex items-center gap-6 text-sm font-medium text-slate-600 dark:text-slate-400">
-          <a href="#features" className="transition-colors hover:text-indigo-600 dark:hover:text-indigo-400">
-            Features
-          </a>
-          <a href="#how-it-works" className="transition-colors hover:text-indigo-600 dark:hover:text-indigo-400">
-            How It Works
-          </a>
-          <a href="#testimonials" className="transition-colors hover:text-indigo-600 dark:hover:text-indigo-400">
-            Success Stories
-          </a>
           <a href="#roles" className="transition-colors hover:text-indigo-600 dark:hover:text-indigo-400">
-            For Roles
+            Portals
+          </a>
+          <a href="#lifecycle" className="transition-colors hover:text-indigo-600 dark:hover:text-indigo-400">
+            Lifecycle
+          </a>
+          <a href="#institutions" className="transition-colors hover:text-indigo-600 dark:hover:text-indigo-400">
+            Institutions
+          </a>
+          <a href="#capabilities" className="transition-colors hover:text-indigo-600 dark:hover:text-indigo-400">
+            Capabilities
           </a>
         </div>
 

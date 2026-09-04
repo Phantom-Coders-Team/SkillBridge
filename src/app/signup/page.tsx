@@ -1,7 +1,8 @@
 "use client";
 
 import Link from "next/link";
-import { useActionState, useState } from "react";
+import { useActionState, useEffect, useState, Suspense } from "react";
+import { useSearchParams } from "next/navigation";
 import { ArrowLeft, ArrowRight, Eye, EyeOff, GraduationCap, Loader2, Lock, Mail, Sparkles, User } from "lucide-react";
 import { signupAction } from "./actions";
 import { cn } from "@/lib/cn";
@@ -21,6 +22,17 @@ const FEATURES = [
   "Mentorship, office hours & sabbatical exchange",
 ];
 
+function RoleParamSync({ onSelect }: { onSelect: (r: string) => void }) {
+  const searchParams = useSearchParams();
+  const r = searchParams.get("role")?.toUpperCase();
+  useEffect(() => {
+    if (r && ["STUDENT", "FACULTY", "INDUSTRY", "TPO"].includes(r)) {
+      onSelect(r);
+    }
+  }, [r, onSelect]);
+  return null;
+}
+
 export default function SignupPage() {
   const [state, formAction, pending] = useActionState(signupAction, null);
   const [showPassword, setShowPassword] = useState(false);
@@ -28,6 +40,9 @@ export default function SignupPage() {
 
   return (
     <div className="relative flex min-h-screen flex-col justify-between overflow-hidden bg-background text-foreground transition-colors duration-200">
+      <Suspense fallback={null}>
+        <RoleParamSync onSelect={setSelectedRole} />
+      </Suspense>
       {/* Ambient background glow */}
       <div aria-hidden className="pointer-events-none absolute inset-0 overflow-hidden">
         <div className="absolute -top-40 left-1/2 h-[560px] w-[900px] -translate-x-1/2 rounded-full bg-indigo-500/15 blur-[140px] dark:bg-indigo-600/25" />
