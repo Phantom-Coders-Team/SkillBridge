@@ -1,4 +1,5 @@
 import { redirect } from "next/navigation";
+import Link from "next/link";
 import { Briefcase, Building2, Sparkles } from "lucide-react";
 import { getCurrentUser } from "@/lib/auth";
 import { prisma } from "@/lib/prisma";
@@ -92,10 +93,19 @@ export default async function InternshipsPage() {
               </details>
             </div>
           ) : user.role === "STUDENT" ? (
-            <MyApplicationsModal
-              applications={myApplications}
-              mySkills={studentProfile?.skills ?? ""}
-            />
+            <div className="flex flex-wrap items-center gap-2.5">
+              <Link
+                href="/challenges"
+                className="inline-flex h-10 items-center gap-1.5 rounded-xl border border-border-muted bg-surface px-3.5 text-sm font-medium text-text-secondary transition-colors hover:bg-surface-elevated hover:text-text-primary"
+              >
+                <Sparkles className="size-4 text-amber-500" />
+                Explore Challenges
+              </Link>
+              <MyApplicationsModal
+                applications={myApplications}
+                mySkills={studentProfile?.skills ?? ""}
+              />
+            </div>
           ) : undefined
         }
       />

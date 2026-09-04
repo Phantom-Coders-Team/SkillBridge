@@ -27,14 +27,11 @@ export interface NavItem {
 
 const STUDENT_NAV: NavItem[] = [
   { label: "Dashboard", href: "/dashboard", icon: LayoutDashboard },
-  { label: "Skill Radar & Freshness", href: "/skills", icon: Radar },
-  { label: "Skill Assessments", href: "/assessments", icon: ClipboardCheck },
-  { label: "Internships & Jobs", href: "/internships", icon: Briefcase },
-  { label: "Challenge Marketplace", href: "/challenges", icon: Sparkles },
+  { label: "Skill Radar & Diagnostic", href: "/skills", icon: Radar },
+  { label: "Internships & Opportunities", href: "/internships", icon: Briefcase },
   { label: "Proof of Work & Badges", href: "/proof-of-work", icon: Award },
-  { label: "Skill Tokens", href: "/tokens", icon: Coins },
-  { label: "Mentor Office Hours", href: "/office-hours", icon: CalendarClock },
   { label: "Reverse Placement", href: "/reverse-placement", icon: TrendingUp },
+  { label: "Mentor Office Hours", href: "/office-hours", icon: CalendarClock },
   { label: "Digital Portfolio", href: "/portfolio", icon: ScrollText },
 ];
 

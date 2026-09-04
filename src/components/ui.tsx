@@ -179,6 +179,7 @@ export function StatCard({
   icon: Icon,
   tone = "indigo",
   className,
+  href,
 }: {
   label: string;
   value: ReactNode;
@@ -186,9 +187,10 @@ export function StatCard({
   icon: LucideIcon;
   tone?: BadgeTone;
   className?: string;
+  href?: string;
 }) {
-  return (
-    <Card hover className={cn("flex items-start gap-4 p-5", className)}>
+  const content = (
+    <Card hover className={cn("flex items-start gap-4 p-5", href && "transition-transform hover:-translate-y-0.5", className)}>
       <div
         className={cn(
           "flex size-11 shrink-0 items-center justify-center rounded-xl shadow-xs",
@@ -204,6 +206,16 @@ export function StatCard({
       </div>
     </Card>
   );
+
+  if (href) {
+    return (
+      <Link href={href} className="block focus:outline-none">
+        {content}
+      </Link>
+    );
+  }
+
+  return content;
 }
 
 /* ------------------------------- PageHeader -------------------------------- */

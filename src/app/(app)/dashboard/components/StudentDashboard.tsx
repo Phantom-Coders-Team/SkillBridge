@@ -192,20 +192,22 @@ export function StudentDashboard({
       )}
 
       {/* Primary KPI Stats */}
-      <section className="grid grid-cols-2 gap-4 sm:grid-cols-3">
+      <section className="grid grid-cols-2 gap-4 sm:grid-cols-3 lg:grid-cols-6">
         <StatCard
           label="My Applications"
           value={stats.applicationsCount ?? 0}
           icon={Briefcase}
           tone="emerald"
-          sub={`${stats.acceptedOffersCount ?? 0} offers accepted`}
+          sub={`${stats.acceptedOffersCount ?? 0} accepted`}
+          href="/internships"
         />
         <StatCard
-          label="My Projects"
+          label="Project Repos"
           value={stats.projectsCount}
           icon={FolderKanban}
           tone="indigo"
           sub="Live repos"
+          href="/proof-of-work"
         />
         <StatCard
           label="Proofs of Work"
@@ -213,6 +215,7 @@ export function StudentDashboard({
           icon={Award}
           tone="emerald"
           sub="Verified badges"
+          href="/proof-of-work"
         />
         <StatCard
           label="Skills Tested"
@@ -220,6 +223,7 @@ export function StudentDashboard({
           icon={Radar}
           tone="violet"
           sub="Radar benchmarks"
+          href="/skills"
         />
         <StatCard
           label="Token Balance"
@@ -227,6 +231,7 @@ export function StudentDashboard({
           icon={Coins}
           tone="amber"
           sub="For mentor clinics"
+          href="/tokens"
         />
         <StatCard
           label="Job Pitches"
@@ -234,6 +239,7 @@ export function StudentDashboard({
           icon={Briefcase}
           tone="blue"
           sub="Recruiter pitches"
+          href="/reverse-placement"
         />
       </section>
 

@@ -1,5 +1,6 @@
+import Link from "next/link";
 import { redirect } from "next/navigation";
-import { ClipboardCheck, ListChecks } from "lucide-react";
+import { ClipboardCheck, ClipboardList, ListChecks } from "lucide-react";
 import { getCurrentUser } from "@/lib/auth";
 import { prisma } from "@/lib/prisma";
 import { Badge, Card, EmptyState, PageHeader, type BadgeTone } from "@/components/ui";
@@ -38,8 +39,17 @@ export default async function SkillsPage() {
       <div className="mx-auto max-w-6xl">
         <PageHeader
           icon={ClipboardCheck}
-          title="Skill Radar & Badge Freshness"
-          subtitle="Track verified proficiency against badge decay and refresh skills with the re-certification diagnostic."
+          title="Skill Radar & Freshness"
+          subtitle="Track verified proficiency against badge decay and refresh skills with calibrated diagnostic assessments."
+          actions={
+            <Link
+              href="/assessments"
+              className="inline-flex h-10 items-center gap-2 rounded-xl bg-indigo-600 px-4 text-xs font-semibold text-white shadow-xs hover:bg-indigo-700 active:scale-98 transition-all"
+            >
+              <ClipboardList className="size-4" />
+              <span>Take Technical Assessments</span>
+            </Link>
+          }
         />
         <SkillDecayEngine initialSkills={skills} />
 
