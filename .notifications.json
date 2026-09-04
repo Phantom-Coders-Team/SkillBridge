@@ -104,31 +104,5 @@
     "read": false,
     "emailSent": false,
     "createdAt": "2026-09-04T17:06:08.415Z"
-  },
-  {
-    "id": "notif_1788541023165_re7f7",
-    "userId": "cmtmxsb7d0000jx04br19tnda",
-    "userEmail": "himanshusahani3565@gmail.com",
-    "userName": "HIMANSHU",
-    "title": "Test Email Notification Dispatched",
-    "message": "A test email notification was sent to himanshusahani3565@gmail.com via the SkillBridge Email Engine.",
-    "type": "TEST",
-    "link": "/dashboard",
-    "read": true,
-    "emailSent": false,
-    "createdAt": "2026-09-04T16:57:03.165Z"
-  },
-  {
-    "id": "notif_1788540955759_glztm",
-    "userId": "cmtlzparg000otnx06chkiqm1",
-    "userEmail": "recruit@infosys.com",
-    "userName": "Infosys",
-    "title": "Test Email Notification Dispatched",
-    "message": "A test email notification was sent to recruit@infosys.com via the SkillBridge Email Engine.",
-    "type": "TEST",
-    "link": "/dashboard",
-    "read": true,
-    "emailSent": false,
-    "createdAt": "2026-09-04T16:55:55.759Z"
   }
 ]

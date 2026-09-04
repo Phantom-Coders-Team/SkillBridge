@@ -10,7 +10,6 @@ import {
   Briefcase,
   CalendarClock,
   Award,
-  Send,
   Loader2,
   ExternalLink,
 } from "lucide-react";
@@ -22,8 +21,6 @@ export function NotificationCenter({ userEmail }: { userEmail: string }) {
   const [notifications, setNotifications] = useState<AppNotification[]>([]);
   const [unreadCount, setUnreadCount] = useState(0);
   const [loading, setLoading] = useState(false);
-  const [sendingTest, setSendingTest] = useState(false);
-  const [feedback, setFeedback] = useState<string | null>(null);
   const popoverRef = useRef<HTMLDivElement>(null);
 
   const handleNotificationClick = (notif: AppNotification) => {
@@ -101,29 +98,6 @@ export function NotificationCenter({ userEmail }: { userEmail: string }) {
     }
   };
 
-  const handleSendTestEmail = async () => {
-    try {
-      setSendingTest(true);
-      setFeedback(null);
-      const res = await fetch("/api/notifications", {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ action: "send_test_email" }),
-      });
-      if (res.ok) {
-        setFeedback(`Notification email dispatched to ${userEmail}!`);
-        await fetchNotifications();
-        setTimeout(() => setFeedback(null), 4000);
-      } else {
-        setFeedback("Failed to trigger test email.");
-      }
-    } catch {
-      setFeedback("Error dispatching test email.");
-    } finally {
-      setSendingTest(false);
-    }
-  };
-
   const getIcon = (type: AppNotification["type"]) => {
     switch (type) {
       case "APPLICATION":
@@ -179,27 +153,6 @@ export function NotificationCenter({ userEmail }: { userEmail: string }) {
                 <CheckCheck className="size-3.5" />
                 <span>Mark all read</span>
               </button>
-            )}
-          </div>
-
-          {/* Test Email Action Bar */}
-          <div className="border-b border-border-muted bg-slate-50/50 p-2.5 dark:bg-slate-900/30">
-            <button
-              onClick={handleSendTestEmail}
-              disabled={sendingTest}
-              className="flex w-full items-center justify-center gap-1.5 rounded-xl border border-indigo-200 bg-indigo-50/60 px-3 py-1.5 text-xs font-semibold text-indigo-700 transition hover:bg-indigo-100/80 disabled:opacity-50 dark:border-indigo-800/60 dark:bg-indigo-950/30 dark:text-indigo-300"
-            >
-              {sendingTest ? (
-                <Loader2 className="size-3.5 animate-spin" />
-              ) : (
-                <Send className="size-3.5" />
-              )}
-              <span>Send Test Notification Email</span>
-            </button>
-            {feedback && (
-              <p className="mt-1.5 text-center text-[11px] font-medium text-emerald-600 dark:text-emerald-400">
-                {feedback}
-              </p>
             )}
           </div>
 

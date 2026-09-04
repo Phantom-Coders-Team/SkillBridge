@@ -5,7 +5,6 @@ import {
   getUnreadCount,
   markNotificationAsRead,
   markAllNotificationsAsRead,
-  notifyTestEmail,
 } from "@/lib/notifications";
 
 export async function GET() {
@@ -40,15 +39,6 @@ export async function POST(req: Request) {
     if (action === "mark_all_read") {
       await markAllNotificationsAsRead(user.id);
       return NextResponse.json({ success: true });
-    }
-
-    if (action === "send_test_email") {
-      const result = await notifyTestEmail({
-        userId: user.id,
-        userEmail: user.email,
-        userName: user.name,
-      });
-      return NextResponse.json({ success: true, result });
     }
 
     return NextResponse.json({ error: "Invalid action" }, { status: 400 });

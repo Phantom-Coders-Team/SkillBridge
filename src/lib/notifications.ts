@@ -7,7 +7,6 @@ import {
   sendRecruiterPitchEmail,
   sendNewApplicationAlertEmail,
   sendMentorBookingEmail,
-  sendTestNotificationEmail,
   sendPitchAcceptedEmail,
 } from "./email";
 
@@ -484,37 +483,6 @@ export async function notifyMentorBooking({
   await updateNotificationEmailStatus(mentorNotif.id, mentorEmailRes.success, mentorEmailRes.simulated);
 
   return { studentNotif, mentorNotif };
-}
-
-export async function notifyTestEmail({
-  userId,
-  userEmail,
-  userName,
-}: {
-  userId: string;
-  userEmail: string;
-  userName: string;
-}) {
-  const notif = await createNotification({
-    userId,
-    userEmail,
-    userName,
-    title: "Test Email Notification Dispatched",
-    message: `A test email notification was sent to ${userEmail} via the SkillBridge Email Engine.`,
-    type: "TEST",
-    link: "/dashboard",
-  });
-
-  const emailResult = await sendTestNotificationEmail({
-    userEmail,
-    userName,
-  });
-
-  notif.emailSent = emailResult.success;
-  notif.emailSimulated = emailResult.simulated;
-  await updateNotificationEmailStatus(notif.id, emailResult.success, emailResult.simulated);
-
-  return { notification: notif, emailResult };
 }
 
 export async function notifyPitchAccepted({
