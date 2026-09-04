@@ -30,12 +30,12 @@ export async function postChallenge(
     await prisma.industryChallenge.create({
       data: {
         industryId: user.id,
-        title,
-        description,
+        title: title.trim(),
+        description: description.trim(),
         challengeType: challengeType as ChallengeTypeValue,
-        domain: domain || null,
-        techStack: techStack || null,
-        objectives: objectives || null,
+        domain: domain?.trim() || null,
+        techStack: techStack?.trim() || null,
+        objectives: objectives?.trim() || null,
         stipend: stipend ? parseInt(stipend, 10) : null,
         deadline: deadline ? new Date(deadline) : null,
         rndOnly,
@@ -43,8 +43,68 @@ export async function postChallenge(
     });
 
     revalidatePath("/challenges");
+    revalidatePath("/dashboard");
     return { success: true };
   } catch {
     return { error: "Failed to post challenge." };
   }
 }
+
+export async function updateChallengeStatus(
+  challengeId: string,
+  status: string,
+): Promise<{ error?: string; success?: boolean }> {
+  const user = await requireRole(["INDUSTRIES", "INDUSTRY"]);
+
+  try {
+    const challenge = await prisma.industryChallenge.findUnique({
+      where: { id: challengeId },
+      select: { industryId: true },
+    });
+
+    if (!challenge || challenge.industryId !== user.id) {
+      return { error: "Unauthorized to update this challenge." };
+    }
+
+    await prisma.industryChallenge.update({
+      where: { id: challengeId },
+      data: { status },
+    });
+
+    revalidatePath("/challenges");
+    revalidatePath("/dashboard");
+    return { success: true };
+  } catch {
+    return { error: "Failed to update challenge status." };
+  }
+}
+
+export async function updateChallengeApplicationStatus(
+  applicationId: string,
+  status: string,
+): Promise<{ error?: string; success?: boolean }> {
+  const user = await requireRole(["INDUSTRIES", "INDUSTRY"]);
+
+  try {
+    const application = await prisma.challengeApplication.findUnique({
+      where: { id: applicationId },
+      include: { challenge: { select: { industryId: true } } },
+    });
+
+    if (!application || application.challenge.industryId !== user.id) {
+      return { error: "Unauthorized to update this application." };
+    }
+
+    await prisma.challengeApplication.update({
+      where: { id: applicationId },
+      data: { status },
+    });
+
+    revalidatePath("/challenges");
+    revalidatePath("/dashboard");
+    return { success: true };
+  } catch {
+    return { error: "Failed to update application status." };
+  }
+}
+

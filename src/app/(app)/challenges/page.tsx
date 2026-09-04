@@ -2,8 +2,9 @@ import { redirect } from "next/navigation";
 import { Building2, Sparkles, Users2 } from "lucide-react";
 import { getCurrentUser } from "@/lib/auth";
 import { prisma } from "@/lib/prisma";
-import { Badge, Button, Card, EmptyState, PageHeader, type BadgeTone } from "@/components/ui";
-import PostChallengeForm from "./PostChallengeForm";
+import { Badge, Card, EmptyState, PageHeader, type BadgeTone } from "@/components/ui";
+import PostChallengeModal from "./PostChallengeModal";
+import MyChallengesModal, { type SerializedChallenge } from "./MyChallengesModal";
 
 const TYPE_TONE: Record<string, BadgeTone> = {
   CAPSTONE: "blue",
@@ -23,13 +24,83 @@ export default async function ChallengesPage() {
   const user = await getCurrentUser();
   if (!user) redirect("/login");
 
-  const challenges = await prisma.industryChallenge.findMany({
-    include: {
-      industry: { select: { name: true, profile: { select: { companyName: true } } } },
-      _count: { select: { applications: true, labUnits: true } },
-    },
-    orderBy: { createdAt: "desc" },
-  });
+  const isIndustry = user.role === "INDUSTRIES" || user.role === "INDUSTRY";
+
+  const [challenges, myChallengesRaw] = await Promise.all([
+    prisma.industryChallenge.findMany({
+      include: {
+        industry: { select: { name: true, profile: { select: { companyName: true } } } },
+        _count: { select: { applications: true, labUnits: true } },
+      },
+      orderBy: { createdAt: "desc" },
+    }),
+    isIndustry
+      ? prisma.industryChallenge.findMany({
+          where: { industryId: user.id },
+          include: {
+            applications: {
+              include: {
+                labUnit: {
+                  include: {
+                    faculty: { select: { name: true, email: true } },
+                    members: {
+                      include: {
+                        student: {
+                          select: {
+                            name: true,
+                            email: true,
+                            profile: { select: { department: true } },
+                          },
+                        },
+                      },
+                    },
+                  },
+                },
+              },
+              orderBy: { createdAt: "desc" },
+            },
+            _count: { select: { applications: true, labUnits: true } },
+          },
+          orderBy: { createdAt: "desc" },
+        })
+      : [],
+  ]);
+
+  const serializedMyChallenges: SerializedChallenge[] = myChallengesRaw.map((c) => ({
+    id: c.id,
+    title: c.title,
+    description: c.description,
+    challengeType: c.challengeType,
+    domain: c.domain,
+    techStack: c.techStack,
+    objectives: c.objectives,
+    stipend: c.stipend,
+    status: c.status,
+    deadline: c.deadline ? c.deadline.toISOString() : null,
+    rndOnly: c.rndOnly,
+    createdAt: c.createdAt.toISOString(),
+    applications: c.applications.map((app) => ({
+      id: app.id,
+      proposal: app.proposal,
+      status: app.status,
+      createdAt: app.createdAt.toISOString(),
+      labUnit: {
+        id: app.labUnit.id,
+        name: app.labUnit.name,
+        faculty: app.labUnit.faculty
+          ? { name: app.labUnit.faculty.name, email: app.labUnit.faculty.email }
+          : null,
+        members: app.labUnit.members.map((m) => ({
+          student: {
+            name: m.student.name,
+            email: m.student.email,
+            profile: m.student.profile ? { department: m.student.profile.department } : null,
+          },
+        })),
+      },
+    })),
+    _count: c._count,
+  }));
 
   return (
     <div className="mx-auto max-w-6xl">
@@ -38,15 +109,11 @@ export default async function ChallengesPage() {
         subtitle="Capstones, R&D sprints and micro-consultancy gigs posted by industry partners."
         icon={Sparkles}
         actions={
-          user.role === "INDUSTRIES" || user.role === "INDUSTRY" ? (
-            <details className="group relative">
-              <summary className="cursor-pointer list-none [&::-webkit-details-marker]:hidden">
-                <Button size="md" icon={Sparkles}>Post Challenge</Button>
-              </summary>
-              <div className="animate-pop-in absolute right-0 z-20 mt-2 w-[540px] max-w-[calc(100vw-2rem)] rounded-2xl border border-border-muted bg-surface p-5 shadow-pop">
-                <PostChallengeForm />
-              </div>
-            </details>
+          isIndustry ? (
+            <div className="flex flex-wrap items-center gap-2">
+              <MyChallengesModal challenges={serializedMyChallenges} />
+              <PostChallengeModal />
+            </div>
           ) : undefined
         }
       />
@@ -62,9 +129,14 @@ export default async function ChallengesPage() {
           {challenges.map((c) => (
             <Card key={c.id} hover className="flex flex-col p-5">
               <div className="mb-2 flex items-center justify-between gap-2">
-                <Badge tone={TYPE_TONE[c.challengeType] ?? "gray"}>
-                  {c.challengeType.replaceAll("_", " ")}
-                </Badge>
+                <div className="flex items-center gap-1.5 flex-wrap">
+                  <Badge tone={TYPE_TONE[c.challengeType] ?? "gray"}>
+                    {c.challengeType.replaceAll("_", " ")}
+                  </Badge>
+                  {isIndustry && c.industryId === user.id && (
+                    <Badge tone="purple">Your Posting</Badge>
+                  )}
+                </div>
                 <Badge tone={STATUS_TONE[c.status] ?? "gray"}>
                   {c.status.replaceAll("_", " ")}
                 </Badge>
@@ -86,7 +158,7 @@ export default async function ChallengesPage() {
 
               <div className="mt-3 flex flex-wrap items-center gap-x-4 gap-y-1 text-xs text-slate-500 dark:text-slate-400">
                 {c.stipend !== null && (
-                  <span className="font-semibold text-emerald-700">₹{c.stipend.toLocaleString("en-IN")}</span>
+                  <span className="font-semibold text-emerald-700 dark:text-emerald-400">₹{c.stipend.toLocaleString("en-IN")}</span>
                 )}
                 {c.deadline && (
                   <span>
@@ -96,7 +168,7 @@ export default async function ChallengesPage() {
               </div>
 
               {c.rndOnly && (
-                <span className="mt-3 inline-block w-fit rounded-lg bg-violet-50 px-2.5 py-1 text-[11px] font-semibold text-violet-700">
+                <span className="mt-3 inline-block w-fit rounded-lg bg-violet-50 dark:bg-violet-950/60 px-2.5 py-1 text-[11px] font-semibold text-violet-700 dark:text-violet-300">
                   R&D only — lab unit required
                 </span>
               )}
