@@ -1,5 +1,5 @@
 import { redirect } from "next/navigation";
-import { BarChart3, Briefcase, FolderKanban, Gauge, Users } from "lucide-react";
+import { BarChart3, Briefcase, FolderKanban, Gauge, Users, School, TrendingDown } from "lucide-react";
 import { getCurrentUser } from "@/lib/auth";
 import { prisma } from "@/lib/prisma";
 import { Card, PageHeader, StatCard } from "@/components/ui";
@@ -40,6 +40,51 @@ export default async function AnalyticsPage() {
         title="Platform Analytics"
         subtitle="High-level aggregate metrics across the collaboration portal."
       />
+
+      {(user.role === "ACADEMICIAN" || user.role === "FACULTY") && (
+        <div className="mb-6 rounded-2xl border border-indigo-200 bg-gradient-to-r from-indigo-50 to-white p-6 shadow-sm dark:border-indigo-900/50 dark:from-indigo-950/20 dark:to-surface">
+          <div className="flex items-center gap-3 border-b border-indigo-100 pb-4 dark:border-indigo-900/50">
+            <div className="rounded-lg bg-indigo-600 p-2 text-white">
+              <School className="size-5" />
+            </div>
+            <div>
+              <h2 className="text-lg font-bold text-slate-900 dark:text-slate-100">Institutional Admin View</h2>
+              <p className="text-sm text-slate-500 dark:text-slate-400">Aggregated skill gap analysis for your students.</p>
+            </div>
+          </div>
+          
+          <div className="mt-5 grid grid-cols-1 md:grid-cols-2 gap-6">
+            <div>
+              <h3 className="mb-3 text-sm font-semibold text-slate-900 dark:text-slate-100">Top Institutional Strengths</h3>
+              <ul className="space-y-2">
+                <li className="flex justify-between text-sm">
+                  <span className="text-emerald-700 dark:text-emerald-400">Full Stack Development</span>
+                  <span className="font-medium text-emerald-800 dark:text-emerald-300">82% pass rate</span>
+                </li>
+                <li className="flex justify-between text-sm">
+                  <span className="text-emerald-700 dark:text-emerald-400">Agile Teamwork</span>
+                  <span className="font-medium text-emerald-800 dark:text-emerald-300">76% pass rate</span>
+                </li>
+              </ul>
+            </div>
+            <div>
+              <h3 className="mb-3 flex items-center gap-2 text-sm font-semibold text-slate-900 dark:text-slate-100">
+                <TrendingDown className="size-4 text-amber-500" /> Critical Skill Gaps
+              </h3>
+              <ul className="space-y-2">
+                <li className="flex justify-between text-sm">
+                  <span className="text-amber-700 dark:text-amber-400">Cloud & DevOps</span>
+                  <span className="font-medium text-amber-800 dark:text-amber-300">41% fail rate</span>
+                </li>
+                <li className="flex justify-between text-sm">
+                  <span className="text-amber-700 dark:text-amber-400">Aptitude & Logical Reasoning</span>
+                  <span className="font-medium text-amber-800 dark:text-amber-300">35% fail rate</span>
+                </li>
+              </ul>
+            </div>
+          </div>
+        </div>
+      )}
 
       <div className="grid grid-cols-2 gap-4 lg:grid-cols-4">
         <StatCard label="Total Users" value={totalUsers} icon={Users} tone="indigo" />

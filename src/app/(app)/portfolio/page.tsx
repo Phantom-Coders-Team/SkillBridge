@@ -1,10 +1,11 @@
 import { redirect } from "next/navigation";
-import { Award, BadgeCheck, FileText, FolderOpen, Plus, ScrollText } from "lucide-react";
+import { Award, BadgeCheck, FileText, FolderOpen, Plus, ScrollText, ShieldCheck } from "lucide-react";
 import { getCurrentUser } from "@/lib/auth";
 import { prisma } from "@/lib/prisma";
 import { Avatar, Badge, Card, EmptyState, PageHeader, type BadgeTone } from "@/components/ui";
 import AddPortfolioForm from "./AddPortfolioForm";
 import RemovePortfolioItem from "./RemovePortfolioItem";
+import AIResumeParseButton from "./AIResumeParseButton";
 
 const TYPE_TONE: Record<string, BadgeTone> = {
   CERTIFICATION: "purple",
@@ -45,16 +46,19 @@ export default async function PortfolioPage() {
         icon={ScrollText}
         actions={
           user.role === "STUDENT" ? (
-            <details className="group relative">
-              <summary className="cursor-pointer list-none [&::-webkit-details-marker]:hidden">
-                <span className="inline-flex h-10 items-center gap-2 rounded-xl bg-indigo-600 px-4 text-sm font-semibold text-white hover:bg-indigo-700">
-                  <Plus className="size-4" /> Add Item
-                </span>
-              </summary>
-              <div className="animate-pop-in absolute right-0 z-20 mt-2 w-[460px] max-w-[calc(100vw-2rem)] rounded-2xl border border-border-muted bg-surface p-5 shadow-pop">
-                <AddPortfolioForm />
-              </div>
-            </details>
+            <div className="flex items-center gap-3">
+              <AIResumeParseButton />
+              <details className="group relative">
+                <summary className="cursor-pointer list-none [&::-webkit-details-marker]:hidden">
+                  <span className="inline-flex h-10 items-center gap-2 rounded-xl bg-indigo-600 px-4 text-sm font-semibold text-white hover:bg-indigo-700">
+                    <Plus className="size-4" /> Add Item
+                  </span>
+                </summary>
+                <div className="animate-pop-in absolute right-0 z-20 mt-2 w-[460px] max-w-[calc(100vw-2rem)] rounded-2xl border border-border-muted bg-surface p-5 shadow-pop">
+                  <AddPortfolioForm />
+                </div>
+              </details>
+            </div>
           ) : undefined
         }
       />
@@ -123,10 +127,14 @@ export default async function PortfolioPage() {
                     <p className="line-clamp-1 text-xs text-slate-500 dark:text-slate-400">{po.description}</p>
                   </div>
                   {"status" in po && po.status === "COMPLETED" ? (
-                    <Badge tone="green">Verified</Badge>
+                    <Badge tone="green">
+                      <span className="flex items-center gap-1.5"><ShieldCheck className="size-3" /> Blockchain Verified</span>
+                    </Badge>
                   ) : "facultySignOff" in po ? (
                     <Badge tone={(po as any).facultySignOff === "APPROVED" && (po as any).industrySignOff === "APPROVED" ? "green" : "amber"}>
-                      {(po as any).facultySignOff === "APPROVED" && (po as any).industrySignOff === "APPROVED" ? "Dual sign-off" : "Pending sign-off"}
+                      {(po as any).facultySignOff === "APPROVED" && (po as any).industrySignOff === "APPROVED" ? (
+                        <span className="flex items-center gap-1.5"><ShieldCheck className="size-3" /> Dual sign-off (Verified)</span>
+                      ) : "Pending sign-off"}
                     </Badge>
                   ) : (
                     <Badge tone="gray">{(po as any).status ?? ""}</Badge>

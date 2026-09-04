@@ -242,5 +242,54 @@ export const ASSESSMENT_TRACKS: AssessmentTrack[] = [
         explanation: "Knuth's famous aphorism cautions against complicating architectures to optimize theoretical bottlenecks before measuring real system behavior."
       }
     ]
+  },
+  {
+    id: "aptitude",
+    title: "Aptitude & Logical Reasoning",
+    category: "Reasoning",
+    primarySkill: "Aptitude & Logical Reasoning",
+    durationMinutes: 5,
+    description: "Evaluates numerical reasoning, logical deduction, and pattern recognition expected in placement drives.",
+    questions: [
+      {
+        id: "apt-1",
+        text: "If a company's revenue grows by 20% in the first year and 25% in the second year, what is the total percentage growth over the two years?",
+        options: [
+          "45%",
+          "50%",
+          "55%",
+          "40%"
+        ],
+        correctIndex: 1,
+        skillTested: "Numerical Reasoning",
+        explanation: "100 -> 120 (after 20% growth). 120 * 1.25 = 150. The total growth is 50%."
+      },
+      {
+        id: "apt-2",
+        text: "In a certain code, 'DEVELOPER' is written as 'EFWFMPQFS'. How is 'TESTING' written in that code?",
+        options: [
+          "UFTUJOH",
+          "UFTUHOI",
+          "UFTUJNO",
+          "UFUTJOH"
+        ],
+        correctIndex: 0,
+        skillTested: "Pattern Recognition",
+        explanation: "Each letter is shifted forward by one in the alphabet (D->E, E->F, etc.). Testing becomes UFTUJOH."
+      },
+      {
+        id: "apt-3",
+        text: "All engineers are analytical. Some analytical people are musicians. Therefore, some engineers must be musicians. Is this conclusion logically valid?",
+        options: [
+          "Yes",
+          "No",
+          "Only if musicians are engineers",
+          "Depends on the context"
+        ],
+        correctIndex: 1,
+        skillTested: "Logical Deduction",
+        explanation: "The conclusion is invalid. Just because engineers are part of the 'analytical' group, and some of the 'analytical' group are musicians, it doesn't guarantee the two subsets overlap."
+      }
+    ]
   }
 ];

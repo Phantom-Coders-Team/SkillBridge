@@ -18,6 +18,7 @@ export default async function AssessmentsPage() {
 
   const [assessments, myAssessments] = await Promise.all([
     prisma.skillAssessment.findMany({
+      where: user.role === "STUDENT" ? { studentId: user.id } : undefined,
       include: {
         student: {
           select: {
@@ -101,7 +102,7 @@ export default async function AssessmentsPage() {
         <Card className="overflow-hidden">
           <div className="border-b border-border-muted px-5 py-3 bg-slate-50/50 dark:bg-slate-800/30 flex items-center justify-between">
             <h3 className="text-xs font-bold uppercase tracking-wider text-slate-500 dark:text-slate-400">
-              Recent Institutional Skill Evaluations
+              {user.role === "STUDENT" ? "My Recent Evaluations" : "Recent Institutional Skill Evaluations"}
             </h3>
             <span className="text-xs text-slate-400">{assessments.length} Records</span>
           </div>

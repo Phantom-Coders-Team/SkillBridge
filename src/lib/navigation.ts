@@ -14,6 +14,7 @@ import {
   Sparkles,
   Target,
   TrendingUp,
+  Video,
   type LucideIcon,
 } from "lucide-react";
 import type { Role } from "@/lib/types";
@@ -27,10 +28,12 @@ export interface NavItem {
 const STUDENT_NAV: NavItem[] = [
   { label: "Dashboard", href: "/dashboard", icon: LayoutDashboard },
   { label: "Skill Radar & Diagnostic", href: "/skills", icon: Radar },
+  { label: "Skill Assessments", href: "/assessments", icon: ClipboardCheck },
   { label: "Internships & Opportunities", href: "/internships", icon: Briefcase },
   { label: "Proof of Work & Badges", href: "/proof-of-work", icon: Award },
   { label: "Reverse Placement", href: "/reverse-placement", icon: TrendingUp },
   { label: "Mentor Office Hours", href: "/office-hours", icon: CalendarClock },
+  { label: "AI Mock Interviews", href: "/mock-interview", icon: Video },
   { label: "Digital Portfolio", href: "/portfolio", icon: ScrollText },
 ];
 
