@@ -33,7 +33,7 @@ const TICKER_ITEMS = [
 const PORTALS = [
   {
     role: "STUDENT",
-    kicker: "// STUDENTS",
+    kicker: "// STUDENT",
     title: "Know your gaps before recruiters do.",
     tone: "border-indigo-500/30 hover:border-indigo-500/70 bg-gradient-to-b from-indigo-500/[0.04] to-surface",
     kickerColor: "text-indigo-600 dark:text-indigo-400",
@@ -50,7 +50,7 @@ const PORTALS = [
   },
   {
     role: "ACADEMICIAN",
-    kicker: "// ACADEMICIANS",
+    kicker: "// ACADEMICIAN",
     title: "Teach what the industry practices.",
     tone: "border-purple-500/30 hover:border-purple-500/70 bg-gradient-to-b from-purple-500/[0.04] to-surface",
     kickerColor: "text-purple-600 dark:text-purple-400",
@@ -66,8 +66,8 @@ const PORTALS = [
     cta: "Enter as academician →",
   },
   {
-    role: "INDUSTRIES",
-    kicker: "// INDUSTRIES",
+    role: "INDUSTRY",
+    kicker: "// INDUSTRY",
     title: "Hire on skills, not just resumes.",
     tone: "border-amber-500/30 hover:border-amber-500/70 bg-gradient-to-b from-amber-500/[0.04] to-surface",
     kickerColor: "text-amber-500 dark:text-amber-400",
@@ -79,12 +79,12 @@ const PORTALS = [
       "Publish training programs and mentorship cohorts",
       "Pipeline management: shortlist → offer, tracked live",
     ],
-    href: "/signup?role=INDUSTRIES",
+    href: "/signup?role=INDUSTRY",
     cta: "Enter as industry →",
   },
   {
-    role: "INSTITUTIONS",
-    kicker: "// INSTITUTIONS",
+    role: "INSTITUTION",
+    kicker: "// INSTITUTION",
     title: "Drive outcomes across all cohorts.",
     tone: "border-emerald-500/30 hover:border-emerald-500/70 bg-gradient-to-b from-emerald-500/[0.04] to-surface",
     kickerColor: "text-emerald-600 dark:text-emerald-400",
@@ -96,7 +96,7 @@ const PORTALS = [
       "AI-assisted syllabus gap analysis and curriculum patches",
       "Accreditation-ready audit records and exports",
     ],
-    href: "/signup?role=INSTITUTIONS",
+    href: "/signup?role=INSTITUTION",
     cta: "Enter as institution →",
   },
 ];
@@ -356,7 +356,7 @@ export default async function Home() {
                 Pick your side of the bridge.
               </h2>
               <p className="mt-3 text-base text-slate-600 dark:text-slate-400 sm:text-lg leading-relaxed">
-                Role-based portals for students, academicians, industries, and institutions — each with an end-to-end workflow built
+                Role-based portals for Student, Academician, Industry, and Institution — each with an end-to-end workflow built
                 specifically for them.
               </p>
             </div>
@@ -661,22 +661,22 @@ export default async function Home() {
               <ul className="mt-3.5 space-y-2 text-xs">
                 <li>
                   <Link href="/signup?role=STUDENT" className="hover:text-indigo-600 dark:hover:text-indigo-400">
-                    Students
+                    Student
                   </Link>
                 </li>
                 <li>
                   <Link href="/signup?role=ACADEMICIAN" className="hover:text-indigo-600 dark:hover:text-indigo-400">
-                    Academicians
+                    Academician
                   </Link>
                 </li>
                 <li>
-                  <Link href="/signup?role=INDUSTRIES" className="hover:text-indigo-600 dark:hover:text-indigo-400">
-                    Industries
+                  <Link href="/signup?role=INDUSTRY" className="hover:text-indigo-600 dark:hover:text-indigo-400">
+                    Industry
                   </Link>
                 </li>
                 <li>
-                  <Link href="/signup?role=INSTITUTIONS" className="hover:text-indigo-600 dark:hover:text-indigo-400">
-                    Institutions
+                  <Link href="/signup?role=INSTITUTION" className="hover:text-indigo-600 dark:hover:text-indigo-400">
+                    Institution
                   </Link>
                 </li>
               </ul>

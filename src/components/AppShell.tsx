@@ -168,7 +168,7 @@ export function AppShell({ user, children }: { user: SessionUser; children: Reac
   const [drawerOpen, setDrawerOpen] = useState(false);
   const [menuOpen, setMenuOpen] = useState(false);
 
-  const items = NAV_ITEMS[user.role] ?? NAV_ITEMS.INSTITUTIONS ?? [];
+  const items = NAV_ITEMS[user.role] ?? NAV_ITEMS.INSTITUTION ?? NAV_ITEMS.INSTITUTIONS ?? [];
   const currentItem = items.find((item) => isActive(item.href, pathname));
 
   return (

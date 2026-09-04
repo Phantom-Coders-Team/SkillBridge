@@ -42,10 +42,10 @@ export function verifyToken(token: string): JwtPayload | null {
 
 export function normalizeRole(role: string): Role {
   const upper = String(role || "").trim().toUpperCase();
-  if (upper === "FACULTY" || upper === "ACADEMICIANS") return "ACADEMICIAN";
-  if (upper === "INDUSTRY") return "INDUSTRIES";
-  if (upper === "TPO" || upper === "INSTITUTION") return "INSTITUTIONS";
-  if (upper === "STUDENTS") return "STUDENT";
+  if (upper === "FACULTY" || upper === "ACADEMICIANS" || upper === "ACADEMICIAN") return "ACADEMICIAN";
+  if (upper === "INDUSTRIES" || upper === "INDUSTRY") return "INDUSTRY";
+  if (upper === "TPO" || upper === "INSTITUTIONS" || upper === "INSTITUTION") return "INSTITUTION";
+  if (upper === "STUDENTS" || upper === "STUDENT") return "STUDENT";
   return upper as Role;
 }
 

@@ -9,10 +9,10 @@ import { cn } from "@/lib/cn";
 import ThemeToggle from "@/components/ThemeToggle";
 
 const ROLE_OPTIONS = [
-  { value: "STUDENT", label: "Students", tone: "bg-blue-50 text-blue-700 ring-blue-200 dark:bg-blue-500/15 dark:text-blue-300 dark:ring-blue-500/40" },
-  { value: "ACADEMICIAN", label: "Academicians", tone: "bg-emerald-50 text-emerald-700 ring-emerald-200 dark:bg-emerald-500/15 dark:text-emerald-300 dark:ring-emerald-500/40" },
-  { value: "INDUSTRIES", label: "Industries", tone: "bg-purple-50 text-purple-700 ring-purple-200 dark:bg-purple-500/15 dark:text-purple-300 dark:ring-purple-500/40" },
-  { value: "INSTITUTIONS", label: "Institutions", tone: "bg-amber-50 text-amber-700 ring-amber-200 dark:bg-amber-500/15 dark:text-amber-300 dark:ring-amber-500/40" },
+  { value: "STUDENT", label: "Student", tone: "bg-blue-50 text-blue-700 ring-blue-200 dark:bg-blue-500/15 dark:text-blue-300 dark:ring-blue-500/40" },
+  { value: "ACADEMICIAN", label: "Academician", tone: "bg-emerald-50 text-emerald-700 ring-emerald-200 dark:bg-emerald-500/15 dark:text-emerald-300 dark:ring-emerald-500/40" },
+  { value: "INDUSTRY", label: "Industry", tone: "bg-purple-50 text-purple-700 ring-purple-200 dark:bg-purple-500/15 dark:text-purple-300 dark:ring-purple-500/40" },
+  { value: "INSTITUTION", label: "Institution", tone: "bg-amber-50 text-amber-700 ring-amber-200 dark:bg-amber-500/15 dark:text-amber-300 dark:ring-amber-500/40" },
 ];
 
 const FEATURES = [
@@ -28,9 +28,9 @@ function RoleParamSync({ onSelect }: { onSelect: (r: string) => void }) {
   useEffect(() => {
     if (!rawRole) return;
     if (rawRole === "FACULTY" || rawRole === "ACADEMICIANS" || rawRole === "ACADEMICIAN") onSelect("ACADEMICIAN");
-    else if (rawRole === "INDUSTRY" || rawRole === "INDUSTRIES") onSelect("INDUSTRIES");
+    else if (rawRole === "INDUSTRY" || rawRole === "INDUSTRIES") onSelect("INDUSTRY");
     else if (rawRole === "STUDENTS" || rawRole === "STUDENT") onSelect("STUDENT");
-    else if (rawRole === "INSTITUTIONS" || rawRole === "INSTITUTION" || rawRole === "TPO") onSelect("INSTITUTIONS");
+    else if (rawRole === "INSTITUTIONS" || rawRole === "INSTITUTION" || rawRole === "TPO") onSelect("INSTITUTION");
   }, [rawRole, onSelect]);
   return null;
 }

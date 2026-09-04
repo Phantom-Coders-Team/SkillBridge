@@ -46,9 +46,10 @@ const INSTITUTIONS_LINKS: QuickLink[] = [
 const QUICK_LINKS: Record<string, QuickLink[]> = {
   STUDENT: STUDENT_LINKS,
   ACADEMICIAN: ACADEMICIAN_LINKS,
+  INDUSTRY: INDUSTRIES_LINKS,
+  INSTITUTION: INSTITUTIONS_LINKS,
   FACULTY: ACADEMICIAN_LINKS,
   INDUSTRIES: INDUSTRIES_LINKS,
-  INDUSTRY: INDUSTRIES_LINKS,
   INSTITUTIONS: INSTITUTIONS_LINKS,
   TPO: INSTITUTIONS_LINKS,
 };
@@ -97,9 +98,10 @@ const INSTITUTIONS_GUIDE = {
 const ROLE_GUIDES: Record<string, { title: string; steps: string[] }> = {
   STUDENT: STUDENT_GUIDE,
   ACADEMICIAN: ACADEMICIAN_GUIDE,
+  INDUSTRY: INDUSTRIES_GUIDE,
+  INSTITUTION: INSTITUTIONS_GUIDE,
   FACULTY: ACADEMICIAN_GUIDE,
   INDUSTRIES: INDUSTRIES_GUIDE,
-  INDUSTRY: INDUSTRIES_GUIDE,
   INSTITUTIONS: INSTITUTIONS_GUIDE,
   TPO: INSTITUTIONS_GUIDE,
 };
@@ -147,8 +149,8 @@ export default async function DashboardPage() {
       ];
       break;
     }
-    case "INDUSTRIES":
-    case "INDUSTRY": {
+    case "INDUSTRY":
+    case "INDUSTRIES": {
       const [slots, pitches, proofs] = await Promise.all([
         prisma.mentorSlot.count({ where: { industryId: user.id } }),
         prisma.jobPitch.count({ where: { industryId: user.id } }),
@@ -161,8 +163,9 @@ export default async function DashboardPage() {
       ];
       break;
     }
-    case "TPO":
-    case "INSTITUTIONS": {
+    case "INSTITUTION":
+    case "INSTITUTIONS":
+    case "TPO": {
       const [users, projectsActive, pitchesOffered, syllabi] = await Promise.all([
         prisma.user.count(),
         prisma.project.count({ where: { status: "IN_PROGRESS" } }),
@@ -186,7 +189,7 @@ export default async function DashboardPage() {
 
   const data: DashboardData = {
     name: user.name,
-    roleLabel: ROLE_LABELS[effectiveRole] ?? "Institutions",
+    roleLabel: ROLE_LABELS[effectiveRole] ?? "Institution",
     dateLabel: new Intl.DateTimeFormat("en-IN", {
       weekday: "long",
       day: "numeric",
@@ -194,8 +197,8 @@ export default async function DashboardPage() {
       year: "numeric",
     }).format(new Date()),
     stats,
-    quickLinks: QUICK_LINKS[effectiveRole] ?? QUICK_LINKS.INSTITUTIONS ?? [],
-    roleGuide: ROLE_GUIDES[effectiveRole] ?? ROLE_GUIDES.INSTITUTIONS ?? { title: "Getting started", steps: [] },
+    quickLinks: QUICK_LINKS[effectiveRole] ?? QUICK_LINKS.INSTITUTION ?? [],
+    roleGuide: ROLE_GUIDES[effectiveRole] ?? ROLE_GUIDES.INSTITUTION ?? { title: "Getting started", steps: [] },
   };
 
   return <DashboardContent {...data} />;

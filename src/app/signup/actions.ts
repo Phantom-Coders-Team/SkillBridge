@@ -12,10 +12,11 @@ export interface SignupState {
 const ALLOWED_ROLES: Role[] = [
   "STUDENT",
   "ACADEMICIAN",
+  "INDUSTRY",
+  "INSTITUTION",
   "INDUSTRIES",
   "INSTITUTIONS",
   "FACULTY",
-  "INDUSTRY",
   "TPO",
 ];
 

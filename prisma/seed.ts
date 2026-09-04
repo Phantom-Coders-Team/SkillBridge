@@ -116,7 +116,7 @@ async function main() {
         name: company,
         email,
         passwordHash,
-        role: "INDUSTRIES",
+        role: "INDUSTRY",
         profile: {
           create: {
             companyName: company,
@@ -143,7 +143,7 @@ async function main() {
         name,
         email,
         passwordHash,
-        role: "INSTITUTIONS",
+        role: "INSTITUTION",
         profile: {
           create: {
             designation,

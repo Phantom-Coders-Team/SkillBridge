@@ -112,7 +112,7 @@ export default async function PublicProfilePage({ params }: { params: Promise<{ 
             <Sparkles aria-hidden className="size-4 text-indigo-500" /> Skills
           </h3>
           <div className="flex flex-wrap gap-2">
-            {p.skills.split(",").map((s, i) => (
+            {p.skills.split(",").map((s: string, i: number) => (
               <Badge key={i} tone="indigo">{s.trim()}</Badge>
             ))}
           </div>
