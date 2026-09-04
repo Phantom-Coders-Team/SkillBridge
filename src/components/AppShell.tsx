@@ -10,6 +10,7 @@ import { NAV_ITEMS } from "@/lib/navigation";
 import { LogoutButton } from "@/components/LogoutButton";
 import { Avatar } from "@/components/ui";
 import ThemeToggle from "@/components/ThemeToggle";
+import { DemoSwitcher } from "@/components/DemoSwitcher";
 import { cn } from "@/lib/cn";
 
 function isActive(href: string, pathname: string): boolean {
@@ -338,6 +339,8 @@ export function AppShell({ user, children }: { user: SessionUser; children: Reac
           © {new Date().getFullYear()} Skill Bridge — Academia-Industry Collaboration Portal
         </footer>
       </div>
+
+      <DemoSwitcher currentRole={user.role} />
     </div>
   );
 }

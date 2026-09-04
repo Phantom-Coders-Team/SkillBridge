@@ -66,7 +66,10 @@ export default function ProfileClient({ profile }: { profile: ProfileData }) {
   const fileRef = useRef<HTMLInputElement>(null);
   const docFormRef = useRef<HTMLFormElement>(null);
 
-  const isInstitution = profile.role === "Institutions";
+  const isInstitution =
+    profile.role === "Institution" ||
+    profile.role === "Institutions" ||
+    profile.role === "INSTITUTION";
 
   function handleFileChange(e: React.ChangeEvent<HTMLInputElement>) {
     const file = e.target.files?.[0];

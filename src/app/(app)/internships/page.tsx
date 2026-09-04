@@ -127,7 +127,7 @@ export default async function InternshipsPage() {
                     <Building2 className="size-3.5" />
                     {l.company.profile?.companyName || l.company.name}
                   </span>
-                  {user.role === "STUDENT" && <MatchBadge skills={l.skills ?? ""} mySkills={mySkills} />}
+                  {user.role === "STUDENT" && <MatchBadge skills={l.skills ?? ""} mySkills={studentProfile?.skills ?? ""} />}
                 </div>
 
                 <div className="mt-3">
@@ -144,7 +144,7 @@ export default async function InternshipsPage() {
                       {l.applications.length === 0 ? (
                         <p className="text-xs text-slate-400 dark:text-slate-500">No applicants yet</p>
                       ) : (
-                        <ApplicantList listingId={l.id} applicants={l.applications} />
+                        <ApplicantList listingId={l.id} applicants={l.applications} listingSkills={l.skills ?? ""} />
                       )}
                     </div>
                   )}
