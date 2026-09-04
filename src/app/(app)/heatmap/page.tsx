@@ -7,7 +7,7 @@ export default async function HeatmapPage() {
   const user = await getCurrentUser();
   if (!user) redirect("/login");
 
-  if (user.role !== "INSTITUTIONS") {
+  if (user.role !== "INSTITUTIONS" && user.role !== "TPO") {
     return (
       <div className="mx-auto max-w-3xl rounded-2xl border border-border-muted bg-surface p-8 text-center text-sm text-slate-500 dark:text-slate-400 shadow-card">
         Only institution representatives can view the skill deficit heatmap.

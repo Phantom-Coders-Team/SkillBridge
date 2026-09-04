@@ -6,7 +6,10 @@ import { cache } from "react";
 import { prisma } from "@/lib/prisma";
 import type { Role, SessionUser } from "@/lib/types";
 
-const JWT_SECRET = process.env.JWT_SECRET || "dev-secret-change-in-production";
+const JWT_SECRET =
+  process.env.JWT_SECRET && process.env.JWT_SECRET.trim().length > 0
+    ? process.env.JWT_SECRET.trim()
+    : "skillbridge-secret-key-2026-secure-token";
 const SESSION_COOKIE = "aip_session";
 const SESSION_MAX_AGE = 60 * 60 * 24 * 7;
 
@@ -38,9 +41,10 @@ export function verifyToken(token: string): JwtPayload | null {
 }
 
 export async function createSession(user: { id: string; name: string; email: string; role: Role }): Promise<void> {
+  const normalizedRole = (user.role === "TPO" ? "INSTITUTIONS" : user.role) as Role;
   const token = signToken({
     sub: user.id,
-    role: user.role,
+    role: normalizedRole,
     name: user.name,
     email: user.email,
   });
@@ -74,18 +78,23 @@ export const getCurrentUser = cache(async (): Promise<SessionUser | null> => {
 
   if (!user || !user.isActive) return null;
 
+  const normalizedRole = (user.role === "TPO" ? "INSTITUTIONS" : user.role) as Role;
+
   return {
     id: user.id,
     name: user.name,
     email: user.email,
-    role: user.role as Role,
+    role: normalizedRole,
     avatarUrl: user.profile?.avatarUrl ?? null,
   };
 });
 
 export async function requireRole(allowed: Role[]): Promise<SessionUser> {
   const user = await getCurrentUser();
-  if (!user || !allowed.includes(user.role)) {
+  const effectiveAllowed = allowed.flatMap((r) =>
+    r === "INSTITUTIONS" ? ["INSTITUTIONS", "TPO"] : [r]
+  );
+  if (!user || !effectiveAllowed.includes(user.role)) {
     throw new Error("UNAUTHORIZED");
   }
   return user;

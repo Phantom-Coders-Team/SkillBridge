@@ -62,4 +62,11 @@ export const NAV_ITEMS: Record<Role, NavItem[]> = {
     { label: "Corporate Partners", href: "/partners", icon: Building2 },
     { label: "Cohort Analytics", href: "/analytics", icon: ClipboardCheck },
   ],
+  TPO: [
+    { label: "Dashboard", href: "/dashboard", icon: LayoutDashboard },
+    { label: "Skill Deficit Heatmap", href: "/heatmap", icon: BarChart3 },
+    { label: "Placement Records", href: "/placements", icon: Target },
+    { label: "Corporate Partners", href: "/partners", icon: Building2 },
+    { label: "Cohort Analytics", href: "/analytics", icon: ClipboardCheck },
+  ],
 };

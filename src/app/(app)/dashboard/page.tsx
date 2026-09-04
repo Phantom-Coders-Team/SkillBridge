@@ -16,7 +16,7 @@ import {
 } from "lucide-react";
 import { getCurrentUser } from "@/lib/auth";
 import { prisma } from "@/lib/prisma";
-import { ROLE_LABELS } from "@/lib/types";
+import { ROLE_LABELS, type Role } from "@/lib/types";
 import { DashboardContent, type DashboardData, type QuickLink, type Stat } from "./DashboardContent";
 
 const QUICK_LINKS: Partial<Record<string, QuickLink[]>> = {
@@ -136,6 +136,7 @@ export default async function DashboardPage() {
       ];
       break;
     }
+    case "TPO":
     case "INSTITUTIONS": {
       const [users, projectsActive, pitchesOffered, syllabi] = await Promise.all([
         prisma.user.count(),
@@ -151,13 +152,18 @@ export default async function DashboardPage() {
       ];
       break;
     }
-    default:
-      notFound();
+    default: {
+      const users = await prisma.user.count();
+      stats = [{ label: "Registered Users", value: users, icon: Users, tone: "indigo" }];
+      break;
+    }
   }
+
+  const effectiveRole = (user.role === "TPO" ? "INSTITUTIONS" : user.role) as Role;
 
   const data: DashboardData = {
     name: user.name,
-    roleLabel: ROLE_LABELS[user.role],
+    roleLabel: ROLE_LABELS[effectiveRole] ?? "Institutions",
     dateLabel: new Intl.DateTimeFormat("en-IN", {
       weekday: "long",
       day: "numeric",
@@ -165,8 +171,8 @@ export default async function DashboardPage() {
       year: "numeric",
     }).format(new Date()),
     stats,
-    quickLinks: QUICK_LINKS[user.role] ?? [],
-    roleGuide: ROLE_GUIDES[user.role] ?? { title: "Getting started", steps: [] },
+    quickLinks: QUICK_LINKS[effectiveRole] ?? QUICK_LINKS.INSTITUTIONS ?? [],
+    roleGuide: ROLE_GUIDES[effectiveRole] ?? ROLE_GUIDES.INSTITUTIONS ?? { title: "Getting started", steps: [] },
   };
 
   return <DashboardContent {...data} />;

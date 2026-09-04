@@ -1,4 +1,4 @@
-export type Role = "STUDENT" | "FACULTY" | "INDUSTRY" | "INSTITUTIONS";
+export type Role = "STUDENT" | "FACULTY" | "INDUSTRY" | "INSTITUTIONS" | "TPO";
 
 export interface SessionUser {
   id: string;
@@ -13,6 +13,7 @@ export const ROLE_LABELS: Record<Role, string> = {
   FACULTY: "Faculty",
   INDUSTRY: "Industry",
   INSTITUTIONS: "Institutions",
+  TPO: "Institutions",
 };
 
 export const ROLE_COLORS: Record<Role, string> = {
@@ -20,4 +21,6 @@ export const ROLE_COLORS: Record<Role, string> = {
   FACULTY: "bg-emerald-100 text-emerald-800 dark:bg-emerald-500/15 dark:text-emerald-300",
   INDUSTRY: "bg-purple-100 text-purple-800 dark:bg-purple-500/15 dark:text-purple-300",
   INSTITUTIONS: "bg-amber-100 text-amber-800 dark:bg-amber-500/15 dark:text-amber-300",
+  TPO: "bg-amber-100 text-amber-800 dark:bg-amber-500/15 dark:text-amber-300",
 };
+

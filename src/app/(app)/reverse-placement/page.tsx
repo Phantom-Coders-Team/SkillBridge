@@ -43,6 +43,8 @@ export default async function ReversePlacementPage() {
 
   const sorted = [...candidates].sort((a, b) => b.pri.score - a.pri.score);
 
+  const effectiveRole = user.role === "TPO" ? "INSTITUTIONS" : user.role;
+
   return (
     <div className="mx-auto max-w-6xl">
       <PageHeader
@@ -53,7 +55,7 @@ export default async function ReversePlacementPage() {
           "recruiters can pitch job and internship packages directly to top candidates."
         }
       />
-      <ReversePlacementClient candidates={sorted} viewerRole={user.role as "STUDENT" | "INDUSTRY" | "INSTITUTIONS"} />
+      <ReversePlacementClient candidates={sorted} viewerRole={effectiveRole as "STUDENT" | "INDUSTRY" | "INSTITUTIONS"} />
     </div>
   );
 }

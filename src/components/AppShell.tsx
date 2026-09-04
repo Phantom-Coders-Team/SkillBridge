@@ -28,7 +28,7 @@ function NavList({
   collapsed?: boolean;
   onNavigate?: () => void;
 }) {
-  const items = NAV_ITEMS[user.role];
+  const items = NAV_ITEMS[user.role] ?? NAV_ITEMS.INSTITUTIONS ?? [];
   return (
     <nav className={cn("flex-1 space-y-1 overflow-y-auto py-4", collapsed ? "px-2" : "px-3")}>
       {!collapsed && (
@@ -147,13 +147,13 @@ function Sidebar({
             "flex items-center gap-3 rounded-xl py-2 transition-colors hover:bg-slate-100 dark:hover:bg-slate-800/60",
             collapsed ? "justify-center px-0" : "px-2",
           )}
-          title={collapsed ? `${user.name} (${ROLE_LABELS[user.role]})` : undefined}
+          title={collapsed ? `${user.name} (${ROLE_LABELS[user.role] ?? user.role})` : undefined}
         >
           <UserAvatar user={user} />
           {!collapsed && (
             <div className="min-w-0 flex-1">
               <p className="truncate text-sm font-semibold text-slate-900 dark:text-slate-100">{user.name}</p>
-              <p className="truncate text-xs text-slate-500 dark:text-slate-400">{ROLE_LABELS[user.role]}</p>
+              <p className="truncate text-xs text-slate-500 dark:text-slate-400">{ROLE_LABELS[user.role] ?? user.role}</p>
             </div>
           )}
         </Link>
@@ -168,7 +168,8 @@ export function AppShell({ user, children }: { user: SessionUser; children: Reac
   const [drawerOpen, setDrawerOpen] = useState(false);
   const [menuOpen, setMenuOpen] = useState(false);
 
-  const currentItem = NAV_ITEMS[user.role].find((item) => isActive(item.href, pathname));
+  const items = NAV_ITEMS[user.role] ?? NAV_ITEMS.INSTITUTIONS ?? [];
+  const currentItem = items.find((item) => isActive(item.href, pathname));
 
   return (
     <div className="flex min-h-screen bg-[--background]">
@@ -247,10 +248,10 @@ export function AppShell({ user, children }: { user: SessionUser; children: Reac
             <span
               className={cn(
                 "hidden rounded-full px-3 py-1 text-xs font-semibold sm:inline-flex",
-                ROLE_COLORS[user.role],
+                ROLE_COLORS[user.role] ?? "bg-slate-100 text-slate-800 dark:bg-slate-800 dark:text-slate-200",
               )}
             >
-              {ROLE_LABELS[user.role]}
+              {ROLE_LABELS[user.role] ?? user.role}
             </span>
 
             <div className="relative">
@@ -274,10 +275,10 @@ export function AppShell({ user, children }: { user: SessionUser; children: Reac
                       <span
                         className={cn(
                           "mt-2 inline-flex rounded-full px-2.5 py-0.5 text-[10px] font-semibold",
-                          ROLE_COLORS[user.role],
+                          ROLE_COLORS[user.role] ?? "bg-slate-100 text-slate-800 dark:bg-slate-800 dark:text-slate-200",
                         )}
                       >
-                        {ROLE_LABELS[user.role]}
+                        {ROLE_LABELS[user.role] ?? user.role}
                       </span>
                     </div>
 
