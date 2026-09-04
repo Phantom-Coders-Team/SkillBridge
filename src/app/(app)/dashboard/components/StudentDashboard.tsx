@@ -27,6 +27,8 @@ export interface StudentDashboardProps {
     tokenBalance: number;
     pitchesCount: number;
     slotsCount: number;
+    applicationsCount?: number;
+    acceptedOffersCount?: number;
   };
   recentProofs: Array<{
     id: string;
@@ -52,6 +54,20 @@ export interface StudentDashboardProps {
       name: string;
     };
   }>;
+  recentApplications?: Array<{
+    id: string;
+    status: string;
+    updatedAt: Date;
+    listing: {
+      id: string;
+      title: string;
+      programType: string;
+      company: {
+        name: string;
+        profile?: { companyName?: string | null } | null;
+      };
+    };
+  }>;
   skillBreakdown?: {
     active: number;
     stale: number;
@@ -65,6 +81,7 @@ export function StudentDashboard({
   stats,
   recentProofs,
   availableChallenges,
+  recentApplications = [],
   skillBreakdown = { active: 3, stale: 1, expired: 0 },
 }: StudentDashboardProps) {
   const firstName = name.split(" ")[0];
@@ -109,8 +126,16 @@ export function StudentDashboard({
           {/* Quick Action Navigation Chips */}
           <div className="mt-6 flex flex-wrap gap-2.5">
             <Link
-              href="/skills"
+              href="/internships"
               className="inline-flex items-center gap-2 rounded-xl border border-indigo-200 bg-white px-3.5 py-2 text-xs font-semibold text-indigo-700 shadow-xs transition-all hover:border-indigo-300 hover:bg-indigo-50 active:scale-[0.98] dark:border-indigo-900/60 dark:bg-surface dark:text-indigo-300 dark:hover:bg-slate-800"
+            >
+              <Briefcase className="size-4 text-emerald-500" />
+              My Applications & Offers ({stats.applicationsCount ?? 0})
+              <ArrowRight className="size-3.5" />
+            </Link>
+            <Link
+              href="/skills"
+              className="inline-flex items-center gap-2 rounded-xl border border-border-muted bg-white px-3.5 py-2 text-xs font-semibold text-slate-700 shadow-xs transition-all hover:border-indigo-200 hover:bg-slate-50 active:scale-[0.98] dark:bg-surface dark:text-slate-200 dark:hover:bg-slate-800"
             >
               <Radar className="size-4 text-indigo-500" />
               Skill Radar & Diagnostic
@@ -132,20 +157,49 @@ export function StudentDashboard({
               Challenge Marketplace
               <ArrowRight className="size-3.5" />
             </Link>
-            <Link
-              href="/office-hours"
-              className="inline-flex items-center gap-2 rounded-xl border border-border-muted bg-white px-3.5 py-2 text-xs font-semibold text-slate-700 shadow-xs transition-all hover:border-indigo-200 hover:bg-slate-50 active:scale-[0.98] dark:bg-surface dark:text-slate-200 dark:hover:bg-slate-800"
-            >
-              <CalendarClock className="size-4 text-sky-500" />
-              Book Mentor Office Hours
-              <ArrowRight className="size-3.5" />
-            </Link>
           </div>
         </div>
       </section>
 
+      {/* Accepted Offer Alert Banner */}
+      {(stats.acceptedOffersCount ?? 0) > 0 && (
+        <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 p-5 rounded-2xl bg-gradient-to-r from-emerald-500/15 via-teal-500/10 to-emerald-500/5 border border-emerald-300 dark:border-emerald-800 text-emerald-950 dark:text-emerald-100 shadow-sm animate-in fade-in">
+          <div className="flex items-center gap-3.5">
+            <div className="size-11 rounded-xl bg-emerald-600 text-white flex items-center justify-center shrink-0 shadow-md">
+              <Award className="size-6" />
+            </div>
+            <div>
+              <div className="flex items-center gap-2">
+                <span className="font-black text-sm text-emerald-900 dark:text-emerald-200">
+                  🎉 Congratulations! Internship Offer Extended / Accepted
+                </span>
+                <span className="px-2 py-0.5 rounded-full text-[10px] font-bold bg-emerald-600 text-white">
+                  Active Offer
+                </span>
+              </div>
+              <p className="text-xs text-emerald-800/80 dark:text-emerald-300/80 mt-0.5">
+                An industry partner has updated and approved your placement application. Review company details and onboard.
+              </p>
+            </div>
+          </div>
+          <Link
+            href="/internships"
+            className="inline-flex items-center gap-1.5 px-4 py-2 rounded-xl bg-emerald-600 text-white text-xs font-bold hover:bg-emerald-700 transition-all shrink-0 shadow-sm"
+          >
+            Track in My Applications <ArrowRight className="size-3.5" />
+          </Link>
+        </div>
+      )}
+
       {/* Primary KPI Stats */}
       <section className="grid grid-cols-2 gap-4 sm:grid-cols-3">
+        <StatCard
+          label="My Applications"
+          value={stats.applicationsCount ?? 0}
+          icon={Briefcase}
+          tone="emerald"
+          sub={`${stats.acceptedOffersCount ?? 0} offers accepted`}
+        />
         <StatCard
           label="My Projects"
           value={stats.projectsCount}
@@ -181,19 +235,101 @@ export function StudentDashboard({
           tone="blue"
           sub="Recruiter pitches"
         />
-        <StatCard
-          label="Mentor Slots"
-          value={stats.slotsCount}
-          icon={CalendarClock}
-          tone="cyan"
-          sub="Sessions booked"
-        />
       </section>
 
       {/* Main Content Layout */}
       <div className="grid grid-cols-1 gap-6 lg:grid-cols-3">
         {/* Left 2 Columns */}
         <div className="space-y-6 lg:col-span-2">
+          {/* My Internship Applications Tracker Card */}
+          <Card className="overflow-hidden">
+            <CardHeader
+              title="My Internship Applications & Offer Status"
+              subtitle="Real-time recruitment pipeline updates from industry partners."
+              icon={Briefcase}
+              action={
+                <Link
+                  href="/internships"
+                  className="text-xs font-semibold text-indigo-600 hover:underline dark:text-indigo-400"
+                >
+                  View All in Opportunities ({stats.applicationsCount ?? 0}) →
+                </Link>
+              }
+            />
+
+            {recentApplications.length > 0 ? (
+              <div className="divide-y divide-border-muted">
+                {recentApplications.map((app) => {
+                  const companyName =
+                    app.listing.company.profile?.companyName || app.listing.company.name;
+                  const isAccepted =
+                    app.status === "APPROVED" ||
+                    app.status === "OFFERED" ||
+                    app.status === "ACCEPTED";
+                  const isShortlisted = app.status === "SHORTLISTED";
+                  const isInterview = app.status === "INTERVIEW";
+                  const isRejected = app.status === "REJECTED";
+
+                  return (
+                    <div
+                      key={app.id}
+                      className="flex flex-col gap-2 p-4 sm:flex-row sm:items-center sm:justify-between"
+                    >
+                      <div className="min-w-0 space-y-1">
+                        <div className="flex items-center gap-2 flex-wrap">
+                          <span className="font-semibold text-slate-900 dark:text-slate-100">
+                            {app.listing.title}
+                          </span>
+                          <span className="text-xs text-slate-500 dark:text-slate-400">
+                            • {companyName}
+                          </span>
+                        </div>
+                        <p className="text-xs text-slate-400">
+                          {app.listing.programType.replaceAll("_", " ")} • Updated{" "}
+                          {new Date(app.updatedAt).toLocaleDateString("en-IN", {
+                            month: "short",
+                            day: "numeric",
+                          })}
+                        </p>
+                      </div>
+
+                      <div className="shrink-0 flex items-center gap-2">
+                        {isAccepted ? (
+                          <Badge tone="emerald">Offer Accepted</Badge>
+                        ) : isShortlisted ? (
+                          <Badge tone="indigo">Shortlisted</Badge>
+                        ) : isInterview ? (
+                          <Badge tone="amber">Interview</Badge>
+                        ) : isRejected ? (
+                          <Badge tone="red">Not Selected</Badge>
+                        ) : (
+                          <Badge tone="blue">Under Review</Badge>
+                        )}
+                        <Link
+                          href="/internships"
+                          className="rounded-lg p-1.5 text-slate-400 hover:bg-slate-100 dark:hover:bg-slate-800"
+                        >
+                          <ArrowRight className="size-4" />
+                        </Link>
+                      </div>
+                    </div>
+                  );
+                })}
+              </div>
+            ) : (
+              <div className="p-6 text-center">
+                <p className="text-xs text-slate-400 dark:text-slate-500">
+                  No active internship applications yet.
+                </p>
+                <Link
+                  href="/internships"
+                  className="mt-2 inline-flex items-center gap-1.5 text-xs font-semibold text-indigo-600 hover:underline dark:text-indigo-400"
+                >
+                  Explore and apply to opportunities →
+                </Link>
+              </div>
+            )}
+          </Card>
           {/* Recent Proof of Work Status */}
           <Card className="overflow-hidden">
             <CardHeader

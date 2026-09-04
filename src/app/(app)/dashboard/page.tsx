@@ -29,6 +29,9 @@ export default async function DashboardPage() {
         activeCount,
         staleCount,
         expiredCount,
+        applicationsCount,
+        acceptedOffersCount,
+        recentApplications,
       ] = await Promise.all([
         prisma.project.count({ where: { ownerId: user.id } }),
         prisma.proofOfWork.count({ where: { studentId: user.id } }),
@@ -59,6 +62,30 @@ export default async function DashboardPage() {
         prisma.skillAssessment.count({ where: { studentId: user.id, decayStatus: "ACTIVE" } }),
         prisma.skillAssessment.count({ where: { studentId: user.id, decayStatus: "STALE" } }),
         prisma.skillAssessment.count({ where: { studentId: user.id, decayStatus: "EXPIRED" } }),
+        prisma.internshipApplication.count({ where: { studentId: user.id } }),
+        prisma.internshipApplication.count({
+          where: { studentId: user.id, status: { in: ["APPROVED", "OFFERED", "ACCEPTED"] } },
+        }),
+        prisma.internshipApplication.findMany({
+          where: { studentId: user.id },
+          include: {
+            listing: {
+              select: {
+                id: true,
+                title: true,
+                programType: true,
+                company: {
+                  select: {
+                    name: true,
+                    profile: { select: { companyName: true } },
+                  },
+                },
+              },
+            },
+          },
+          orderBy: { updatedAt: "desc" },
+          take: 4,
+        }),
       ]);
 
       const data: DashboardViewProps = {
@@ -72,9 +99,12 @@ export default async function DashboardPage() {
           tokenBalance: ledger?.balance ?? 0,
           pitchesCount,
           slotsCount,
+          applicationsCount,
+          acceptedOffersCount,
         },
         recentProofs,
         availableChallenges,
+        recentApplications,
         skillBreakdown: {
           active: activeCount || 3,
           stale: staleCount || 1,

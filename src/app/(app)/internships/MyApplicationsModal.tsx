@@ -47,10 +47,14 @@ const STAGES = [
 
 const STATUS_ORDER: Record<string, number> = {
   APPLIED: 0,
+  PENDING: 0,
+  SUBMITTED: 0,
   SHORTLISTED: 1,
   INTERVIEW: 2,
   OFFERED: 3,
   ACCEPTED: 3,
+  APPROVED: 3,
+  SELECTED: 3,
 };
 
 export function MyApplicationsModal({
@@ -161,8 +165,35 @@ export function MyApplicationsModal({
                           </p>
                         </div>
 
-                        {/* Match Tier Badge */}
-                        <div className="shrink-0 flex items-center gap-2">
+                        {/* Status & Match Badges */}
+                        <div className="shrink-0 flex items-center gap-2 flex-wrap">
+                          {normalizedStatus === "APPROVED" || normalizedStatus === "OFFERED" || normalizedStatus === "ACCEPTED" ? (
+                            <span className="inline-flex items-center gap-1 px-2.5 py-1 rounded-full text-xs font-bold bg-emerald-100 text-emerald-800 dark:bg-emerald-950/80 dark:text-emerald-300 border border-emerald-500/40 animate-pulse">
+                              <Award className="size-3 text-emerald-600 dark:text-emerald-400" />
+                              Offer Accepted
+                            </span>
+                          ) : normalizedStatus === "SHORTLISTED" ? (
+                            <span className="inline-flex items-center gap-1 px-2.5 py-1 rounded-full text-xs font-bold bg-indigo-100 text-indigo-800 dark:bg-indigo-950/80 dark:text-indigo-300 border border-indigo-500/40">
+                              <CheckCircle2 className="size-3 text-indigo-600 dark:text-indigo-400" />
+                              Shortlisted
+                            </span>
+                          ) : normalizedStatus === "INTERVIEW" ? (
+                            <span className="inline-flex items-center gap-1 px-2.5 py-1 rounded-full text-xs font-bold bg-amber-100 text-amber-800 dark:bg-amber-950/80 dark:text-amber-300 border border-amber-500/40">
+                              <Calendar className="size-3 text-amber-600 dark:text-amber-400" />
+                              Interview
+                            </span>
+                          ) : isRejected ? (
+                            <span className="inline-flex items-center gap-1 px-2.5 py-1 rounded-full text-xs font-bold bg-rose-100 text-rose-800 dark:bg-rose-950/80 dark:text-rose-300 border border-rose-500/40">
+                              <XCircle className="size-3 text-rose-600 dark:text-rose-400" />
+                              Not Selected
+                            </span>
+                          ) : (
+                            <span className="inline-flex items-center gap-1 px-2.5 py-1 rounded-full text-xs font-bold bg-blue-100 text-blue-800 dark:bg-blue-950/80 dark:text-blue-300 border border-blue-500/40">
+                              <Clock className="size-3 text-blue-600 dark:text-blue-400" />
+                              Applied
+                            </span>
+                          )}
+
                           <span className="inline-flex items-center gap-1 px-2.5 py-1 rounded-full text-xs font-bold bg-indigo-50 dark:bg-indigo-950/60 text-indigo-700 dark:text-indigo-300 border border-indigo-200 dark:border-indigo-800">
                             <Zap className="size-3 text-indigo-500" />
                             {match.matchScore}% Match

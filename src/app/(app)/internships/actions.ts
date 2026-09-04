@@ -66,6 +66,7 @@ export async function applyToOpportunity(
       create: { listingId, studentId: user.id, message: message || null },
     });
     revalidatePath("/internships");
+    revalidatePath("/dashboard");
     return { success: true };
   } catch {
     return { error: "Failed to apply." };
@@ -88,6 +89,7 @@ export async function updateApplicationStatus(
       data: { status },
     });
     revalidatePath("/internships");
+    revalidatePath("/dashboard");
     return { success: true };
   } catch {
     return { error: "Failed to update status." };
