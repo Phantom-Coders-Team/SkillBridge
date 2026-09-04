@@ -89,6 +89,35 @@ export async function signOffProof(
     });
   }
 
+  // Credit tokens to student upon verified sign-off
+  if (action === "faculty_sign" || action === "industry_sign") {
+    let studentLedger = await prisma.tokenLedger.findFirst({
+      where: { studentId: proof.studentId },
+    });
+    if (!studentLedger) {
+      studentLedger = await prisma.tokenLedger.create({
+        data: { studentId: proof.studentId, balance: 100 },
+      });
+    }
+
+    const tokenAward = action === "faculty_sign" ? 25 : 35;
+    await prisma.tokenLedger.update({
+      where: { id: studentLedger.id },
+      data: { balance: { increment: tokenAward } },
+    });
+    await prisma.tokenTransaction.create({
+      data: {
+        ledgerId: studentLedger.id,
+        amount: tokenAward,
+        type: "CREDIT",
+        reason: `${action === "faculty_sign" ? "Academician Attestation" : "Industry Attestation"} · Proof #${proofId.slice(-6)}`,
+      },
+    });
+
+    revalidatePath("/tokens");
+    revalidatePath("/dashboard");
+  }
+
   revalidatePath(`/proof-of-work/${proofId}`);
   revalidatePath(`/verify/${token}`);
   return { success: true };

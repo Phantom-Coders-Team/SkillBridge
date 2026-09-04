@@ -65,7 +65,16 @@ export async function signupAction(_prevState: SignupState | null, formData: For
       ...(role === "STUDENT"
         ? {
             ledger: {
-              create: { balance: 0 },
+              create: {
+                balance: 100,
+                transactions: {
+                  create: {
+                    amount: 100,
+                    type: "CREDIT",
+                    reason: "Welcome onboarding skill tokens",
+                  },
+                },
+              },
             },
           }
         : {}),

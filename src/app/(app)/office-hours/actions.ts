@@ -61,5 +61,7 @@ export async function bookOfficeHour(
 
   revalidatePath("/office-hours");
   revalidatePath("/tokens");
+  revalidatePath("/dashboard");
   return { ok: true, balance: ledger.balance - cost };
 }
+

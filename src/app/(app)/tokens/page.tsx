@@ -14,12 +14,31 @@ export default async function TokensPage() {
   const user = await getCurrentUser();
   if (!user) redirect("/login");
 
-  const ledger = await prisma.tokenLedger.findFirst({
+  let ledger = await prisma.tokenLedger.findFirst({
     where: { studentId: user.id },
     include: {
       transactions: { orderBy: { createdAt: "desc" }, take: 25 },
     },
   });
+
+  if (!ledger && user.role === "STUDENT") {
+    ledger = await prisma.tokenLedger.create({
+      data: {
+        studentId: user.id,
+        balance: 100,
+        transactions: {
+          create: {
+            amount: 100,
+            type: "CREDIT",
+            reason: "Welcome onboarding skill tokens",
+          },
+        },
+      },
+      include: {
+        transactions: { orderBy: { createdAt: "desc" }, take: 25 },
+      },
+    });
+  }
 
   const balance = ledger?.balance ?? 0;
   const credits = ledger?.transactions.filter((t) => t.amount > 0).length ?? 0;
