@@ -141,18 +141,11 @@ export default async function Home() {
         <div className="absolute left-[-160px] top-80 h-[380px] w-[460px] rounded-full bg-sky-300/15 blur-[130px] dark:bg-sky-600/10" />
       </div>
 
-      {/* 3D Visual background */}
-      <div className="pointer-events-none fixed inset-0 z-0 overflow-hidden" aria-hidden>
-        <div className="pointer-events-auto absolute left-1/2 top-[32rem] -translate-x-1/2 -translate-y-1/2 opacity-75 sm:top-[28rem]">
-          <ThreedVisual />
-        </div>
-      </div>
-
       <LandingNav user={user} />
 
       <main className="relative z-10 mx-auto max-w-6xl px-4 pb-32 sm:px-6">
         {/* Hero Section */}
-        <section className="animate-fade-up pt-16 text-center sm:pt-28">
+        <section className="relative isolate animate-fade-up pt-16 text-center sm:pt-28">
           {/* Status Badge */}
           <div className="inline-flex items-center gap-2.5 rounded-full border border-indigo-200/80 bg-surface/85 px-4 py-1.5 text-xs font-semibold text-slate-700 shadow-sm backdrop-blur-md dark:border-indigo-800/80 dark:bg-surface/85 dark:text-slate-200">
             <span className="relative flex size-2">
@@ -163,12 +156,25 @@ export default async function Home() {
             <span>Over 1,200+ micro-credentials verified this semester</span>
           </div>
 
-          <h1 className="mx-auto mt-8 max-w-4xl text-5xl font-extrabold leading-[1.05] tracking-tight text-slate-900 dark:text-white sm:text-7xl lg:text-8xl">
-            Academia. Industry.
-            <span className="block bg-gradient-to-r from-indigo-600 via-violet-600 to-indigo-500 bg-clip-text text-transparent dark:from-indigo-400 dark:via-violet-400 dark:to-indigo-300">
-              Real Impact.
-            </span>
-          </h1>
+          {/* Heading with 3D Globe pinned directly behind words */}
+          <div className="relative mx-auto mt-8 max-w-4xl">
+            {/* 3D Visual globe - stuck directly behind title, smaller size */}
+            <div
+              className="pointer-events-none absolute left-1/2 top-1/2 -z-10 -translate-x-1/2 -translate-y-1/2 opacity-80 dark:opacity-85"
+              aria-hidden
+            >
+              <div className="pointer-events-auto w-[320px] max-w-[90vw] sm:w-[400px] md:w-[460px]">
+                <ThreedVisual />
+              </div>
+            </div>
+
+            <h1 className="relative z-10 text-5xl font-extrabold leading-[1.05] tracking-tight text-slate-900 dark:text-white sm:text-7xl lg:text-8xl">
+              Academia. Industry.
+              <span className="block bg-gradient-to-r from-indigo-600 via-violet-600 to-indigo-500 bg-clip-text text-transparent dark:from-indigo-400 dark:via-violet-400 dark:to-indigo-300">
+                Real Impact.
+              </span>
+            </h1>
+          </div>
 
           <p className="mx-auto mt-7 max-w-2xl text-lg leading-relaxed text-slate-600 dark:text-slate-300 sm:text-xl">
             The next-generation platform uniting students, faculty, and enterprise partners — transforming coursework

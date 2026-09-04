@@ -3,6 +3,7 @@
 import { Canvas, useFrame } from "@react-three/fiber";
 import { Float, OrbitControls, Points, Line } from "@react-three/drei";
 import { useMemo, useRef, useState, useEffect } from "react";
+import { useTheme } from "next-themes";
 import * as THREE from "three";
 import type { Group, Points as ThreePoints } from "three";
 
@@ -15,7 +16,7 @@ function spherePositions(count: number, radius: number): THREE.Vector3[] {
   const goldenRatio = (1 + Math.sqrt(5)) / 2;
   for (let i = 0; i < count; i++) {
     const theta = Math.acos(1 - (2 * (i + 0.5)) / count);
-    const phi = 2 * Math.PI * i / goldenRatio;
+    const phi = (2 * Math.PI * i) / goldenRatio;
     positions.push(
       new THREE.Vector3(
         radius * Math.sin(theta) * Math.cos(phi),
@@ -27,7 +28,7 @@ function spherePositions(count: number, radius: number): THREE.Vector3[] {
   return positions;
 }
 
-function NetworkSphere() {
+function NetworkSphere({ isDark }: { isDark: boolean }) {
   const group = useRef<Group>(null);
 
   const { nodePositions, links } = useMemo(() => {
@@ -56,32 +57,36 @@ function NetworkSphere() {
     }
   });
 
+  const lineColor = isDark ? "#818cf8" : "#6366f1";
+  const lineOpacity = isDark ? 0.38 : 0.45;
+  const pointColor = isDark ? "#6366f1" : "#4f46e5";
+
   return (
     <group ref={group}>
       {links.map(([a, b], i) => (
         <Line
           key={`link-${i}`}
           points={[a, b]}
-          color="#818cf8"
-          lineWidth={0.8}
+          color={lineColor}
+          lineWidth={0.9}
           transparent
-          opacity={0.35}
+          opacity={lineOpacity}
         />
       ))}
       <Points positions={new Float32Array(nodePositions.flatMap((p) => [p.x, p.y, p.z]))} frustumCulled={false}>
         <pointsMaterial
-          color="#6366f1"
-          size={0.09}
+          color={pointColor}
+          size={isDark ? 0.09 : 0.1}
           sizeAttenuation
           transparent
-          opacity={0.9}
+          opacity={isDark ? 0.9 : 0.85}
         />
       </Points>
     </group>
   );
 }
 
-function SpherePoints() {
+function SpherePoints({ isDark }: { isDark: boolean }) {
   const ref = useRef<ThreePoints>(null);
   const points = useMemo(() => spherePositions(NODE_COUNT, SPHERE_RADIUS), []);
 
@@ -92,32 +97,43 @@ function SpherePoints() {
     }
   });
 
+  const pointColor = isDark ? "#a78bfa" : "#818cf8";
+
   return (
     <Points ref={ref} positions={new Float32Array(points.flatMap((p) => [p.x, p.y, p.z]))} frustumCulled={false}>
-      <pointsMaterial color="#a78bfa" size={0.05} sizeAttenuation transparent opacity={0.5} />
+      <pointsMaterial
+        color={pointColor}
+        size={isDark ? 0.05 : 0.055}
+        sizeAttenuation
+        transparent
+        opacity={isDark ? 0.5 : 0.5}
+      />
     </Points>
   );
 }
 
 export default function ThreedVisual() {
-  const [dark, setDark] = useState(false);
+  const { theme, resolvedTheme } = useTheme();
+  const [mounted, setMounted] = useState(false);
 
   useEffect(() => {
-    const mq = window.matchMedia("(prefers-color-scheme: dark)");
-    const update = () => setDark(mq.matches);
-    update();
-    mq.addEventListener("change", update);
-    return () => mq.removeEventListener("change", update);
+    setMounted(true);
   }, []);
+
+  const isDark = mounted
+    ? (resolvedTheme ?? theme) === "dark"
+    : typeof document !== "undefined"
+      ? document.documentElement.classList.contains("dark")
+      : false;
 
   return (
     <div className="pointer-events-auto relative mx-auto aspect-square w-full max-w-[680px]">
       <Canvas camera={{ position: [0, 0, 6.2], fov: 45 }} dpr={[1, 2]} gl={{ alpha: true }}>
-        <ambientLight intensity={1.2} />
-        <pointLight position={[10, 10, 10]} intensity={1} color="#818cf8" />
+        <ambientLight intensity={isDark ? 1.2 : 1.3} />
+        <pointLight position={[10, 10, 10]} intensity={isDark ? 1 : 1.1} color={isDark ? "#818cf8" : "#6366f1"} />
         <Float speed={1.6} rotationIntensity={0.4} floatIntensity={0.6}>
-          <NetworkSphere />
-          <SpherePoints />
+          <NetworkSphere isDark={isDark} />
+          <SpherePoints isDark={isDark} />
         </Float>
         <OrbitControls
           enableZoom={false}
@@ -127,7 +143,6 @@ export default function ThreedVisual() {
           minPolarAngle={Math.PI / 3}
           maxPolarAngle={(2 * Math.PI) / 3}
         />
-        <fogExp2 attach="fog" args={[dark ? "#0f172a" : "#f8fafc", 0.28]} />
       </Canvas>
     </div>
   );
