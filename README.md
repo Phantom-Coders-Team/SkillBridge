@@ -82,6 +82,11 @@ Flips traditional campus hiring upside down. Students with **PRI ≥ 850** becom
 - Automatically flags obsolete topics (e.g., SOAP/CORBA, legacy frameworks) against live industry job requirements.
 - Generates instant **Curriculum Patches & Micro-Modules** (e.g., gRPC, GraphQL, Event-Driven Streaming) for faculty boards of study.
 
+### 5. 🎙️ AI Mock Interviews & Smart Assessments
+- **Real-Time AI Interviewer:** Chat-based bot utilizing the **Web Speech API** for live voice-to-text behavioral and technical mock interviews.
+- **Dynamic Assessments:** Aptitude, Logical Reasoning, and Technical tracks that automatically pinpoint strengths and upskill gaps into a verified skill graph.
+- **AI Resume Parser:** 1-click automatic skill extraction directly into the student's digital portfolio.
+
 ### 5. ⚖️ Dual Grading Matrix
 - Bridges academic rigor with industry standards.
 - Faculty assess academic fundamentals (algorithms, documentation, discipline).
@@ -92,11 +97,11 @@ Flips traditional campus hiring upside down. Students with **PRI ≥ 850** becom
 - Tracks skills across **ACTIVE ➔ STALE ➔ EXPIRED** states.
 - Incentivizes students to recertify, commit code, and attend mentorship clinics to keep their profile current.
 
-### 7. 🎟️ Digital India e-RUPI Vouchers & Skill Token Economy
+### 8. 🎟️ Digital India e-RUPI Vouchers & Skill Token Economy
 - **e-RUPI Vouchers:** Purpose-bound digital vouchers issued by corporate CSR/partners for certifications, lab equipment, and student training.
 - **Skill Tokens:** Internal token ledger allowing students to book 15-minute 1:1 Office Hours and Code Clinics with verified industry mentors.
 
-### 8. 🌐 Spatial 3D Interactive Globe
+### 9. 🌐 Spatial 3D Interactive Globe
 - Built using **Three.js** and **React Three Fiber**.
 - Visualizes the living network of institutions, industry hubs, and collaborative lab units worldwide directly on the landing page.
 
@@ -106,10 +111,10 @@ Flips traditional campus hiring upside down. Students with **PRI ≥ 850** becom
 
 | Stakeholder | Key Features & Capabilities | SIH Impact & Value |
 |:---|:---|:---|
-| **👨‍🎓 Student** | • Multi-factor PRI 0–1000 Tracker<br>• Proof-of-Work Portfolio with QR Verification<br>• Skill Decay Monitoring (Active/Stale/Expired)<br>• Reverse Placement Job Pitches<br>• 1:1 Mentor Booking & Office Hours<br>• Internship & Apprenticeship Marketplace | Transforms passive learners into verified builders with immutable credentials. |
+| **👨‍🎓 Student** | • Multi-factor PRI 0–1000 Tracker<br>• Proof-of-Work Portfolio with QR Verification<br>• AI Mock Interviews & Auto-Resume Parsing<br>• Reverse Placement Job Pitches<br>• 1:1 Mentor Booking & Office Hours<br>• Internship & Apprenticeship Marketplace | Transforms passive learners into verified builders with immutable credentials. |
 | **👩‍🏫 Academician** | • Faculty Portal & Industry Sabbatical Exchange<br>• AI Syllabus Obsolescence Audit & Patching<br>• Lab Unit Incubator Management<br>• Dual Grading Evaluation Console<br>• AICTE-Recognized Faculty Development Programs (FDP) | Enables faculty to stay updated with industry trends and engage in paid consultancies. |
 | **🏢 Industry Partner** | • Capstone & R&D Challenge Marketplace<br>• Reverse Placement Direct Candidate Outreach<br>• Dual Grading on Real-World Deliverables<br>• Mentor Slot Scheduling & 1:1 Code Clinics<br>• Purpose-Bound e-RUPI Education Voucher Issuance | Drastically cuts hiring turnaround time and retraining costs through verified talent pipelines. |
-| **🏛️ Institution / TPO** | • Department-Level Skill Gap Heatmaps<br>• Real-Time Placement Tracker & Job Pitch Funnel<br>• NAAC, NBA, and NIRF Accreditation Metrics<br>• Industry Partner Directory & MoUs<br>• Automated Student Skill Analytics | Provides actionable macro insights to modernize curricula and achieve 100% placement success. |
+| **🏛️ Institution / TPO** | • Institutional Admin View & Analytics Dashboard<br>• Department-Level Skill Gap Heatmaps<br>• Real-Time Placement Tracker & Job Pitch Funnel<br>• NAAC, NBA, and NIRF Accreditation Metrics<br>• Industry Partner Directory & MoUs | Provides actionable macro insights to modernize curricula and achieve 100% placement success. |
 
 ---
 
@@ -300,6 +305,9 @@ SkillBridge/
 │   ├── app/
 │   │   ├── (app)/            # Authenticated stakeholder application routes
 │   │   │   ├── dashboard/    # Unified stakeholder-aware dashboard
+│   │   │   ├── mock-interview/# Web Speech API based AI Mock Interviewer
+│   │   │   ├── assessments/  # Skill assessments & aptitude tracking
+│   │   │   ├── analytics/    # Institutional Admin View & aggregate data
 │   │   │   ├── pri/          # Placement Readiness Index deep-dive & breakdown
 │   │   │   ├── proof-of-work/# Verifiable project proofs & blockchain explorer
 │   │   │   ├── reverse-placement/ # Reverse hiring marketplace (PRI 850+)
