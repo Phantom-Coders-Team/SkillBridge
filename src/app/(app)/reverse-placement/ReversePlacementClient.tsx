@@ -19,7 +19,7 @@ export function ReversePlacementClient({
   viewerRole,
 }: {
   candidates: Candidate[];
-  viewerRole: "STUDENT" | "INDUSTRY" | "TPO" | "FACULTY";
+  viewerRole: "STUDENT" | "INDUSTRY" | "INSTITUTIONS" | "FACULTY";
 }) {
   const isRecruiter = viewerRole === "INDUSTRY";
   const isStudent = viewerRole === "STUDENT";

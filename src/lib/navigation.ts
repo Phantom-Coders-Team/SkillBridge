@@ -55,7 +55,7 @@ export const NAV_ITEMS: Record<Role, NavItem[]> = {
     { label: "Host Mentor Slots", href: "/mentor-slots", icon: CalendarClock },
     { label: "Dual Grading", href: "/dual-grading", icon: Scale },
   ],
-  TPO: [
+  INSTITUTIONS: [
     { label: "Dashboard", href: "/dashboard", icon: LayoutDashboard },
     { label: "Skill Deficit Heatmap", href: "/heatmap", icon: BarChart3 },
     { label: "Placement Records", href: "/placements", icon: Target },

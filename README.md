@@ -1,6 +1,6 @@
 # Skill Bridge
 
-A unified collaboration portal connecting students, faculty, industry partners, and Training & Placement Officers (TPOs) for skill development, capstone projects, mentorship, and placements.
+A unified collaboration portal connecting students, faculty, industry partners, and institutions for skill development, capstone projects, mentorship, and placements.
 
 ## Tech Stack
 
@@ -23,7 +23,7 @@ A unified collaboration portal connecting students, faculty, industry partners, 
 | **Student** | Dashboard, projects, challenges, proof of work, skills, assessments, tokens, mentors, office hours, portfolio, internships, reverse placement |
 | **Faculty** | Dashboard, projects, challenges, lab units, dual grading, syllabus audit, faculty portal, sabbaticals |
 | **Industry** | Dashboard, challenges, dual grading, mentor slots, job pitches, internships, faculty programs, sabbaticals |
-| **TPO** | Dashboard, placements, skill heatmap, reverse placement, partners, analytics, assessments |
+| **Institutions** | Dashboard, placements, skill heatmap, reverse placement, partners, analytics, assessments |
 
 ## Key Features
 
@@ -49,7 +49,7 @@ A unified collaboration portal connecting students, faculty, industry partners, 
 ### Career & Placement
 - **Reverse Placement:** High-PRI students (>850) are pitched to directly by recruiters instead of traditional campus placement.
 - **Job Pitches:** Industry partners send tailored job offers with stipend and role details to specific students.
-- **Skill Heatmap (TPO):** Department-wise skill gap analysis comparing student scores against hiring benchmarks with bootcamp recommendations.
+- **Skill Heatmap (Institutions):** Department-wise skill gap analysis comparing student scores against hiring benchmarks with bootcamp recommendations.
 - **Placement Tracker:** Real-time status tracking of all job pitches (pitched > shortlisted > offered > accepted).
 - **Digital Portfolio:** Students showcase verified skills, certifications, projects, proofs of work, and uploaded documents.
 

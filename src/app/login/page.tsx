@@ -24,7 +24,7 @@ const DEMO_ACCOUNTS = [
     tone: "bg-purple-50 text-purple-700 ring-purple-200 hover:bg-purple-100 dark:bg-purple-500/15 dark:text-purple-300 dark:ring-purple-500/40 dark:hover:bg-purple-500/25",
   },
   {
-    role: "TPO",
+    role: "Institutions",
     email: "tpo@university.edu",
     tone: "bg-amber-50 text-amber-700 ring-amber-200 hover:bg-amber-100 dark:bg-amber-500/15 dark:text-amber-300 dark:ring-amber-500/40 dark:hover:bg-amber-500/25",
   },

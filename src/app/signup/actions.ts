@@ -9,7 +9,7 @@ export interface SignupState {
   error?: string;
 }
 
-const ALLOWED_ROLES: Role[] = ["STUDENT", "FACULTY", "INDUSTRY", "TPO"];
+const ALLOWED_ROLES: Role[] = ["STUDENT", "FACULTY", "INDUSTRY", "INSTITUTIONS"];
 
 export async function signupAction(_prevState: SignupState | null, formData: FormData): Promise<SignupState> {
   const name = String(formData.get("name") || "").trim();

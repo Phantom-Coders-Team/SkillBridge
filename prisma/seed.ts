@@ -131,19 +131,19 @@ async function main() {
     industryUserIds.push(user.id);
   }
 
-  // ----- TPO -----
-  const tpos: Array<[string, string, string]> = [
+  // ----- INSTITUTIONS -----
+  const institutions: Array<[string, string, string]> = [
     ["Dr. Lakshmi Narayanan", "tpo@university.edu", "Training & Placement Officer"],
     ["Mr. Suresh Babu", "tpo.assist@university.edu", "Assistant TPO"],
   ];
 
-  for (const [name, email, designation] of tpos) {
+  for (const [name, email, designation] of institutions) {
     await prisma.user.create({
       data: {
         name,
         email,
         passwordHash,
-        role: "TPO",
+        role: "INSTITUTIONS",
         profile: {
           create: {
             designation,
@@ -535,7 +535,7 @@ async function main() {
     },
   });
 
-  // ----- HIRING BENCHMARKS (Phase 4: TPO Skill Deficit Heatmap) -----
+  // ----- HIRING BENCHMARKS (Phase 4: Institution Skill Deficit Heatmap) -----
   // department / year / skill / required benchmark score (0-100) for upcoming campus hiring
   const benchmarkDefs = [
     // CS 4th Year
@@ -740,7 +740,7 @@ async function main() {
 
   console.log("Seeding complete!");
   console.log(`  Users: ${8 + 4 + 5 + 2}`);
-  console.log(`  Students: 8, Faculty: 4, Industry: 5, TPO: 2`);
+  console.log(`  Students: 8, Faculty: 4, Industry: 5, Institutions: 2`);
   console.log(`  Syllabi: ${syllabi.length}`);
   console.log(`  Projects: ${projectDefs.length}`);
   console.log(`  Skills: ${skillAssessments.length}`);

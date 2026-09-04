@@ -680,7 +680,7 @@ export default async function Home() {
                   </Link>
                 </li>
                 <li>
-                  <Link href="/signup?role=TPO" className="hover:text-indigo-600 dark:hover:text-indigo-400">
+                  <Link href="/signup?role=INSTITUTIONS" className="hover:text-indigo-600 dark:hover:text-indigo-400">
                     Institutions
                   </Link>
                 </li>

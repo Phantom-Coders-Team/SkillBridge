@@ -17,7 +17,7 @@ export default async function ReversePlacementPage() {
         <EmptyState
           icon={Trophy}
           title="Faculty view unavailable"
-          description="Reverse campus placement is available to students, TPOs, and industry recruiters."
+          description="Reverse campus placement is available to students, institutions, and industry recruiters."
         />
       </div>
     );
@@ -53,7 +53,7 @@ export default async function ReversePlacementPage() {
           "recruiters can pitch job and internship packages directly to top candidates."
         }
       />
-      <ReversePlacementClient candidates={sorted} viewerRole={user.role as "STUDENT" | "INDUSTRY" | "TPO"} />
+      <ReversePlacementClient candidates={sorted} viewerRole={user.role as "STUDENT" | "INDUSTRY" | "INSTITUTIONS"} />
     </div>
   );
 }

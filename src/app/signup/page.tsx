@@ -12,7 +12,7 @@ const ROLE_OPTIONS = [
   { value: "STUDENT", label: "Student", tone: "bg-blue-50 text-blue-700 ring-blue-200 dark:bg-blue-500/15 dark:text-blue-300 dark:ring-blue-500/40" },
   { value: "FACULTY", label: "Faculty", tone: "bg-emerald-50 text-emerald-700 ring-emerald-200 dark:bg-emerald-500/15 dark:text-emerald-300 dark:ring-emerald-500/40" },
   { value: "INDUSTRY", label: "Industry", tone: "bg-purple-50 text-purple-700 ring-purple-200 dark:bg-purple-500/15 dark:text-purple-300 dark:ring-purple-500/40" },
-  { value: "TPO", label: "TPO", tone: "bg-amber-50 text-amber-700 ring-amber-200 dark:bg-amber-500/15 dark:text-amber-300 dark:ring-amber-500/40" },
+  { value: "INSTITUTIONS", label: "Institutions", tone: "bg-amber-50 text-amber-700 ring-amber-200 dark:bg-amber-500/15 dark:text-amber-300 dark:ring-amber-500/40" },
 ];
 
 const FEATURES = [
@@ -26,7 +26,7 @@ function RoleParamSync({ onSelect }: { onSelect: (r: string) => void }) {
   const searchParams = useSearchParams();
   const r = searchParams.get("role")?.toUpperCase();
   useEffect(() => {
-    if (r && ["STUDENT", "FACULTY", "INDUSTRY", "TPO"].includes(r)) {
+    if (r && ["STUDENT", "FACULTY", "INDUSTRY", "INSTITUTIONS"].includes(r)) {
       onSelect(r);
     }
   }, [r, onSelect]);

@@ -35,7 +35,7 @@ const QUICK_LINKS: Partial<Record<string, QuickLink[]>> = {
     { label: "Reverse Placement", href: "/reverse-placement", icon: Target, desc: "Pitch top students" },
     { label: "Proof of Work", href: "/proof-of-work", icon: Award, desc: "Review sign-offs" },
   ],
-  TPO: [
+  INSTITUTIONS: [
     { label: "Placements", href: "/placements", icon: Briefcase, desc: "Track offers" },
     { label: "Skill Heatmap", href: "/heatmap", icon: Radar, desc: "Spot deficits" },
     { label: "Partners", href: "/partners", icon: Users, desc: "Industry directory" },
@@ -71,7 +71,7 @@ const ROLE_GUIDES: Partial<Record<string, { title: string; steps: string[] }>> =
       "Approve proof of work so verified talent rises in the rankings.",
     ],
   },
-  TPO: {
+  INSTITUTIONS: {
     title: "Drive placement outcomes",
     steps: [
       "Watch the skill heatmap to spot deficits early and steer interventions.",
@@ -136,7 +136,7 @@ export default async function DashboardPage() {
       ];
       break;
     }
-    case "TPO": {
+    case "INSTITUTIONS": {
       const [users, projectsActive, pitchesOffered, syllabi] = await Promise.all([
         prisma.user.count(),
         prisma.project.count({ where: { status: "IN_PROGRESS" } }),

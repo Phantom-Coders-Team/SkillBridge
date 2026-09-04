@@ -18,7 +18,7 @@ export const metadata: Metadata = {
     default: "Skill Bridge — Academia × Industry Portal",
     template: "%s · Skill Bridge",
   },
-  description: "A unified portal connecting students, faculty, industry, and TPOs for skill development, capstone projects, mentorship, and placements.",
+  description: "A unified portal connecting students, faculty, industry, and institutions for skill development, capstone projects, mentorship, and placements.",
 };
 
 export default function RootLayout({ children }: LayoutProps<"/">) {

@@ -7,10 +7,10 @@ export default async function HeatmapPage() {
   const user = await getCurrentUser();
   if (!user) redirect("/login");
 
-  if (user.role !== "TPO") {
+  if (user.role !== "INSTITUTIONS") {
     return (
       <div className="mx-auto max-w-3xl rounded-2xl border border-border-muted bg-surface p-8 text-center text-sm text-slate-500 dark:text-slate-400 shadow-card">
-        Only Training &amp; Placement Officers can view the skill deficit heatmap.
+        Only institution representatives can view the skill deficit heatmap.
       </div>
     );
   }
@@ -94,7 +94,7 @@ export default async function HeatmapPage() {
 
   return (
     <div className="mx-auto max-w-6xl">
-      <h1 className="text-2xl font-bold text-gray-900 dark:text-gray-100">TPO Skill Deficit Heatmap</h1>
+      <h1 className="text-2xl font-bold text-gray-900 dark:text-gray-100">Institution Skill Deficit Heatmap</h1>
       <p className="mt-1 text-sm text-gray-500 dark:text-gray-400">
         Contrasts each department batch&apos;s average verified skill scores against the required
         benchmark for upcoming campus hiring drives.
