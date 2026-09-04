@@ -46,34 +46,8 @@ export async function submitAssessmentAction(data: {
       });
     }
 
-    // Award tokens for passing skill assessment
-    if (data.score >= 50) {
-      let ledger = await prisma.tokenLedger.findFirst({
-        where: { studentId: user.id },
-      });
-      if (!ledger) {
-        ledger = await prisma.tokenLedger.create({
-          data: { studentId: user.id, balance: 100 },
-        });
-      }
-      const tokenReward = 30;
-      await prisma.tokenLedger.update({
-        where: { id: ledger.id },
-        data: { balance: { increment: tokenReward } },
-      });
-      await prisma.tokenTransaction.create({
-        data: {
-          ledgerId: ledger.id,
-          amount: tokenReward,
-          type: "CREDIT",
-          reason: `Passed Skill Assessment · ${data.skillName} (${data.score}%)`,
-        },
-      });
-    }
-
     revalidatePath("/assessments");
     revalidatePath("/dashboard");
-    revalidatePath("/tokens");
     revalidatePath("/internships");
     revalidatePath("/portfolio");
 

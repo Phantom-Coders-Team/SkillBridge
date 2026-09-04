@@ -489,8 +489,8 @@ export async function sendMentorBookingEmail({
     : `📅 Your Mentorship Session with ${otherPartyName} is Confirmed!`;
 
   const description = isMentor
-    ? `Student <strong>${otherPartyName}</strong> has redeemed their skill tokens to book an office hour session with you on <em>"${topic}"</em>.`
-    : `Your office hour session with industry mentor <strong>${otherPartyName}</strong> has been confirmed. Prepare your code queries and questions ahead of time!`;
+    ? `Student <strong>${otherPartyName}</strong> has scheduled a 1:1 mentorship & code clinic session with you on <em>"${topic}"</em>.`
+    : `Your 1:1 mentorship session with industry mentor <strong>${otherPartyName}</strong> has been confirmed. Prepare your code queries and questions ahead of time!`;
 
   const html = renderEmailTemplate({
     title: `Mentorship Session: ${topic}`,

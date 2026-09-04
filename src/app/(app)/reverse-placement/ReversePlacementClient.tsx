@@ -22,7 +22,7 @@ import {
   Zap,
   BookOpen,
   FolderGit2,
-  Coins,
+  CalendarClock,
   Flame,
   Info,
   X,
@@ -329,8 +329,8 @@ export function ReversePlacementClient({
                     <span className="font-bold text-slate-800 dark:text-slate-200">{myCandidate.pri.breakdown.dualGrading}/150</span>
                   </div>
                   <div className="flex items-center justify-between p-2 rounded-lg bg-surface-muted">
-                    <span className="text-slate-500">Skill Tokens:</span>
-                    <span className="font-bold text-slate-800 dark:text-slate-200">{myCandidate.pri.breakdown.tokens}/100</span>
+                    <span className="text-slate-500">Mentorship Sessions:</span>
+                    <span className="font-bold text-slate-800 dark:text-slate-200">{(myCandidate.pri.breakdown.mentorship ?? myCandidate.pri.breakdown.tokens ?? 0)}/100</span>
                   </div>
                   <div className="flex items-center justify-between p-2 rounded-lg bg-surface-muted">
                     <span className="text-slate-500">Challenges:</span>
@@ -485,7 +485,7 @@ export function ReversePlacementClient({
                 Placement Readiness Index Leaderboard
               </h2>
               <p className="text-xs text-slate-500 dark:text-slate-400">
-                Ranked by multi-factor PRI score: skills, projects, proofs of work, dual grading, tokens and challenges.
+                Ranked by multi-factor PRI score: skills, projects, proofs of work, dual grading, mentorship and challenges.
               </p>
             </div>
 
@@ -810,17 +810,17 @@ export function ReversePlacementClient({
                   </span>
                 </div>
 
-                {/* 5. Tokens */}
+                {/* 5. Mentorship */}
                 <div className="p-2.5 rounded-xl border border-border-muted bg-surface-muted/50 flex items-center justify-between">
                   <div className="flex items-center gap-2">
-                    <Coins className="size-4 text-amber-500" />
+                    <CalendarClock className="size-4 text-emerald-500" />
                     <div>
-                      <p className="font-semibold text-slate-900 dark:text-slate-100">Verified Skill Token Balance</p>
-                      <p className="text-[11px] text-slate-400">Earned via assessments & mentorship credits</p>
+                      <p className="font-semibold text-slate-900 dark:text-slate-100">1:1 Industry Mentorship & Code Clinics</p>
+                      <p className="text-[11px] text-slate-400">Technical consultations & live architecture reviews</p>
                     </div>
                   </div>
                   <span className="font-extrabold text-sm text-slate-800 dark:text-slate-200">
-                    {breakdownCandidate.pri.breakdown.tokens} / 100
+                    {(breakdownCandidate.pri.breakdown.mentorship ?? breakdownCandidate.pri.breakdown.tokens ?? 0)} / 100
                   </span>
                 </div>
 

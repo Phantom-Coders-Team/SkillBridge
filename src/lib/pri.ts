@@ -5,7 +5,8 @@ export interface PriInputs {
   projectsCompleted: number;
   proofOfWorkCount: number;
   dualGradingScore: number | null;
-  tokenBalance: number;
+  mentorshipSlots?: number;
+  tokenBalance?: number;
   challengeCompletions: number;
 }
 
@@ -21,7 +22,7 @@ const MAX_SKILL = 300;
 const MAX_PROJECTS = 250;
 const MAX_POW = 150;
 const MAX_DUAL = 150;
-const MAX_TOKENS = 100;
+const MAX_MENTORSHIP = 100;
 const MAX_CHALLENGES = 50;
 
 /**
@@ -37,7 +38,8 @@ export function calculatePri(inputs: PriInputs): PriResult {
     inputs.dualGradingScore === null || inputs.dualGradingScore === undefined
       ? 0
       : clampUnit(inputs.dualGradingScore / 100) * MAX_DUAL;
-  const tokenComponent = clampUnit(Math.min(inputs.tokenBalance, 100) / 100) * MAX_TOKENS;
+  const mentorSlotsCount = inputs.mentorshipSlots ?? inputs.tokenBalance ?? 0;
+  const mentorshipComponent = clampUnit(Math.min(mentorSlotsCount, 2) / 2) * MAX_MENTORSHIP;
   const challengeComponent = clampUnit(Math.min(inputs.challengeCompletions, 5) / 5) * MAX_CHALLENGES;
 
   const breakdown: Record<string, number> = {
@@ -45,7 +47,8 @@ export function calculatePri(inputs: PriInputs): PriResult {
     projects: Math.round(projectComponent),
     proofOfWork: Math.round(powComponent),
     dualGrading: Math.round(dualComponent),
-    tokens: Math.round(tokenComponent),
+    mentorship: Math.round(mentorshipComponent),
+    tokens: Math.round(mentorshipComponent), // legacy alias for backward compatibility
     challenges: Math.round(challengeComponent),
   };
 
@@ -54,10 +57,17 @@ export function calculatePri(inputs: PriInputs): PriResult {
     MAX_PROJECTS +
     MAX_POW +
     (inputs.dualGradingScore !== null && inputs.dualGradingScore !== undefined ? MAX_DUAL : 0) +
-    MAX_TOKENS +
+    MAX_MENTORSHIP +
     MAX_CHALLENGES;
 
-  const score = Object.values(breakdown).reduce((sum, v) => sum + v, 0);
+  // Compute total based on distinct components (excluding the legacy tokens alias)
+  const score =
+    breakdown.skills +
+    breakdown.projects +
+    breakdown.proofOfWork +
+    breakdown.dualGrading +
+    breakdown.mentorship +
+    breakdown.challenges;
 
   return {
     score,

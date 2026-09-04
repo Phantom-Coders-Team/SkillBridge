@@ -130,12 +130,12 @@ export async function respondToPitch(
 
 
 export async function computeStudentPri(studentId: string) {
-  const [assessments, projects, proofs, gradings, ledger, challengeCount] = await Promise.all([
+  const [assessments, projects, proofs, gradings, mentorSlotsCount, challengeCount] = await Promise.all([
     prisma.skillAssessment.findMany({ where: { studentId } }),
     prisma.project.count({ where: { ownerId: studentId, status: { in: ["IN_PROGRESS", "COMPLETED"] } } }),
     prisma.proofOfWork.count({ where: { studentId } }),
     prisma.dualGrading.findMany({ where: { labUnit: { members: { some: { studentId } } } } }),
-    prisma.tokenLedger.findFirst({ where: { studentId } }),
+    prisma.mentorSlot.count({ where: { studentId, status: { in: ["BOOKED", "COMPLETED"] } } }),
     prisma.labUnitMember.count({ where: { studentId } }),
   ]);
 
@@ -151,7 +151,7 @@ export async function computeStudentPri(studentId: string) {
     projectsCompleted: projects,
     proofOfWorkCount: proofs,
     dualGradingScore,
-    tokenBalance: ledger?.balance ?? 0,
+    mentorshipSlots: mentorSlotsCount,
     challengeCompletions: challengeCount,
   });
 }

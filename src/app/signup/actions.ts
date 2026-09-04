@@ -95,22 +95,6 @@ export async function signupAction(_prevState: SignupState | null, formData: For
       profile: {
         create: profileData,
       },
-      ...(role === "STUDENT"
-        ? {
-            ledger: {
-              create: {
-                balance: 100,
-                transactions: {
-                  create: {
-                    amount: 100,
-                    type: "CREDIT",
-                    reason: "Welcome onboarding skill tokens",
-                  },
-                },
-              },
-            },
-          }
-        : {}),
     },
     select: { id: true, name: true, email: true, role: true },
   });

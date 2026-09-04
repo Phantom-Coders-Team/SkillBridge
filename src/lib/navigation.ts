@@ -6,7 +6,6 @@ import {
   Building2,
   CalendarClock,
   ClipboardCheck,
-  Coins,
   FlaskConical,
   LayoutDashboard,
   Radar,

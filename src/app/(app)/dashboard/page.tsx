@@ -21,7 +21,6 @@ export default async function DashboardPage() {
         projectsCount,
         proofsCount,
         skillsCount,
-        ledger,
         pitchesCount,
         slotsCount,
         recentProofs,
@@ -36,7 +35,6 @@ export default async function DashboardPage() {
         prisma.project.count({ where: { ownerId: user.id } }),
         prisma.proofOfWork.count({ where: { studentId: user.id } }),
         prisma.skillAssessment.count({ where: { studentId: user.id } }),
-        prisma.tokenLedger.findFirst({ where: { studentId: user.id } }),
         prisma.jobPitch.count({ where: { studentId: user.id } }),
         prisma.mentorSlot.count({ where: { studentId: user.id } }),
         prisma.proofOfWork.findMany({
@@ -96,7 +94,6 @@ export default async function DashboardPage() {
           projectsCount,
           proofsCount,
           skillsCount,
-          tokenBalance: ledger?.balance ?? 0,
           pitchesCount,
           slotsCount,
           applicationsCount,

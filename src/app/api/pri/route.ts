@@ -15,6 +15,7 @@ export async function POST(req: Request) {
     projectsCompleted?: number;
     proofOfWorkCount?: number;
     dualGradingScore?: number | null;
+    mentorshipSlots?: number;
     tokenBalance?: number;
     challengeCompletions?: number;
   };
@@ -32,7 +33,7 @@ export async function POST(req: Request) {
       body.dualGradingScore === null || body.dualGradingScore === undefined
         ? null
         : Number(body.dualGradingScore),
-    tokenBalance: Number(body.tokenBalance ?? 0),
+    mentorshipSlots: Number(body.mentorshipSlots ?? body.tokenBalance ?? 0),
     challengeCompletions: Number(body.challengeCompletions ?? 0),
   });
 

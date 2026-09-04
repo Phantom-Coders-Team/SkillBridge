@@ -3,69 +3,63 @@
 import { revalidatePath } from "next/cache";
 import { prisma } from "@/lib/prisma";
 import { getCurrentUser } from "@/lib/auth";
-import { OFFICE_HOUR_COST, CODE_CLINIC_COST } from "./costs";
 
 export interface BookingResult {
   ok: boolean;
   error?: string;
-  balance?: number;
+  meetingLink?: string;
 }
 
 export async function bookOfficeHour(
   slotId: string,
-  variant: "OFFICE_HOUR" | "CODE_CLINIC"
+  sessionFormat: string = "Career Mentorship",
+  notes?: string
 ): Promise<BookingResult> {
   const user = await getCurrentUser();
   if (!user || user.role !== "STUDENT") {
-    return { ok: false, error: "Only students can book mentorship slots." };
+    return { ok: false, error: "Only registered students can book mentorship sessions." };
   }
 
-  const cost = variant === "CODE_CLINIC" ? CODE_CLINIC_COST : OFFICE_HOUR_COST;
-
-  const [slot, ledger] = await Promise.all([
-    prisma.mentorSlot.findUnique({ where: { id: slotId } }),
-    prisma.tokenLedger.findFirst({ where: { studentId: user.id } }),
-  ]);
+  const slot = await prisma.mentorSlot.findUnique({
+    where: { id: slotId },
+    include: {
+      industry: {
+        select: {
+          id: true,
+          name: true,
+          email: true,
+          profile: { select: { companyName: true, designation: true } },
+        },
+      },
+    },
+  });
 
   if (!slot) {
-    return { ok: false, error: "Mentor slot not found." };
+    return { ok: false, error: "Mentorship slot not found." };
   }
   if (slot.status !== "AVAILABLE") {
-    return { ok: false, error: "This slot has already been booked." };
-  }
-  if (!ledger || ledger.balance < cost) {
-    return { ok: false, error: `Insufficient tokens. ${variant === "CODE_CLINIC" ? "Code clinic" : "Office hour"} costs ${cost} tokens.` };
+    return { ok: false, error: "This slot has already been booked by another student." };
   }
 
-  await prisma.$transaction([
-    prisma.mentorSlot.update({
-      where: { id: slot.id },
-      data: { studentId: user.id, status: "BOOKED" },
-    }),
-    prisma.tokenLedger.update({
-      where: { id: ledger.id },
-      data: { balance: ledger.balance - cost },
-    }),
-    prisma.tokenTransaction.create({
-      data: {
-        ledgerId: ledger.id,
-        amount: -cost,
-        type: "DEBIT",
-        reason:
-          variant === "CODE_CLINIC"
-            ? `Code clinic booking · ${slot.topic || "Industry mentor"}`
-            : `Office hours booking · ${slot.topic || "Industry mentor"}`,
-      },
-    }),
-  ]);
+  const combinedTopic = notes
+    ? `${sessionFormat} · ${notes}`
+    : `${sessionFormat} · ${slot.topic || "Technical & Career Mentorship"}`;
 
-  // Dispatch confirmation emails to both student and mentor
+  // Direct free booking - set studentId and mark as BOOKED
+  await prisma.mentorSlot.update({
+    where: { id: slot.id },
+    data: {
+      studentId: user.id,
+      status: "BOOKED",
+      topic: combinedTopic,
+    },
+  });
+
+  const meetingLink = `https://meet.jit.si/SkillBridge-Mentor-${slot.id.slice(0, 10)}`;
+
+  // Dispatch confirmation emails & in-app notifications
   try {
-    const mentor = await prisma.user.findUnique({
-      where: { id: slot.industryId },
-      select: { id: true, name: true, email: true, profile: { select: { companyName: true } } },
-    });
-
+    const mentor = slot.industry;
     if (mentor) {
       const timeLabel = new Date(slot.timeSlot).toLocaleString("en-IN", {
         dateStyle: "medium",
@@ -81,7 +75,7 @@ export async function bookOfficeHour(
         mentorId: mentor.id,
         mentorEmail: mentor.email,
         mentorName: mentorDisplayName,
-        topic: slot.topic || "Technical Mentorship & Career Guidance",
+        topic: combinedTopic,
         timeLabel,
       }).catch((err) => console.error("Failed to dispatch mentor booking emails:", err));
     }
@@ -90,8 +84,37 @@ export async function bookOfficeHour(
   }
 
   revalidatePath("/office-hours");
-  revalidatePath("/tokens");
+  revalidatePath("/mentor-slots");
   revalidatePath("/dashboard");
-  return { ok: true, balance: ledger.balance - cost };
+  return { ok: true, meetingLink };
 }
 
+export async function cancelOfficeHour(slotId: string): Promise<{ ok: boolean; error?: string }> {
+  const user = await getCurrentUser();
+  if (!user) {
+    return { ok: false, error: "Unauthorized" };
+  }
+
+  const slot = await prisma.mentorSlot.findUnique({ where: { id: slotId } });
+  if (!slot) {
+    return { ok: false, error: "Slot not found" };
+  }
+
+  // Only the booked student or the industry mentor can cancel
+  if (slot.studentId !== user.id && slot.industryId !== user.id) {
+    return { ok: false, error: "You are not authorized to cancel this session." };
+  }
+
+  await prisma.mentorSlot.update({
+    where: { id: slot.id },
+    data: {
+      studentId: null,
+      status: "AVAILABLE",
+    },
+  });
+
+  revalidatePath("/office-hours");
+  revalidatePath("/mentor-slots");
+  revalidatePath("/dashboard");
+  return { ok: true };
+}

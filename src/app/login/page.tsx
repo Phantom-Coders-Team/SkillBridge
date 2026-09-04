@@ -31,10 +31,10 @@ const DEMO_ACCOUNTS = [
 ];
 
 const FEATURES = [
-  "Skill tokens & verifiable proof of work",
+  "Verifiable proof of work & credentials",
   "Capstone and R&D challenge marketplace",
   "Dual-graded placements with live PRI scores",
-  "Mentorship, office hours & sabbatical exchange",
+  "1:1 Industry mentorship & live code clinics",
 ];
 
 export default function LoginPage() {

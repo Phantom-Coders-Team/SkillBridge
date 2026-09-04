@@ -8,7 +8,6 @@ import {
   CalendarClock,
   CheckCircle2,
   Clock,
-  Coins,
   ExternalLink,
   FolderKanban,
   GraduationCap,
@@ -26,7 +25,7 @@ export interface StudentDashboardProps {
     projectsCount: number;
     proofsCount: number;
     skillsCount: number;
-    tokenBalance: number;
+    tokenBalance?: number;
     pitchesCount: number;
     slotsCount: number;
     applicationsCount?: number;
@@ -113,9 +112,9 @@ export function StudentDashboard({
               <GraduationCap className="size-3.5" />
               Student Workspace
             </span>
-            <span className="inline-flex items-center gap-1 rounded-full bg-amber-50 px-3 py-1 text-xs font-semibold text-amber-700 ring-1 ring-amber-200/80 dark:bg-amber-500/15 dark:text-amber-300 dark:ring-amber-500/30">
-              <Coins className="size-3.5" />
-              {stats.tokenBalance} Skill Tokens Available
+            <span className="inline-flex items-center gap-1.5 rounded-full bg-emerald-50 px-3 py-1 text-xs font-semibold text-emerald-700 ring-1 ring-emerald-200/80 dark:bg-emerald-500/15 dark:text-emerald-300 dark:ring-emerald-500/30">
+              <CalendarClock className="size-3.5" />
+              {stats.slotsCount ?? 0} Mentorship Sessions Booked
             </span>
           </div>
 
@@ -229,12 +228,12 @@ export function StudentDashboard({
           href="/skills"
         />
         <StatCard
-          label="Token Balance"
-          value={stats.tokenBalance}
-          icon={Coins}
-          tone="amber"
-          sub="For mentor clinics"
-          href="/tokens"
+          label="Mentor Sessions"
+          value={stats.slotsCount ?? 0}
+          icon={CalendarClock}
+          tone="emerald"
+          sub="1:1 video clinics"
+          href="/office-hours"
         />
         <StatCard
           label="Job Pitches"
@@ -425,7 +424,7 @@ export function StudentDashboard({
           <Card className="overflow-hidden">
             <CardHeader
               title="Recommended Industry Challenges"
-              subtitle="Solve real-world corporate problem statements to earn skill tokens and job offers."
+              subtitle="Solve real-world corporate problem statements to build verified portfolio proofs and land job offers."
               icon={Sparkles}
               action={
                 <Link
@@ -542,7 +541,7 @@ export function StudentDashboard({
                 "Submit project repositories for dual sign-off.",
                 "Take the diagnostic test to keep your badges fresh.",
                 "Join an R&D lab unit on an open industry challenge.",
-                "Spend tokens to book office hours with hiring mentors.",
+                "Book 1:1 office hours and code clinics with industry hiring mentors.",
                 "Respond promptly when recruiters pitch you.",
               ].map((step, idx) => (
                 <li key={step} className="flex items-start gap-3">

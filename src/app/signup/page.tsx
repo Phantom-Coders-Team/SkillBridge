@@ -72,9 +72,9 @@ const ROLE_PITCHES: Record<
     tag: "For Students & Candidates",
     heading: "Start building your future with verified skills.",
     description:
-      "Showcase proof of work, sync GitHub footprints, apply to vetted internships, and earn verifiable on-chain skill tokens.",
+      "Showcase proof of work, sync GitHub footprints, apply to vetted internships, and book 1:1 industry mentorship sessions.",
     features: [
-      "100 Free Welcome Onboarding Skill Tokens",
+      "1:1 Industry Mentorship & Live Code Clinics",
       "GitHub repository & programming language footprint sync",
       "Direct internship & job applications with live tracking",
       "Real-time interview scheduling & calendar invitations",

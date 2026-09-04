@@ -71,22 +71,6 @@ export async function POST(req: Request) {
               companyName: target.role === "INDUSTRY" ? target.name : undefined,
             },
           },
-          ...(target.role === "STUDENT"
-            ? {
-                ledger: {
-                  create: {
-                    balance: 150,
-                    transactions: {
-                      create: {
-                        amount: 150,
-                        type: "CREDIT",
-                        reason: "Demo starter skill tokens",
-                      },
-                    },
-                  },
-                },
-              }
-            : {}),
         },
         select: { id: true, name: true, email: true, role: true },
       });

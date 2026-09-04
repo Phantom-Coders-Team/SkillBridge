@@ -1,7 +1,7 @@
 import { redirect } from "next/navigation";
 import { getCurrentUser } from "@/lib/auth";
 import { prisma } from "@/lib/prisma";
-import { OfficeHoursClient } from "./OfficeHoursClient";
+import { OfficeHoursClient, type BookedSession } from "./OfficeHoursClient";
 import type { BookableSlot } from "./BookingModal";
 
 export default async function OfficeHoursPage() {
@@ -11,22 +11,27 @@ export default async function OfficeHoursPage() {
   if (user.role !== "STUDENT") {
     return (
       <div className="mx-auto max-w-3xl rounded-2xl border border-border-muted bg-surface p-8 text-center text-sm text-slate-500 dark:text-slate-400 shadow-card">
-        Skill-token office hours are available to students.
+        1:1 Industry Mentorship and Code Clinics are open to students.
       </div>
     );
   }
 
-  const [slots, ledger] = await Promise.all([
+  const [availableSlots, userBookings] = await Promise.all([
     prisma.mentorSlot.findMany({
       where: { status: "AVAILABLE" },
       include: { industry: { select: { name: true, profile: { select: { companyName: true, designation: true } } } } },
       orderBy: { timeSlot: "asc" },
       take: 30,
     }),
-    prisma.tokenLedger.findFirst({ where: { studentId: user.id } }),
+    prisma.mentorSlot.findMany({
+      where: { studentId: user.id },
+      include: { industry: { select: { name: true, profile: { select: { companyName: true, designation: true } } } } },
+      orderBy: { timeSlot: "desc" },
+      take: 20,
+    }),
   ]);
 
-  const bookable: BookableSlot[] = slots.map((s) => ({
+  const bookable: BookableSlot[] = availableSlots.map((s) => ({
     id: s.id,
     topic: s.topic,
     timeSlot: s.timeSlot.toISOString(),
@@ -36,14 +41,26 @@ export default async function OfficeHoursPage() {
     designation: s.industry.profile?.designation || null,
   }));
 
+  const myBooked: BookedSession[] = userBookings.map((s) => ({
+    id: s.id,
+    topic: s.topic,
+    timeSlot: s.timeSlot.toISOString(),
+    durationMins: s.durationMins,
+    status: s.status,
+    mentorName: s.industry.name,
+    companyName: s.industry.profile?.companyName || s.industry.name,
+    designation: s.industry.profile?.designation || null,
+  }));
+
   return (
-    <div className="mx-auto max-w-6xl">
-      <h1 className="text-2xl font-bold text-gray-900 dark:text-gray-100">Skill-Token Mentor Office Hours</h1>
-      <p className="mt-1 text-sm text-gray-500 dark:text-gray-400">
-        Spend your earned skill tokens to reserve 15-min code clinic slots or office hours with
-        industry mentors.
+    <div className="mx-auto max-w-6xl space-y-2">
+      <h1 className="text-2xl font-bold tracking-tight text-slate-900 dark:text-slate-100 sm:text-3xl">
+        1:1 Industry Mentorship & Code Clinics
+      </h1>
+      <p className="text-sm text-slate-500 dark:text-slate-400">
+        Connect directly with senior engineers, technical leaders, and hiring managers. Attend live video consultations to review projects, debug code, and sharpen interview readiness.
       </p>
-      <OfficeHoursClient slots={bookable} initialBalance={ledger?.balance ?? 0} />
+      <OfficeHoursClient slots={bookable} myBookings={myBooked} />
     </div>
   );
 }
