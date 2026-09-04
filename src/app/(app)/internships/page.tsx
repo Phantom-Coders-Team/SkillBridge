@@ -8,6 +8,7 @@ import ApplyButton from "./ApplyButton";
 import ExportButton from "./ExportButton";
 import ApplicantList from "./ApplicantList";
 import MatchBadge from "./MatchBadge";
+import { MyApplicationsModal } from "./MyApplicationsModal";
 
 const TYPE_TONE: Record<string, BadgeTone> = {
   INTERNSHIP: "blue",
@@ -25,7 +26,7 @@ export default async function InternshipsPage() {
 
   const isIndustry = user.role === "INDUSTRIES" || user.role === "INDUSTRY";
 
-  const [listings, studentProfile] = await Promise.all([
+  const [listings, studentProfile, myApplications] = await Promise.all([
     prisma.learningProgram.findMany({
       where: isIndustry ? { companyId: user.id } : undefined,
       include: {
@@ -41,6 +42,24 @@ export default async function InternshipsPage() {
     user.role === "STUDENT"
       ? prisma.profile.findUnique({ where: { userId: user.id }, select: { skills: true } })
       : null,
+    user.role === "STUDENT"
+      ? prisma.internshipApplication.findMany({
+          where: { studentId: user.id },
+          include: {
+            listing: {
+              include: {
+                company: {
+                  select: {
+                    name: true,
+                    profile: { select: { companyName: true, location: true } },
+                  },
+                },
+              },
+            },
+          },
+          orderBy: { createdAt: "desc" },
+        })
+      : [],
   ]);
 
   const mySkills = user.role === "STUDENT"
@@ -54,7 +73,7 @@ export default async function InternshipsPage() {
         subtitle="Industry internships, apprenticeships, entry-level roles, and learning programs — matched to your skills."
         icon={Briefcase}
         actions={
-          user.role === "INDUSTRIES" || user.role === "INDUSTRY" ? (
+          isIndustry ? (
             <div className="flex flex-wrap items-center gap-2">
               <ExportButton
                 href={`/api/exports/applications`}
@@ -72,6 +91,11 @@ export default async function InternshipsPage() {
                 </div>
               </details>
             </div>
+          ) : user.role === "STUDENT" ? (
+            <MyApplicationsModal
+              applications={myApplications}
+              mySkills={studentProfile?.skills ?? ""}
+            />
           ) : undefined
         }
       />
