@@ -1,9 +1,10 @@
 import { redirect } from "next/navigation";
 import Link from "next/link";
-import { ArrowRight, Award, ExternalLink, ShieldCheck } from "lucide-react";
+import { ArrowRight, Award, ExternalLink, ShieldCheck, Plus } from "lucide-react";
 import { getCurrentUser } from "@/lib/auth";
 import { prisma } from "@/lib/prisma";
 import { Badge, Card, EmptyState, PageHeader, type BadgeTone } from "@/components/ui";
+import AddProofOfWorkForm from "./AddProofOfWorkForm";
 
 const SIGN_TONE: Record<string, BadgeTone> = {
   PENDING: "amber",
@@ -30,6 +31,14 @@ export default async function ProofOfWorkPage() {
     take: 20,
   });
 
+  const studentProjects =
+    user.role === "STUDENT"
+      ? await prisma.project.findMany({
+          where: { ownerId: user.id },
+          select: { id: true, title: true },
+        })
+      : [];
+
   const approved = proofs.filter((p) => p.facultySignOff === "APPROVED" && p.industrySignOff === "APPROVED").length;
   const pending = proofs.filter((p) => p.facultySignOff === "PENDING" || p.industrySignOff === "PENDING").length;
 
@@ -39,6 +48,20 @@ export default async function ProofOfWorkPage() {
         icon={Award}
         title="Proof of Work"
         subtitle="Verified artifacts of student contributions with dual sign-offs."
+        actions={
+          user.role === "STUDENT" ? (
+            <details className="group relative">
+              <summary className="cursor-pointer list-none [&::-webkit-details-marker]:hidden">
+                <span className="inline-flex h-10 items-center gap-2 rounded-xl bg-indigo-600 px-4 text-sm font-semibold text-white hover:bg-indigo-700">
+                  <Plus className="size-4" /> Add Proof of Work
+                </span>
+              </summary>
+              <div className="animate-pop-in absolute right-0 z-20 mt-2 w-[400px] max-w-[calc(100vw-2rem)] rounded-2xl border border-border-muted bg-surface p-5 shadow-pop">
+                <AddProofOfWorkForm projects={studentProjects} />
+              </div>
+            </details>
+          ) : undefined
+        }
       />
 
       {(user.role === "ACADEMICIAN" ||
