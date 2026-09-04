@@ -1,5 +1,6 @@
 import fs from "fs";
 import path from "path";
+import { prisma } from "./prisma";
 import {
   sendEmail,
   sendApplicationStatusEmail,
@@ -27,7 +28,7 @@ export interface AppNotification {
 
 const STORAGE_FILE = path.join(process.cwd(), ".notifications.json");
 
-// In-memory cache
+// In-memory cache fallback
 let notificationsMemory: AppNotification[] = [];
 
 function loadNotifications(): AppNotification[] {
@@ -48,8 +49,25 @@ function saveNotifications(notifications: AppNotification[]) {
   try {
     fs.writeFileSync(STORAGE_FILE, JSON.stringify(notifications.slice(0, 200), null, 2), "utf-8");
   } catch (err) {
-    console.error("Failed to save .notifications.json", err);
+    // Expected on read-only serverless lambdas
   }
+}
+
+function mapDbRow(row: any): AppNotification {
+  return {
+    id: row.id,
+    userId: row.user_id,
+    userEmail: row.user_email,
+    userName: row.user_name,
+    title: row.title,
+    message: row.message,
+    type: row.type as AppNotification["type"],
+    link: row.link || undefined,
+    read: Boolean(row.read),
+    emailSent: Boolean(row.email_sent),
+    emailSimulated: Boolean(row.email_simulated),
+    createdAt: row.created_at ? new Date(row.created_at).toISOString() : new Date().toISOString(),
+  };
 }
 
 /**
@@ -72,10 +90,11 @@ export async function createNotification({
   type: AppNotification["type"];
   link?: string;
 }): Promise<AppNotification> {
-  const current = loadNotifications();
+  const notifId = `notif_${Date.now()}_${Math.random().toString(36).substring(2, 7)}`;
+  const now = new Date().toISOString();
 
   const newNotification: AppNotification = {
-    id: `notif_${Date.now()}_${Math.random().toString(36).substring(2, 7)}`,
+    id: notifId,
     userId,
     userEmail,
     userName,
@@ -85,21 +104,59 @@ export async function createNotification({
     link,
     read: false,
     emailSent: false,
-    createdAt: new Date().toISOString(),
+    createdAt: now,
   };
 
-  // Prepend
-  current.unshift(newNotification);
-  saveNotifications(current);
+  try {
+    await prisma.$executeRawUnsafe(
+      `
+      INSERT INTO notifications (id, user_id, user_email, user_name, title, message, type, link, read, email_sent, email_simulated, created_at)
+      VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10, $11, $12::timestamptz)
+      ON CONFLICT (id) DO NOTHING
+      `,
+      notifId,
+      userId,
+      userEmail,
+      userName,
+      title,
+      message,
+      type,
+      link || null,
+      false,
+      false,
+      false,
+      now
+    );
+  } catch (err) {
+    console.error("Failed to save notification to Neon PostgreSQL, using local fallback", err);
+    const current = loadNotifications();
+    current.unshift(newNotification);
+    saveNotifications(current);
+  }
 
   return newNotification;
 }
 
-export function updateNotificationEmailStatus(
+export async function updateNotificationEmailStatus(
   id: string,
   emailSent: boolean,
   emailSimulated?: boolean
 ) {
+  try {
+    await prisma.$executeRawUnsafe(
+      `
+      UPDATE notifications
+      SET email_sent = $1, email_simulated = $2
+      WHERE id = $3
+      `,
+      emailSent,
+      Boolean(emailSimulated),
+      id
+    );
+  } catch (err) {
+    console.error("Failed to update notification email status in DB", err);
+  }
+
   const all = loadNotifications();
   const item = all.find((n) => n.id === id);
   if (item) {
@@ -113,6 +170,23 @@ export function updateNotificationEmailStatus(
  * Get recent notifications for a user
  */
 export async function getUserNotifications(userId: string): Promise<AppNotification[]> {
+  try {
+    const rows = await prisma.$queryRawUnsafe<any[]>(
+      `
+      SELECT * FROM notifications
+      WHERE user_id = $1
+      ORDER BY created_at DESC
+      LIMIT 30
+      `,
+      userId
+    );
+    if (rows && rows.length > 0) {
+      return rows.map(mapDbRow);
+    }
+  } catch (err) {
+    console.error("Failed to fetch user notifications from DB, falling back to file/memory", err);
+  }
+
   const all = loadNotifications();
   return all.filter((n) => n.userId === userId).slice(0, 30);
 }
@@ -121,6 +195,21 @@ export async function getUserNotifications(userId: string): Promise<AppNotificat
  * Get unread count for a user
  */
 export async function getUnreadCount(userId: string): Promise<number> {
+  try {
+    const result = await prisma.$queryRawUnsafe<{ count: string | number }[]>(
+      `
+      SELECT COUNT(*) as count FROM notifications
+      WHERE user_id = $1 AND read = false
+      `,
+      userId
+    );
+    if (result && result[0]) {
+      return Number(result[0].count);
+    }
+  } catch (err) {
+    console.error("Failed to fetch unread count from DB, falling back to file/memory", err);
+  }
+
   const all = loadNotifications();
   return all.filter((n) => n.userId === userId && !n.read).length;
 }
@@ -129,6 +218,20 @@ export async function getUnreadCount(userId: string): Promise<number> {
  * Mark notification as read
  */
 export async function markNotificationAsRead(notificationId: string, userId: string): Promise<boolean> {
+  try {
+    await prisma.$executeRawUnsafe(
+      `
+      UPDATE notifications
+      SET read = true
+      WHERE id = $1 AND user_id = $2
+      `,
+      notificationId,
+      userId
+    );
+  } catch (err) {
+    console.error("Failed to mark notification as read in DB", err);
+  }
+
   const all = loadNotifications();
   const notif = all.find((n) => n.id === notificationId && n.userId === userId);
   if (notif) {
@@ -143,6 +246,19 @@ export async function markNotificationAsRead(notificationId: string, userId: str
  * Mark all user notifications as read
  */
 export async function markAllNotificationsAsRead(userId: string): Promise<boolean> {
+  try {
+    await prisma.$executeRawUnsafe(
+      `
+      UPDATE notifications
+      SET read = true
+      WHERE user_id = $1 AND read = false
+      `,
+      userId
+    );
+  } catch (err) {
+    console.error("Failed to mark all notifications as read in DB", err);
+  }
+
   const all = loadNotifications();
   let updated = false;
   all.forEach((n) => {
@@ -209,7 +325,7 @@ export async function notifyApplicationStatusChange({
 
   notif.emailSent = emailResult.success;
   notif.emailSimulated = emailResult.simulated;
-  updateNotificationEmailStatus(notif.id, emailResult.success, emailResult.simulated);
+  await updateNotificationEmailStatus(notif.id, emailResult.success, emailResult.simulated);
 
   return { notification: notif, emailResult };
 }
@@ -252,7 +368,7 @@ export async function notifyRecruiterPitch({
 
   notif.emailSent = emailResult.success;
   notif.emailSimulated = emailResult.simulated;
-  updateNotificationEmailStatus(notif.id, emailResult.success, emailResult.simulated);
+  await updateNotificationEmailStatus(notif.id, emailResult.success, emailResult.simulated);
 
   return { notification: notif, emailResult };
 }
@@ -295,7 +411,7 @@ export async function notifyNewApplicationSubmitted({
 
   notif.emailSent = emailResult.success;
   notif.emailSimulated = emailResult.simulated;
-  updateNotificationEmailStatus(notif.id, emailResult.success, emailResult.simulated);
+  await updateNotificationEmailStatus(notif.id, emailResult.success, emailResult.simulated);
 
   return { notification: notif, emailResult };
 }
@@ -364,8 +480,8 @@ export async function notifyMentorBooking({
   studentNotif.emailSimulated = studentEmailRes.simulated;
   mentorNotif.emailSent = mentorEmailRes.success;
   mentorNotif.emailSimulated = mentorEmailRes.simulated;
-  updateNotificationEmailStatus(studentNotif.id, studentEmailRes.success, studentEmailRes.simulated);
-  updateNotificationEmailStatus(mentorNotif.id, mentorEmailRes.success, mentorEmailRes.simulated);
+  await updateNotificationEmailStatus(studentNotif.id, studentEmailRes.success, studentEmailRes.simulated);
+  await updateNotificationEmailStatus(mentorNotif.id, mentorEmailRes.success, mentorEmailRes.simulated);
 
   return { studentNotif, mentorNotif };
 }
@@ -396,7 +512,7 @@ export async function notifyTestEmail({
 
   notif.emailSent = emailResult.success;
   notif.emailSimulated = emailResult.simulated;
-  updateNotificationEmailStatus(notif.id, emailResult.success, emailResult.simulated);
+  await updateNotificationEmailStatus(notif.id, emailResult.success, emailResult.simulated);
 
   return { notification: notif, emailResult };
 }
@@ -452,8 +568,8 @@ export async function notifyPitchAccepted({
   recruiterNotif.emailSimulated = emailResult.simulated;
   studentNotif.emailSent = emailResult.success;
   studentNotif.emailSimulated = emailResult.simulated;
-  updateNotificationEmailStatus(recruiterNotif.id, emailResult.success, emailResult.simulated);
-  updateNotificationEmailStatus(studentNotif.id, emailResult.success, emailResult.simulated);
+  await updateNotificationEmailStatus(recruiterNotif.id, emailResult.success, emailResult.simulated);
+  await updateNotificationEmailStatus(studentNotif.id, emailResult.success, emailResult.simulated);
 
   return { recruiterNotif, studentNotif, emailResult };
 }
