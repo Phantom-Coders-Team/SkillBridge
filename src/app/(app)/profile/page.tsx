@@ -33,7 +33,7 @@ export default async function ProfilePage() {
   const data = {
     name: user.name,
     email: user.email,
-    role: ROLE_LABELS[user.role],
+    role: ROLE_LABELS[user.role] ?? user.role,
     bio: profile?.bio ?? "",
     phone: profile?.phone ?? "",
     location: profile?.location ?? "",
