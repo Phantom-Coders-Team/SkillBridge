@@ -9,9 +9,9 @@ export default async function DualGradingPage() {
 
   const gradings = await prisma.dualGrading.findMany({
     where:
-      user.role === "FACULTY"
+      user.role === "ACADEMICIAN" || user.role === "FACULTY"
         ? { gradedByFacultyId: user.id }
-        : user.role === "INDUSTRY"
+        : user.role === "INDUSTRIES" || user.role === "INDUSTRY"
           ? { gradedByIndustryId: user.id }
           : {},
     include: {
@@ -26,7 +26,7 @@ export default async function DualGradingPage() {
       <div className="mb-6">
         <h1 className="text-2xl font-bold text-gray-900 dark:text-gray-100">Dual-Grading Dashboard</h1>
         <p className="mt-1 text-sm text-gray-500 dark:text-gray-400">
-          Faculty enters academic marks (0-100), Industry Lead inputs corporate job readiness score.
+          Academicians enter academic marks (0-100), Industry partners input corporate job readiness score.
         </p>
       </div>
 

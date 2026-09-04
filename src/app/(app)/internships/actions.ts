@@ -15,7 +15,7 @@ export async function postOpportunity(
   _prev: ActionState | null,
   formData: FormData,
 ): Promise<ActionState> {
-  const user = await requireRole(["INDUSTRY"]);
+  const user = await requireRole(["INDUSTRIES", "INDUSTRY"]);
 
   const title = formData.get("title") as string | null;
   const description = formData.get("description") as string | null;
@@ -76,7 +76,7 @@ export async function updateApplicationStatus(
   _prev: { error?: string; success?: boolean } | null,
   formData: FormData,
 ): Promise<{ error?: string; success?: boolean }> {
-  const user = await requireRole(["INDUSTRY"]);
+  const user = await requireRole(["INDUSTRIES", "INDUSTRY"]);
   const appId = formData.get("appId") as string | null;
   const status = formData.get("status") as string | null;
 

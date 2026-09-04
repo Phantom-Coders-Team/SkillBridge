@@ -33,7 +33,7 @@ const TICKER_ITEMS = [
 const PORTALS = [
   {
     role: "STUDENT",
-    kicker: "// STUDENT",
+    kicker: "// STUDENTS",
     title: "Know your gaps before recruiters do.",
     tone: "border-indigo-500/30 hover:border-indigo-500/70 bg-gradient-to-b from-indigo-500/[0.04] to-surface",
     kickerColor: "text-indigo-600 dark:text-indigo-400",
@@ -49,25 +49,25 @@ const PORTALS = [
     cta: "Enter as student →",
   },
   {
-    role: "FACULTY",
-    kicker: "// ACADEMICIAN",
+    role: "ACADEMICIAN",
+    kicker: "// ACADEMICIANS",
     title: "Teach what the industry practices.",
     tone: "border-purple-500/30 hover:border-purple-500/70 bg-gradient-to-b from-purple-500/[0.04] to-surface",
     kickerColor: "text-purple-600 dark:text-purple-400",
     dotColor: "bg-purple-500",
     btnTone: "border-purple-500/40 hover:bg-purple-600 hover:text-white text-purple-700 dark:text-purple-300",
     bullets: [
-      "Faculty internships and industrial training",
+      "Academician immersions and industrial training",
       "FDP directory, filterable and AICTE-recognised",
       "Consultancy briefs and collaborative research",
       "Mentorship and guest-lecture exchange",
     ],
-    href: "/signup?role=FACULTY",
+    href: "/signup?role=ACADEMICIAN",
     cta: "Enter as academician →",
   },
   {
-    role: "INDUSTRY",
-    kicker: "// INDUSTRY",
+    role: "INDUSTRIES",
+    kicker: "// INDUSTRIES",
     title: "Hire on skills, not just resumes.",
     tone: "border-amber-500/30 hover:border-amber-500/70 bg-gradient-to-b from-amber-500/[0.04] to-surface",
     kickerColor: "text-amber-500 dark:text-amber-400",
@@ -79,8 +79,25 @@ const PORTALS = [
       "Publish training programs and mentorship cohorts",
       "Pipeline management: shortlist → offer, tracked live",
     ],
-    href: "/signup?role=INDUSTRY",
+    href: "/signup?role=INDUSTRIES",
     cta: "Enter as industry →",
+  },
+  {
+    role: "INSTITUTIONS",
+    kicker: "// INSTITUTIONS",
+    title: "Drive outcomes across all cohorts.",
+    tone: "border-emerald-500/30 hover:border-emerald-500/70 bg-gradient-to-b from-emerald-500/[0.04] to-surface",
+    kickerColor: "text-emerald-600 dark:text-emerald-400",
+    dotColor: "bg-emerald-500",
+    btnTone: "border-emerald-500/40 hover:bg-emerald-600 hover:text-white text-emerald-700 dark:text-emerald-300",
+    bullets: [
+      "Skill deficit heatmap across all departments",
+      "Placement records and verified hiring telemetry",
+      "AI-assisted syllabus gap analysis and curriculum patches",
+      "Accreditation-ready audit records and exports",
+    ],
+    href: "/signup?role=INSTITUTIONS",
+    cta: "Enter as institution →",
   },
 ];
 
@@ -196,7 +213,7 @@ export default async function Home() {
                 <span className="relative inline-flex size-2 rounded-full bg-emerald-500" />
               </span>
               <Sparkles aria-hidden className="size-3.5 text-indigo-600 dark:text-indigo-400" />
-              <span>Three doors, One platform</span>
+              <span>Four doors, One platform</span>
             </div>
           </div>
 
@@ -327,25 +344,25 @@ export default async function Home() {
         </section>
 
         {/* ================================================================
-            SECTION 01: THREE DOORS, ONE PLATFORM (ROLES)
+            SECTION 01: FOUR DOORS, ONE PLATFORM (ROLES)
         ================================================================ */}
         <section id="roles" className="mt-28 sm:mt-36">
           <Reveal>
             <div className="max-w-2xl">
               <span className="font-mono text-xs font-semibold tracking-wider text-indigo-600 dark:text-indigo-400 uppercase">
-                01 / THREE DOORS, ONE PLATFORM
+                01 / FOUR DOORS, ONE PLATFORM
               </span>
               <h2 className="mt-3 text-3xl font-extrabold tracking-tight text-slate-900 dark:text-white sm:text-5xl">
                 Pick your side of the bridge.
               </h2>
               <p className="mt-3 text-base text-slate-600 dark:text-slate-400 sm:text-lg leading-relaxed">
-                Role-based portals for students, academicians, and industries — each with an end-to-end workflow built
+                Role-based portals for students, academicians, industries, and institutions — each with an end-to-end workflow built
                 specifically for them.
               </p>
             </div>
           </Reveal>
 
-          <div className="mt-12 grid grid-cols-1 gap-6 md:grid-cols-3">
+          <div className="mt-12 grid grid-cols-1 gap-6 sm:grid-cols-2 lg:grid-cols-4">
             {PORTALS.map((p, i) => (
               <Reveal key={p.role} delay={i * 100}>
                 <div
@@ -648,13 +665,13 @@ export default async function Home() {
                   </Link>
                 </li>
                 <li>
-                  <Link href="/signup?role=FACULTY" className="hover:text-indigo-600 dark:hover:text-indigo-400">
+                  <Link href="/signup?role=ACADEMICIAN" className="hover:text-indigo-600 dark:hover:text-indigo-400">
                     Academicians
                   </Link>
                 </li>
                 <li>
-                  <Link href="/signup?role=INDUSTRY" className="hover:text-indigo-600 dark:hover:text-indigo-400">
-                    Industry
+                  <Link href="/signup?role=INDUSTRIES" className="hover:text-indigo-600 dark:hover:text-indigo-400">
+                    Industries
                   </Link>
                 </li>
                 <li>

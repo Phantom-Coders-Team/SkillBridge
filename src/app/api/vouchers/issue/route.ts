@@ -7,7 +7,7 @@ export const runtime = "nodejs";
 
 export async function POST(req: Request) {
   const user = await getCurrentUser();
-  if (!user || user.role !== "INDUSTRY") {
+  if (!user || (user.role !== "INDUSTRIES" && user.role !== "INDUSTRY")) {
     return NextResponse.json({ error: "Only industry partners can issue e-RUPI upskilling vouchers." }, { status: 403 });
   }
 

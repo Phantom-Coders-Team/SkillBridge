@@ -8,7 +8,7 @@ export async function createLabUnit(
   _prev: { error?: string; success?: boolean } | null,
   formData: FormData,
 ): Promise<{ error?: string; success?: boolean }> {
-  const user = await requireRole(["FACULTY"]);
+  const user = await requireRole(["ACADEMICIAN", "FACULTY"]);
 
   const name = formData.get("name") as string | null;
   const challengeId = formData.get("challengeId") as string | null;
@@ -39,7 +39,7 @@ export async function applyToChallenge(
   _prev: { error?: string; success?: boolean } | null,
   formData: FormData,
 ): Promise<{ error?: string; success?: boolean }> {
-  const user = await requireRole(["FACULTY"]);
+  const user = await requireRole(["ACADEMICIAN", "FACULTY"]);
 
   const labUnitId = formData.get("labUnitId") as string | null;
   const challengeId = formData.get("challengeId") as string | null;

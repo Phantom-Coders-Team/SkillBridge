@@ -19,9 +19,9 @@ export function ReversePlacementClient({
   viewerRole,
 }: {
   candidates: Candidate[];
-  viewerRole: "STUDENT" | "INDUSTRY" | "INSTITUTIONS" | "FACULTY";
+  viewerRole: "STUDENT" | "INDUSTRIES" | "INDUSTRY" | "INSTITUTIONS" | "ACADEMICIAN" | "FACULTY";
 }) {
-  const isRecruiter = viewerRole === "INDUSTRY";
+  const isRecruiter = viewerRole === "INDUSTRIES" || viewerRole === "INDUSTRY";
   const isStudent = viewerRole === "STUDENT";
 
   const [selected, setSelected] = useState<Candidate | null>(null);

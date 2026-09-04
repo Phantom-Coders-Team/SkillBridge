@@ -15,7 +15,7 @@ export async function applyToProgram(
   _prev: ActionState | null,
   formData: FormData,
 ): Promise<ActionState> {
-  const user = await requireRole(["FACULTY"]);
+  const user = await requireRole(["ACADEMICIAN", "FACULTY"]);
   const listingId = formData.get("listingId") as string | null;
   const message = formData.get("message") as string | null;
 
@@ -38,7 +38,7 @@ export async function postFacultyProgram(
   _prev: ActionState | null,
   formData: FormData,
 ): Promise<ActionState> {
-  const user = await requireRole(["INDUSTRY"]);
+  const user = await requireRole(["INDUSTRIES", "INDUSTRY"]);
   const title = formData.get("title") as string | null;
   const description = formData.get("description") as string | null;
   const programType = formData.get("programType") as string | null;
@@ -75,7 +75,7 @@ export async function updateFacultyApplicationStatus(
   _prev: { error?: string; success?: boolean } | null,
   formData: FormData,
 ): Promise<{ error?: string; success?: boolean }> {
-  const user = await requireRole(["INDUSTRY"]);
+  const user = await requireRole(["INDUSTRIES", "INDUSTRY"]);
   const appId = formData.get("appId") as string | null;
   const status = formData.get("status") as string | null;
   if (!appId || !status) return { error: "Missing fields." };
@@ -90,7 +90,7 @@ export async function updateFacultyApplicationStatus(
 
 export async function getFacultyApplications() {
   const user = await getCurrentUser();
-  if (!user || user.role !== "FACULTY") return [];
+  if (!user || (user.role !== "ACADEMICIAN" && user.role !== "FACULTY")) return [];
   return prisma.facultyProgramApplication.findMany({
     where: { facultyId: user.id },
     include: { listing: { include: { company: { select: { name: true, profile: { select: { companyName: true } } } } } } },

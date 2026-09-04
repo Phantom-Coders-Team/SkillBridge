@@ -17,7 +17,7 @@ export default async function MentorSlotsPage() {
 
   const slots = await prisma.mentorSlot.findMany({
     where:
-      user.role === "INDUSTRY"
+      user.role === "INDUSTRIES" || user.role === "INDUSTRY"
         ? { industryId: user.id }
         : { studentId: user.id },
     include: { student: { select: { name: true } } },
@@ -31,7 +31,7 @@ export default async function MentorSlotsPage() {
         icon={CalendarRange}
         title="Mentor Slots"
         subtitle={
-          user.role === "INDUSTRY"
+          user.role === "INDUSTRIES" || user.role === "INDUSTRY"
             ? "Session slots you host for student mentorship."
             : "Mentorship sessions booked with industry professionals."
         }

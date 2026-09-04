@@ -17,7 +17,7 @@ export async function pitchTopCandidate(
   stipend: number
 ): Promise<ReversePitchResult> {
   const user = await getCurrentUser();
-  if (!user || user.role !== "INDUSTRY") {
+  if (!user || (user.role !== "INDUSTRIES" && user.role !== "INDUSTRY")) {
     return { ok: false, error: "Only industry recruiters can pitch candidates." };
   }
 

@@ -25,7 +25,7 @@ export default async function SyllabusPage() {
         Audit syllabus modules against current industry trends and apply refreshed patch modules.
       </p>
 
-      {user.role === "FACULTY" && (
+      {(user.role === "ACADEMICIAN" || user.role === "FACULTY") && (
         <div className="mt-6">
           <SyllabusAudit />
         </div>

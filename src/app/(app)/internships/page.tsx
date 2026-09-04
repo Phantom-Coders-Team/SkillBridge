@@ -51,7 +51,7 @@ export default async function InternshipsPage() {
         subtitle="Industry internships, apprenticeships, entry-level roles, and learning programs — matched to your skills."
         icon={Briefcase}
         actions={
-          user.role === "INDUSTRY" ? (
+          user.role === "INDUSTRIES" || user.role === "INDUSTRY" ? (
             <div className="flex flex-wrap items-center gap-2">
               <ExportButton
                 href={`/api/exports/applications`}
@@ -136,7 +136,7 @@ export default async function InternshipsPage() {
                     ) : (
                       <ApplyButton listingId={l.id} />
                     ))}
-                  {user.role === "INDUSTRY" && (
+                  {(user.role === "INDUSTRIES" || user.role === "INDUSTRY") && (
                     <div className="rounded-xl bg-slate-50 px-3 py-2 dark:bg-slate-800">
                       {l.applications.length === 0 ? (
                         <p className="text-xs text-slate-400 dark:text-slate-500">No applicants yet</p>

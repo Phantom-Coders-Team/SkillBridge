@@ -18,6 +18,9 @@ export default async function FacultyPortalPage() {
   const user = await getCurrentUser();
   if (!user) redirect("/login");
 
+  const isAcademician = user.role === "ACADEMICIAN" || user.role === "FACULTY";
+  const isIndustry = user.role === "INDUSTRIES" || user.role === "INDUSTRY";
+
   const [listings, myApps] = await Promise.all([
     prisma.facultyProgramListing.findMany({
       include: {
@@ -26,7 +29,7 @@ export default async function FacultyPortalPage() {
       },
       orderBy: { createdAt: "desc" },
     }),
-    user.role === "FACULTY"
+    isAcademician
       ? prisma.facultyProgramApplication.findMany({
           where: { facultyId: user.id },
           include: { listing: true },
@@ -38,11 +41,11 @@ export default async function FacultyPortalPage() {
   return (
     <div className="mx-auto max-w-6xl">
       <PageHeader
-        title="Faculty Development Portal"
-        subtitle="Faculty internships, industrial training, FDPs, consultancy, and collaborative research."
+        title="Academician Development Portal"
+        subtitle="Academician immersions, industrial training, FDPs, consultancy, and collaborative research."
         icon={BookOpen}
         actions={
-          user.role === "INDUSTRY" ? (
+          isIndustry ? (
             <details className="group relative">
               <summary className="cursor-pointer list-none [&::-webkit-details-marker]:hidden">
                 <span className="inline-flex h-10 items-center gap-2 rounded-xl bg-indigo-600 px-4 text-sm font-semibold text-white hover:bg-indigo-700">
@@ -57,8 +60,8 @@ export default async function FacultyPortalPage() {
         }
       />
 
-      {/* Faculty: My applications */}
-      {user.role === "FACULTY" && myApps.length > 0 && (
+      {/* Academician: My applications */}
+      {isAcademician && myApps.length > 0 && (
         <section className="mb-8">
           <h2 className="mb-3 text-sm font-semibold uppercase tracking-wide text-slate-400 dark:text-slate-500">
             My Applications
@@ -79,12 +82,12 @@ export default async function FacultyPortalPage() {
       )}
 
       <h2 className="mb-3 text-sm font-semibold uppercase tracking-wide text-slate-400 dark:text-slate-500">
-        {user.role === "FACULTY" ? "Available programs" : "All programs"}
+        {isAcademician ? "Available programs" : "All programs"}
       </h2>
 
       <div className="grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-3">
         {listings.map((l) => {
-          const applied = user.role === "FACULTY" && l.applications.some((a) => a.facultyId === user.id);
+          const applied = isAcademician && l.applications.some((a) => a.facultyId === user.id);
           return (
             <Card key={l.id} hover className="flex flex-col p-5">
               <div className="mb-2 flex items-center justify-between gap-2">
@@ -115,7 +118,7 @@ export default async function FacultyPortalPage() {
               </div>
 
               <div className="mt-3">
-                {user.role === "FACULTY" &&
+                {isAcademician &&
                   (applied ? (
                     <div className="text-center text-xs font-semibold uppercase tracking-wide text-emerald-600 dark:text-emerald-400">
                       Applied
@@ -131,7 +134,7 @@ export default async function FacultyPortalPage() {
 
       {listings.length === 0 && (
         <div className="rounded-2xl border border-border-muted bg-surface px-6 py-14 text-center">
-          <p className="text-sm text-slate-500 dark:text-slate-400">No faculty programs posted yet.</p>
+          <p className="text-sm text-slate-500 dark:text-slate-400">No programs posted yet.</p>
         </div>
       )}
     </div>

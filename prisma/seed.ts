@@ -70,7 +70,7 @@ async function main() {
     studentUserIds.push(user.id);
   }
 
-  // ----- FACULTY -----
+  // ----- ACADEMICIANS -----
   const faculty: Array<[string, string, string, string]> = [
     ["Dr. Rajesh Kumar", "rajesh.kumar@faculty.edu", "Professor", "Computer Science"],
     ["Dr. Sunita Rao", "sunita.rao@faculty.edu", "Associate Professor", "Electrical Engineering"],
@@ -85,7 +85,7 @@ async function main() {
         name,
         email,
         passwordHash,
-        role: "FACULTY",
+        role: "ACADEMICIAN",
         profile: {
           create: {
             department: dept,
@@ -99,7 +99,7 @@ async function main() {
     facultyIds.push(user.id);
   }
 
-  // ----- INDUSTRY -----
+  // ----- INDUSTRIES -----
   const industry: Array<[string, string, string, string, string]> = [
     ["Infosys", "recruit@infosys.com", "Senior Hiring Manager", "Talent Acquisition", "Infosys Limited, Bengaluru"],
     ["TCS", "campus@tcs.com", "Campus Recruitment Lead", "Campus Hiring", "Tata Consultancy Services, Pune"],
@@ -116,7 +116,7 @@ async function main() {
         name: company,
         email,
         passwordHash,
-        role: "INDUSTRY",
+        role: "INDUSTRIES",
         profile: {
           create: {
             companyName: company,

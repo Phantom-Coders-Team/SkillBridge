@@ -41,7 +41,10 @@ export default async function ProofOfWorkPage() {
         subtitle="Verified artifacts of student contributions with dual sign-offs."
       />
 
-      {(user.role === "FACULTY" || user.role === "INDUSTRY") && (
+      {(user.role === "ACADEMICIAN" ||
+        user.role === "FACULTY" ||
+        user.role === "INDUSTRIES" ||
+        user.role === "INDUSTRY") && (
         <div className="mb-5 flex flex-wrap gap-3">
           <span className="inline-flex items-center gap-2 rounded-full bg-amber-50 px-3 py-1.5 text-xs font-semibold text-amber-700">
             {pending} pending your review
@@ -73,7 +76,7 @@ export default async function ProofOfWorkPage() {
                   <p className="mt-1 text-sm leading-relaxed text-slate-500 dark:text-slate-400">{p.description}</p>
                 </div>
                 <div className="flex shrink-0 flex-wrap gap-2">
-                  <Badge tone={SIGN_TONE[p.facultySignOff] ?? "gray"}>Faculty: {p.facultySignOff}</Badge>
+                  <Badge tone={SIGN_TONE[p.facultySignOff] ?? "gray"}>Academician: {p.facultySignOff}</Badge>
                   <Badge tone={SIGN_TONE[p.industrySignOff] ?? "gray"}>Industry: {p.industrySignOff}</Badge>
                 </div>
               </div>
