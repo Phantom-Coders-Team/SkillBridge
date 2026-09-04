@@ -25,6 +25,7 @@ export async function updateProfileAction(_prevState: ProfileState | null, formD
   const phone = String(formData.get("phone") || "").trim() || null;
   const location = String(formData.get("location") || "").trim() || null;
   const department = String(formData.get("department") || "").trim() || null;
+  const collegeName = String(formData.get("collegeName") || "").trim() || null;
   const year = formData.get("year") ? Number(formData.get("year")) : null;
   const rollNumber = String(formData.get("rollNumber") || "").trim() || null;
   const skills = String(formData.get("skills") || "").trim() || null;
@@ -61,6 +62,7 @@ export async function updateProfileAction(_prevState: ProfileState | null, formD
       phone,
       location,
       department,
+      collegeName,
       year,
       rollNumber,
       skills,
@@ -72,6 +74,7 @@ export async function updateProfileAction(_prevState: ProfileState | null, formD
       phone,
       location,
       department,
+      collegeName,
       year,
       rollNumber,
       skills,

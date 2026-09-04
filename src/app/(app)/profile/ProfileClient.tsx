@@ -20,6 +20,7 @@ interface ProfileData {
   phone: string;
   location: string;
   department: string;
+  collegeName: string;
   year: number | null;
   rollNumber: string;
   skills: string;
@@ -127,6 +128,11 @@ export default function ProfileClient({ profile }: { profile: ProfileData }) {
             <p className="mt-4 text-sm text-slate-600 dark:text-slate-300">
               {profile.department}
               {profile.year ? ` - Year ${profile.year}` : ""}
+            </p>
+          )}
+          {profile.collegeName && (
+            <p className="mt-1 text-sm text-slate-600 dark:text-slate-300">
+              {profile.collegeName}
             </p>
           )}
           {profile.rollNumber && (
@@ -244,6 +250,22 @@ export default function ProfileClient({ profile }: { profile: ProfileData }) {
                   />
                 </div>
                 <div>
+                  <label htmlFor="collegeName" className="mb-1.5 block text-sm font-medium text-slate-700 dark:text-slate-300">
+                    College Name
+                  </label>
+                  <input
+                    id="collegeName"
+                    name="collegeName"
+                    type="text"
+                    defaultValue={profile.collegeName}
+                    placeholder="e.g. IIT Bombay"
+                    className="h-10 w-full rounded-xl border border-slate-300 bg-white px-3 text-sm text-slate-900 placeholder:text-slate-400 transition-colors focus:border-indigo-500 focus:ring-2 focus:ring-indigo-500/30 focus:outline-none dark:border-slate-600 dark:bg-surface dark:text-slate-100 dark:placeholder:text-slate-500"
+                  />
+                </div>
+              </div>
+
+              <div className="grid gap-4 sm:grid-cols-2">
+                <div>
                   <label htmlFor="year" className="mb-1.5 block text-sm font-medium text-slate-700 dark:text-slate-300">
                     Year
                   </label>
@@ -258,20 +280,19 @@ export default function ProfileClient({ profile }: { profile: ProfileData }) {
                     className="h-10 w-full rounded-xl border border-slate-300 bg-white px-3 text-sm text-slate-900 placeholder:text-slate-400 transition-colors focus:border-indigo-500 focus:ring-2 focus:ring-indigo-500/30 focus:outline-none dark:border-slate-600 dark:bg-surface dark:text-slate-100 dark:placeholder:text-slate-500"
                   />
                 </div>
-              </div>
-
-              <div>
-                <label htmlFor="rollNumber" className="mb-1.5 block text-sm font-medium text-slate-700 dark:text-slate-300">
-                  Roll Number
-                </label>
-                <input
-                  id="rollNumber"
-                  name="rollNumber"
-                  type="text"
-                  defaultValue={profile.rollNumber}
-                  placeholder="e.g. CS21B001"
-                  className="h-10 w-full rounded-xl border border-slate-300 bg-white px-3 text-sm text-slate-900 placeholder:text-slate-400 transition-colors focus:border-indigo-500 focus:ring-2 focus:ring-indigo-500/30 focus:outline-none dark:border-slate-600 dark:bg-surface dark:text-slate-100 dark:placeholder:text-slate-500"
-                />
+                <div>
+                  <label htmlFor="rollNumber" className="mb-1.5 block text-sm font-medium text-slate-700 dark:text-slate-300">
+                    Roll Number
+                  </label>
+                  <input
+                    id="rollNumber"
+                    name="rollNumber"
+                    type="text"
+                    defaultValue={profile.rollNumber}
+                    placeholder="e.g. CS21B001"
+                    className="h-10 w-full rounded-xl border border-slate-300 bg-white px-3 text-sm text-slate-900 placeholder:text-slate-400 transition-colors focus:border-indigo-500 focus:ring-2 focus:ring-indigo-500/30 focus:outline-none dark:border-slate-600 dark:bg-surface dark:text-slate-100 dark:placeholder:text-slate-500"
+                  />
+                </div>
               </div>
 
               <div>

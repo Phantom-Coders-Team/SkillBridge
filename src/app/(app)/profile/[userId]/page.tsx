@@ -1,5 +1,5 @@
 import { redirect, notFound } from "next/navigation";
-import { User, Mail, MapPin, Phone, GraduationCap, Hash, Sparkles } from "lucide-react";
+import { User, Mail, MapPin, Phone, GraduationCap, Hash, Sparkles, Building2 } from "lucide-react";
 import { getCurrentUser } from "@/lib/auth";
 import { prisma } from "@/lib/prisma";
 import { ROLE_LABELS, ROLE_COLORS, type Role } from "@/lib/types";
@@ -25,6 +25,7 @@ export default async function PublicProfilePage({ params }: { params: Promise<{ 
           department: true,
           companyName: true,
           designation: true,
+          collegeName: true,
           skills: true,
           location: true,
           phone: true,
@@ -80,6 +81,7 @@ export default async function PublicProfilePage({ params }: { params: Promise<{ 
             { icon: Mail, label: "Email", value: user.email },
             { icon: Phone, label: "Phone", value: p?.phone },
             { icon: MapPin, label: "Location", value: p?.location },
+            { icon: Building2, label: "College", value: p?.collegeName },
             { icon: GraduationCap, label: "Department", value: p?.department },
             { icon: Hash, label: "Roll Number", value: p?.rollNumber },
             { icon: User, label: "Year", value: p?.year ? `Year ${p.year}` : undefined },
