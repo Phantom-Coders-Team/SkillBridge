@@ -103,9 +103,9 @@ export default async function DashboardPage() {
         availableChallenges,
         recentApplications,
         skillBreakdown: {
-          active: activeCount || 3,
-          stale: staleCount || 1,
-          expired: expiredCount || 0,
+          active: activeCount ?? 0,
+          stale: staleCount ?? 0,
+          expired: expiredCount ?? 0,
         },
       };
 

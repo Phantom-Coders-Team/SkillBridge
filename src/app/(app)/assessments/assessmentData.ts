@@ -289,6 +289,182 @@ export const ASSESSMENT_TRACKS: AssessmentTrack[] = [
         correctIndex: 1,
         skillTested: "Logical Deduction",
         explanation: "The conclusion is invalid. Just because engineers are part of the 'analytical' group, and some of the 'analytical' group are musicians, it doesn't guarantee the two subsets overlap."
+      },
+      {
+        id: "apt-4",
+        text: "A bag contains 4 red balls, 5 blue balls, and 3 green balls. If two balls are drawn at random without replacement, what is the probability that both are blue?",
+        options: [
+          "5/33",
+          "25/144",
+          "5/22",
+          "1/6"
+        ],
+        correctIndex: 0,
+        skillTested: "Probability & Combinatorics",
+        explanation: "P(1st blue) = 5/12. P(2nd blue | 1st blue) = 4/11. Total probability = (5/12) * (4/11) = 20/132 = 5/33."
+      },
+      {
+        id: "apt-5",
+        text: "Five teammates (A, B, C, D, E) sit in a row facing the podium. B sits between A and C. D is to the immediate right of C. E is at the far left end next to A. Who is sitting in the exact middle?",
+        options: [
+          "B",
+          "A",
+          "C",
+          "D"
+        ],
+        correctIndex: 0,
+        skillTested: "Spatial & Sequence Reasoning",
+        explanation: "The left-to-right order is E, A, B, C, D. The teammate in the exact middle position (3rd of 5) is B."
+      }
+    ]
+  },
+  {
+    id: "aiml",
+    title: "AI, Machine Learning & Data Science",
+    category: "Technical",
+    primarySkill: "Artificial Intelligence & ML",
+    durationMinutes: 5,
+    description: "Evaluates model architectures, loss formulations, overfitting mitigation, transformers, and data preprocessing.",
+    questions: [
+      {
+        id: "ai-1",
+        text: "When training a deep neural network on an imbalanced classification dataset (e.g. 99% negative, 1% positive), which evaluation metric is LEAST informative?",
+        options: [
+          "Overall Classification Accuracy",
+          "Area Under the Precision-Recall Curve (PR-AUC)",
+          "F1-Score",
+          "Balanced Accuracy"
+        ],
+        correctIndex: 0,
+        skillTested: "Model Evaluation & Metrics",
+        explanation: "A naive model predicting 'negative' 100% of the time achieves 99% accuracy on this dataset while failing to detect any positive instances."
+      },
+      {
+        id: "ai-2",
+        text: "What is the primary role of Dropout in training deep artificial neural networks?",
+        options: [
+          "To speed up matrix multiplication by pruning dead neurons permanently",
+          "To act as a regularization technique by randomly zeroing activations during training, preventing co-adaptation of feature detectors",
+          "To guarantee convergence to the global minimum of non-convex loss functions",
+          "To convert continuous float values into quantized 8-bit integers"
+        ],
+        correctIndex: 1,
+        skillTested: "Regularization & Generalization",
+        explanation: "Dropout randomly deactivates a subset of neurons at each training iteration, forcing the network to learn robust, redundant representations and mitigating overfitting."
+      },
+      {
+        id: "ai-3",
+        text: "In the Transformer architecture, what is the computational complexity of the standard scaled dot-product self-attention mechanism with respect to sequence length N?",
+        options: [
+          "O(N)",
+          "O(N log N)",
+          "O(N^2)",
+          "O(1)"
+        ],
+        correctIndex: 2,
+        skillTested: "Transformer & LLM Architecture",
+        explanation: "Calculating attention weights requires multiplying the N x d Query matrix with the d x N Key matrix, resulting in an N x N attention matrix with O(N^2) complexity."
+      },
+      {
+        id: "ai-4",
+        text: "Which loss function is mathematically standard when training a multi-class classification neural network using Softmax output activations?",
+        options: [
+          "Categorical Cross-Entropy Loss (Log Loss)",
+          "Mean Squared Error (MSE)",
+          "Hinge Loss",
+          "Mean Absolute Error (L1 Loss)"
+        ],
+        correctIndex: 0,
+        skillTested: "Optimization & Loss Formulations",
+        explanation: "Categorical Cross-Entropy measures the distance between the predicted probability distribution and the true one-hot distribution, yielding steep gradients for misclassified examples."
+      },
+      {
+        id: "ai-5",
+        text: "What phenomenon occurs when a model deployed in production experiences a change in the statistical distribution of input features over time, degrading prediction accuracy?",
+        options: [
+          "Data Drift (or Covariate Shift)",
+          "Cold Start Problem",
+          "Vanishing Gradient",
+          "Dead ReLU"
+        ],
+        correctIndex: 0,
+        skillTested: "MLOps & Model Monitoring",
+        explanation: "Data drift occurs when real-world production inputs diverge from the statistical characteristics of the training dataset, requiring automated telemetry and retraining triggers."
+      }
+    ]
+  },
+  {
+    id: "cybersecurity",
+    title: "Cybersecurity & System Defense",
+    category: "Security",
+    primarySkill: "Cybersecurity & Threat Defense",
+    durationMinutes: 5,
+    description: "Evaluates zero-trust architecture, OWASP vulnerabilities, cryptography, and secure API implementation.",
+    questions: [
+      {
+        id: "sec-1",
+        text: "What is the most effective defense against SQL Injection vulnerabilities in modern web applications?",
+        options: [
+          "Client-side regular expression filtering in JavaScript",
+          "Using Parameterized Queries (Prepared Statements) or Object-Relational Mappers (ORMs)",
+          "Encrypting the backend database hard drive",
+          "Restricting web traffic to HTTPS only"
+        ],
+        correctIndex: 1,
+        skillTested: "AppSec & Injection Mitigation",
+        explanation: "Parameterized queries separate SQL code from user-supplied data, ensuring input parameters are treated strictly as literals rather than executable SQL syntax."
+      },
+      {
+        id: "sec-2",
+        text: "What foundational principle defines the 'Zero Trust' security architecture model?",
+        options: [
+          "Never trust, always verify: assume breach and strictly authenticate/authorize every access request regardless of origin",
+          "Trust any connection that originates from within the internal corporate LAN or VPN",
+          "Disable all encryption protocols to allow deep packet inspection",
+          "Rely entirely on static perimeter firewalls to protect all subnets"
+        ],
+        correctIndex: 0,
+        skillTested: "Zero Trust Architecture",
+        explanation: "Zero Trust assumes threats exist both inside and outside network boundaries; every request must be authenticated, authorized, and encrypted before granting access."
+      },
+      {
+        id: "sec-3",
+        text: "In asymmetric public key cryptography, how is a sender's digital signature generated and verified?",
+        options: [
+          "Generated with sender's public key; verified with recipient's private key",
+          "Generated with sender's private key; verified with sender's public key",
+          "Generated with a shared symmetric AES secret key",
+          "Generated by hashing the message with MD5 without keys"
+        ],
+        correctIndex: 1,
+        skillTested: "Cryptography & PKI",
+        explanation: "The signer signs (encrypts hash) using their private key, which only they hold; anyone holding their public key can verify the signature and ensure authenticity."
+      },
+      {
+        id: "sec-4",
+        text: "Which HTTP response header is crucial to prevent Cross-Site Scripting (XSS) by restricting the domains from which scripts and assets can load?",
+        options: [
+          "Content-Security-Policy (CSP)",
+          "Access-Control-Allow-Origin",
+          "X-Frame-Options",
+          "Strict-Transport-Security"
+        ],
+        correctIndex: 0,
+        skillTested: "Web Security Headers & XSS",
+        explanation: "Content-Security-Policy restricts executable script sources, disables unauthorized inline scripts, and stops untrusted third-party script injection."
+      },
+      {
+        id: "sec-5",
+        text: "Why should passwords NEVER be stored using fast hashing algorithms like MD5 or SHA-256?",
+        options: [
+          "Because they require too much RAM to compute",
+          "Because GPUs can compute billions of hashes per second, making offline brute-force and dictionary attacks trivial; slow, salted KDFs like Argon2 or bcrypt must be used",
+          "Because SHA-256 is proprietary commercial software",
+          "Because MD5 cannot hash strings longer than 8 characters"
+        ],
+        correctIndex: 1,
+        skillTested: "Authentication & Credential Security",
+        explanation: "Modern hardware can compute billions of SHA-256 hashes per second. Adaptive, memory-hard key derivation functions like bcrypt and Argon2 with random salting defend against brute force."
       }
     ]
   }

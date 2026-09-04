@@ -15,6 +15,10 @@ export async function submitAssessmentAction(data: {
   }
 
   try {
+    const normalizedScore = Math.max(0, Math.min(100, Math.round(data.score)));
+    const isPassed = normalizedScore >= 60;
+    const finalDecayStatus = data.decayStatus || (isPassed ? "ACTIVE" : "STALE");
+
     // Check if an assessment for this skill already exists for this student
     const existing = await prisma.skillAssessment.findFirst({
       where: {
@@ -27,9 +31,9 @@ export async function submitAssessmentAction(data: {
       await prisma.skillAssessment.update({
         where: { id: existing.id },
         data: {
-          score: Math.max(0, Math.min(100, data.score)),
-          decayStatus: data.decayStatus || "ACTIVE",
-          verifiedAt: new Date(),
+          score: normalizedScore,
+          decayStatus: finalDecayStatus,
+          verifiedAt: isPassed ? new Date() : existing.verifiedAt,
           lastAssessedAt: new Date(),
         },
       });
@@ -38,18 +42,48 @@ export async function submitAssessmentAction(data: {
         data: {
           studentId: user.id,
           skillName: data.skillName,
-          score: Math.max(0, Math.min(100, data.score)),
-          decayStatus: data.decayStatus || "ACTIVE",
-          verifiedAt: new Date(),
+          score: normalizedScore,
+          decayStatus: finalDecayStatus,
+          verifiedAt: isPassed ? new Date() : null,
           lastAssessedAt: new Date(),
         },
       });
+    }
+
+    // If candidate passed the assessment, sync this skill into student's profile for matching
+    if (isPassed && user.role === "STUDENT") {
+      const profile = await prisma.profile.findUnique({
+        where: { userId: user.id },
+      });
+
+      if (profile) {
+        const currentSkills = profile.skills
+          ? profile.skills
+              .split(",")
+              .map((s) => s.trim())
+              .filter(Boolean)
+          : [];
+
+        const skillAlreadyPresent = currentSkills.some(
+          (s) => s.toLowerCase() === data.skillName.toLowerCase()
+        );
+
+        if (!skillAlreadyPresent) {
+          const updatedSkills = [...currentSkills, data.skillName].join(", ");
+          await prisma.profile.update({
+            where: { userId: user.id },
+            data: { skills: updatedSkills },
+          });
+        }
+      }
     }
 
     revalidatePath("/assessments");
     revalidatePath("/dashboard");
     revalidatePath("/internships");
     revalidatePath("/portfolio");
+    revalidatePath("/skills");
+    revalidatePath("/reverse-placement");
 
     return { success: true };
   } catch (err: any) {

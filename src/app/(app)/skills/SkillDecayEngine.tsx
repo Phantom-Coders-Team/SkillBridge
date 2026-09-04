@@ -13,11 +13,12 @@ export interface SkillEntry {
 }
 
 const STATUS_META: Record<
-  DecayStatus,
+  string,
   { label: string; badge: string; dot: string }
 > = {
   ACTIVE: { label: "Fresh", badge: "bg-green-100 text-green-800 ring-green-200 dark:bg-green-950/60 dark:text-green-300", dot: "#16a34a" },
   STALE: { label: "Decaying", badge: "bg-yellow-100 text-yellow-800 ring-yellow-200 dark:bg-yellow-950/60 dark:text-yellow-300", dot: "#ca8a04" },
+  AT_RISK: { label: "At Risk", badge: "bg-amber-100 text-amber-800 ring-amber-200 dark:bg-amber-950/60 dark:text-amber-300", dot: "#f59e0b" },
   EXPIRED: { label: "Expired", badge: "bg-red-100 text-red-800 ring-red-200 dark:bg-red-950/60 dark:text-red-300", dot: "#dc2626" },
   RECERTIFIED: { label: "Refreshed", badge: "bg-blue-100 text-blue-800 ring-blue-200 dark:bg-blue-950/60 dark:text-blue-300", dot: "#2563eb" },
 };
@@ -239,7 +240,7 @@ export function SkillDecayEngine({ initialSkills }: { initialSkills: SkillEntry[
 
           <ul className="mt-4 space-y-3">
             {skills.map((s) => {
-              const meta = STATUS_META[s.decayStatus];
+              const meta = STATUS_META[s.decayStatus] || STATUS_META.ACTIVE;
               const hrs = hoursSince(s.verifiedAt);
               const isOpen = expanded === s.id;
 
@@ -360,7 +361,7 @@ export function SkillDecayEngine({ initialSkills }: { initialSkills: SkillEntry[
 }
 
 function FreshnessRow({ status, note }: { status: DecayStatus; note: string }) {
-  const meta = STATUS_META[status];
+  const meta = STATUS_META[status] || STATUS_META.ACTIVE;
   return (
     <div className="flex items-start gap-3">
       <span className="mt-1.5 h-2.5 w-2.5 shrink-0 rounded-full" style={{ backgroundColor: meta.dot }} />
@@ -431,7 +432,7 @@ function RadarChart({ data }: { data: SkillEntry[] }) {
       {/* Dots */}
       {data.map((d, i) => {
         const [x, y] = point(i, d.score);
-        const color = STATUS_META[d.decayStatus].dot;
+        const color = (STATUS_META[d.decayStatus] || STATUS_META.ACTIVE).dot;
         return (
           <circle
             key={d.id}
@@ -473,7 +474,7 @@ function RadarChart({ data }: { data: SkillEntry[] }) {
             textAnchor="middle"
             fontSize={9}
             fontWeight={700}
-            fill={STATUS_META[d.decayStatus].dot}
+            fill={(STATUS_META[d.decayStatus] || STATUS_META.ACTIVE).dot}
           >
             {d.score}
           </text>

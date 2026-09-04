@@ -75,8 +75,8 @@ export default async function PortfolioPage() {
               <div className="flex flex-wrap gap-1.5">
                 {skills.length === 0 && <span className="text-xs text-slate-400">No verified skills yet</span>}
                 {skills.slice(0, 12).map((s) => (
-                  <span key={s.id} className="inline-flex items-center gap-1 rounded-full bg-indigo-50 px-2 py-0.5 text-[11px] font-semibold text-indigo-700 dark:bg-indigo-500/15 dark:text-indigo-300">
-                    <BadgeCheck className="size-3" /> {s.skillName} {s.score}
+                  <span key={s.id} className="inline-flex items-center gap-1 rounded-full bg-indigo-50 px-2.5 py-0.5 text-[11px] font-semibold text-indigo-700 dark:bg-indigo-500/15 dark:text-indigo-300">
+                    <BadgeCheck className="size-3 text-indigo-600 dark:text-indigo-400" /> {s.skillName} · {s.score}%
                   </span>
                 ))}
               </div>

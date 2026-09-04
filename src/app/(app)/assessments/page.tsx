@@ -1,14 +1,26 @@
+import Link from "next/link";
 import { redirect } from "next/navigation";
-import { ClipboardCheck, Sparkles, TrendingUp, AlertTriangle, CheckCircle2 } from "lucide-react";
+import {
+  ClipboardCheck,
+  Sparkles,
+  TrendingUp,
+  AlertTriangle,
+  CheckCircle2,
+  Radar,
+  ArrowRight,
+} from "lucide-react";
 import { getCurrentUser } from "@/lib/auth";
 import { prisma } from "@/lib/prisma";
 import { Badge, Card, EmptyState, PageHeader, type BadgeTone } from "@/components/ui";
 import { SkillQuizModal } from "./SkillQuizModal";
+import { ASSESSMENT_TRACKS } from "./assessmentData";
 
 const DECAY_TONE: Record<string, BadgeTone> = {
   ACTIVE: "green",
+  STALE: "amber",
   AT_RISK: "amber",
   EXPIRED: "red",
+  RECERTIFIED: "blue",
   PENDING: "gray",
 };
 
@@ -47,7 +59,18 @@ export default async function AssessmentsPage() {
         icon={ClipboardCheck}
         title="Student Skill Assessments"
         subtitle="Standardized questionnaire evaluations, skill gap analysis, and industry competency verification."
-        actions={<SkillQuizModal />}
+        actions={
+          <div className="flex items-center gap-3">
+            <Link
+              href="/skills"
+              className="inline-flex h-10 items-center gap-2 rounded-xl border border-border-muted bg-surface px-3.5 text-xs font-semibold text-slate-700 dark:text-slate-300 hover:bg-slate-50 dark:hover:bg-slate-800 transition-colors"
+            >
+              <Radar className="size-4 text-indigo-500" />
+              <span>Skill Radar & Freshness</span>
+            </Link>
+            <SkillQuizModal />
+          </div>
+        }
       />
 
       {/* Student Personal Benchmark Banner */}
@@ -90,6 +113,48 @@ export default async function AssessmentsPage() {
           </Card>
         </div>
       )}
+
+      {/* Available Assessment Tracks Showcase */}
+      <Card className="p-5">
+        <div className="flex items-center justify-between mb-3 border-b border-border-muted pb-3">
+          <div>
+            <h3 className="text-xs font-bold uppercase tracking-wider text-slate-500 dark:text-slate-400">
+              Standardized Assessment Tracks ({ASSESSMENT_TRACKS.length})
+            </h3>
+            <p className="text-xs text-slate-500 dark:text-slate-400 mt-0.5">
+              Targeted questionnaires across technical domains, soft skills, and aptitude reasoning.
+            </p>
+          </div>
+          <SkillQuizModal />
+        </div>
+        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-3 pt-1">
+          {ASSESSMENT_TRACKS.map((t) => (
+            <div
+              key={t.id}
+              className="p-3 rounded-xl border border-border-muted bg-slate-50/50 dark:bg-slate-800/30 flex flex-col justify-between"
+            >
+              <div>
+                <div className="flex items-center justify-between text-[10px] text-slate-500 mb-1.5 font-semibold">
+                  <span className="px-2 py-0.5 rounded-md bg-indigo-50 dark:bg-indigo-950/50 text-indigo-600 dark:text-indigo-400">
+                    {t.category}
+                  </span>
+                  <span>{t.questions.length} Questions</span>
+                </div>
+                <h4 className="text-xs font-bold text-slate-900 dark:text-slate-100 leading-snug">
+                  {t.title}
+                </h4>
+                <p className="text-[11px] text-slate-500 dark:text-slate-400 line-clamp-2 mt-1">
+                  {t.description}
+                </p>
+              </div>
+              <div className="mt-3 pt-2 border-t border-border-muted/60 flex items-center justify-between text-[11px] font-medium text-slate-600 dark:text-slate-300">
+                <span className="text-slate-400">Key: {t.primarySkill}</span>
+                <span className="text-indigo-600 dark:text-indigo-400 font-semibold">{t.durationMinutes}m</span>
+              </div>
+            </div>
+          ))}
+        </div>
+      </Card>
 
       {/* Table of all assessments */}
       {assessments.length === 0 ? (
