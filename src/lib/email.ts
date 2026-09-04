@@ -33,6 +33,9 @@ function getTransporter() {
     port,
     secure,
     auth: { user, pass },
+    tls: {
+      rejectUnauthorized: false,
+    },
   });
 }
 
@@ -46,9 +49,24 @@ export async function sendEmail({
   html,
   text,
 }: SendEmailOptions): Promise<EmailSendResult> {
-  const from =
-    process.env.SMTP_FROM ||
-    `"SkillBridge Notifications" <notifications@skillbridge.edu>`;
+  const smtpUser = process.env.SMTP_USER;
+  const defaultFrom = smtpUser
+    ? `"SkillBridge" <${smtpUser}>`
+    : `"SkillBridge Notifications" <notifications@skillbridge.edu>`;
+  const from = process.env.SMTP_FROM || defaultFrom;
+
+  // If the target is a demo mock domain like .edu and real SMTP is configured,
+  // reroute to SMTP_USER so the tester receives the actual email in their inbox!
+  let effectiveTo = to;
+  let effectiveSubject = subject;
+  if (
+    (to.endsWith(".edu") || to.includes("@example.com")) &&
+    smtpUser &&
+    smtpUser.includes("@")
+  ) {
+    effectiveTo = smtpUser;
+    effectiveSubject = `[Demo for ${to}] ${subject}`;
+  }
 
   const transporter = getTransporter();
 
@@ -57,8 +75,8 @@ export async function sendEmail({
     console.log(`\n======================================================`);
     console.log(`📨 [SIMULATED EMAIL NOTIFICATION DISPATCHED]`);
     console.log(`From:    ${from}`);
-    console.log(`To:      ${to}`);
-    console.log(`Subject: ${subject}`);
+    console.log(`To:      ${to} (effective: ${effectiveTo})`);
+    console.log(`Subject: ${effectiveSubject}`);
     console.log(`Time:    ${new Date().toISOString()}`);
     console.log(`Body Snippet: ${text || html.slice(0, 150)}...`);
     console.log(`======================================================\n`);
@@ -73,13 +91,13 @@ export async function sendEmail({
   try {
     const info = await transporter.sendMail({
       from,
-      to,
-      subject,
+      to: effectiveTo,
+      subject: effectiveSubject,
       text: text || html.replace(/<[^>]*>?/gm, ""),
       html,
     });
 
-    console.log(`✅ [EMAIL SENT] ID: ${info.messageId} to ${to}`);
+    console.log(`✅ [EMAIL SENT] ID: ${info.messageId} to ${effectiveTo} (original: ${to})`);
     return {
       success: true,
       simulated: false,
@@ -87,7 +105,7 @@ export async function sendEmail({
     };
   } catch (error) {
     const message = error instanceof Error ? error.message : "Failed to send email";
-    console.error(`❌ [EMAIL ERROR] Failed to send email to ${to}:`, message);
+    console.error(`❌ [EMAIL ERROR] Failed to send email to ${effectiveTo}:`, message);
     return {
       success: false,
       error: message,
@@ -481,3 +499,44 @@ export async function sendTestNotificationEmail({
     html,
   });
 }
+
+/**
+ * 6. Pitch Accepted Notification (Student accepts recruiter pitch)
+ */
+export async function sendPitchAcceptedEmail({
+  recruiterEmail,
+  recruiterName,
+  studentName,
+  roleDetails,
+  stipend,
+}: {
+  recruiterEmail: string;
+  recruiterName: string;
+  studentName: string;
+  roleDetails: string;
+  stipend: number;
+}) {
+  const html = renderEmailTemplate({
+    title: `Job Pitch Accepted: ${studentName}`,
+    recipientName: recruiterName,
+    badgeText: "Offer Accepted & Confirmed",
+    badgeTone: "green",
+    headline: `🎉 ${studentName} has Accepted Your Job Pitch!`,
+    description: `Great news! Verified candidate <strong>${studentName}</strong> has officially accepted your placement offer for <strong>${roleDetails}</strong>. You can now connect directly to coordinate onboarding and contracts.`,
+    details: [
+      { label: "Candidate", value: studentName },
+      { label: "Role", value: roleDetails },
+      { label: "Agreed Stipend", value: `₹${stipend.toLocaleString("en-IN")}/month` },
+      { label: "Status", value: "Offer Accepted" },
+    ],
+    ctaLabel: "View Recruiter Dashboard",
+    ctaUrl: "/job-pitches",
+  });
+
+  return sendEmail({
+    to: recruiterEmail,
+    subject: `🎉 Great News! ${studentName} accepted your Job Pitch for ${roleDetails}`,
+    html,
+  });
+}
+

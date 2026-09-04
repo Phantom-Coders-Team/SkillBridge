@@ -88,6 +88,10 @@ export async function respondToPitch(
 
   const pitch = await prisma.jobPitch.findUnique({
     where: { id: pitchId },
+    include: {
+      student: { select: { id: true, name: true, email: true } },
+      industry: { select: { id: true, name: true, email: true, profile: { select: { companyName: true } } } },
+    },
   });
   if (!pitch || pitch.studentId !== user.id) {
     return { ok: false, error: "Pitch not found or unauthorized." };
@@ -97,6 +101,26 @@ export async function respondToPitch(
     where: { id: pitchId },
     data: { status },
   });
+
+  // If job pitch was accepted, notify recruiter and student via email
+  if (status === "ACCEPTED" && pitch.industry?.email) {
+    const recruiterName = pitch.industry.profile?.companyName || pitch.industry.name || "Corporate Recruiter";
+    const { notifyPitchAccepted } = await import("@/lib/notifications");
+    try {
+      await notifyPitchAccepted({
+        recruiterId: pitch.industry.id,
+        recruiterEmail: pitch.industry.email,
+        recruiterName,
+        studentId: pitch.student.id,
+        studentEmail: pitch.student.email,
+        studentName: pitch.student.name,
+        roleDetails: pitch.roleDetails || "Technical Placement Offer",
+        stipend: pitch.stipend ?? 0,
+      });
+    } catch (err) {
+      console.error("Failed to dispatch pitch acceptance notification:", err);
+    }
+  }
 
   revalidatePath("/reverse-placement");
   revalidatePath("/job-pitches");

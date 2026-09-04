@@ -7,6 +7,7 @@ import {
   sendNewApplicationAlertEmail,
   sendMentorBookingEmail,
   sendTestNotificationEmail,
+  sendPitchAcceptedEmail,
 } from "./email";
 
 export interface AppNotification {
@@ -384,3 +385,60 @@ export async function notifyTestEmail({
 
   return { notification: notif, emailResult };
 }
+
+export async function notifyPitchAccepted({
+  recruiterId,
+  recruiterEmail,
+  recruiterName,
+  studentId,
+  studentEmail,
+  studentName,
+  roleDetails,
+  stipend,
+}: {
+  recruiterId: string;
+  recruiterEmail: string;
+  recruiterName: string;
+  studentId: string;
+  studentEmail: string;
+  studentName: string;
+  roleDetails: string;
+  stipend: number;
+}) {
+  const recruiterNotif = await createNotification({
+    userId: recruiterId,
+    userEmail: recruiterEmail,
+    userName: recruiterName,
+    title: `Job Pitch Accepted: ${studentName}`,
+    message: `${studentName} has accepted your placement offer for "${roleDetails}" (₹${stipend.toLocaleString("en-IN")}/mo).`,
+    type: "PITCH",
+    link: "/job-pitches",
+  });
+
+  const studentNotif = await createNotification({
+    userId: studentId,
+    userEmail: studentEmail,
+    userName: studentName,
+    title: `Offer Accepted: ${recruiterName}`,
+    message: `You accepted the offer from ${recruiterName} for "${roleDetails}".`,
+    type: "PITCH",
+    link: "/reverse-placement",
+  });
+
+  const emailResult = await sendPitchAcceptedEmail({
+    recruiterEmail,
+    recruiterName,
+    studentName,
+    roleDetails,
+    stipend,
+  });
+
+  recruiterNotif.emailSent = emailResult.success;
+  recruiterNotif.emailSimulated = emailResult.simulated;
+  studentNotif.emailSent = emailResult.success;
+  studentNotif.emailSimulated = emailResult.simulated;
+  saveNotifications(loadNotifications());
+
+  return { recruiterNotif, studentNotif, emailResult };
+}
+

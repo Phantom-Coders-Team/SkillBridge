@@ -126,14 +126,18 @@ export async function updateApplicationStatus(
         updatedApp.listing.company.name ||
         "Industry Partner";
 
-      notifyApplicationStatusChange({
-        studentId: updatedApp.student.id,
-        studentEmail: updatedApp.student.email,
-        studentName: updatedApp.student.name,
-        listingTitle: updatedApp.listing.title,
-        companyName,
-        status,
-      }).catch((err) => console.error("Failed to dispatch status email to student:", err));
+      try {
+        await notifyApplicationStatusChange({
+          studentId: updatedApp.student.id,
+          studentEmail: updatedApp.student.email,
+          studentName: updatedApp.student.name,
+          listingTitle: updatedApp.listing.title,
+          companyName,
+          status,
+        });
+      } catch (err) {
+        console.error("Failed to dispatch status email to student:", err);
+      }
     }
 
     revalidatePath("/internships");
