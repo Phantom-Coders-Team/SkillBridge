@@ -21,12 +21,20 @@ export async function postOpportunity(
   const description = formData.get("description") as string | null;
   const programType = formData.get("programType") as string | null;
   const skills = formData.get("skills") as string | null;
-  const duration = formData.get("duration") as string | null;
+  const durationInput = formData.get("duration") as string | null;
+  const deadlineInput = formData.get("deadline") as string | null;
   const mode = formData.get("mode") as string | null;
   const certification = formData.get("certification") === "on";
 
   if (!title || !description || !programType) {
     return { error: "Title, description, and type are required." };
+  }
+
+  let duration = durationInput || null;
+  if (deadlineInput) {
+    duration = durationInput
+      ? `${durationInput} · Deadline: ${deadlineInput}`
+      : `Deadline: ${deadlineInput}`;
   }
 
   try {
@@ -37,7 +45,7 @@ export async function postOpportunity(
         description,
         programType: programType as ProgramType,
         skills: skills || null,
-        duration: duration || null,
+        duration,
         mode: mode || null,
         certification,
       },
@@ -46,6 +54,37 @@ export async function postOpportunity(
     return { success: true };
   } catch {
     return { error: "Failed to post the opportunity." };
+  }
+}
+
+export async function deleteOpportunity(
+  listingId: string
+): Promise<{ success?: boolean; error?: string }> {
+  const user = await requireRole(["INDUSTRIES", "INDUSTRY"]);
+
+  const listing = await prisma.learningProgram.findUnique({
+    where: { id: listingId },
+    select: { companyId: true },
+  });
+
+  if (!listing) {
+    return { error: "Listing not found." };
+  }
+
+  if (listing.companyId !== user.id) {
+    return { error: "You can only remove listings that your company posted." };
+  }
+
+  try {
+    await prisma.learningProgram.delete({
+      where: { id: listingId },
+    });
+    revalidatePath("/internships");
+    revalidatePath("/dashboard");
+    return { success: true };
+  } catch (err) {
+    console.error("Failed to delete listing:", err);
+    return { error: "Failed to remove the listing." };
   }
 }
 
@@ -69,6 +108,20 @@ export async function applyToOpportunity(
       where: { id: listingId },
       include: { company: { select: { id: true, email: true, name: true } } },
     });
+
+    if (!listing) return { error: "Opportunity not found." };
+
+    // Check if application deadline has passed
+    if (listing.duration && listing.duration.includes("Deadline:")) {
+      const match = listing.duration.match(/Deadline:\s*([0-9]{4}-[0-9]{2}-[0-9]{2})/);
+      if (match && match[1]) {
+        const deadlineDate = new Date(match[1]);
+        deadlineDate.setHours(23, 59, 59, 999);
+        if (deadlineDate.getTime() < Date.now()) {
+          return { error: "Applications for this opportunity have closed (Deadline has passed)." };
+        }
+      }
+    }
 
     await prisma.internshipApplication.upsert({
       where: { listingId_studentId: { listingId, studentId: user.id } },

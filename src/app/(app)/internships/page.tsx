@@ -6,6 +6,7 @@ import { prisma } from "@/lib/prisma";
 import { Badge, Card, EmptyState, PageHeader, type BadgeTone } from "@/components/ui";
 import PostOpportunityForm from "./PostOpportunityForm";
 import ApplyButton from "./ApplyButton";
+import DeleteOpportunityButton from "./DeleteOpportunityButton";
 import ExportButton from "./ExportButton";
 import ApplicantList from "./ApplicantList";
 import MatchBadge from "./MatchBadge";
@@ -122,13 +123,27 @@ export default async function InternshipsPage() {
             const myApplication = user.role === "STUDENT"
               ? l.applications.find((a) => a.studentId === user.id)
               : undefined;
+
+            const deadlineMatch = l.duration?.match(/Deadline:\s*([0-9]{4}-[0-9]{2}-[0-9]{2})/);
+            const deadlineDateStr = deadlineMatch ? deadlineMatch[1] : null;
+            const isExpired = deadlineDateStr
+              ? new Date(`${deadlineDateStr}T23:59:59`).getTime() < Date.now()
+              : false;
+
             return (
               <Card key={l.id} hover className="flex flex-col p-5">
-                <div className="mb-2 flex items-center justify-between gap-2">
-                  <Badge tone={TYPE_TONE[l.programType] ?? "gray"}>
-                    {l.programType.replaceAll("_", " ")}
-                  </Badge>
-                  {l.certification && <Badge tone="green">Certification</Badge>}
+                <div className="mb-2 flex items-center justify-between gap-2 flex-wrap">
+                  <div className="flex items-center gap-1.5 flex-wrap">
+                    <Badge tone={TYPE_TONE[l.programType] ?? "gray"}>
+                      {l.programType.replaceAll("_", " ")}
+                    </Badge>
+                    {l.certification && <Badge tone="green">Certification</Badge>}
+                  </div>
+                  {isExpired ? (
+                    <Badge tone="red">Applications Closed</Badge>
+                  ) : deadlineDateStr ? (
+                    <Badge tone="amber">Deadline: {deadlineDateStr}</Badge>
+                  ) : null}
                 </div>
 
                 <h3 className="text-base font-semibold text-slate-900 dark:text-slate-100">{l.title}</h3>
@@ -170,15 +185,24 @@ export default async function InternshipsPage() {
                       <div className="text-center text-xs font-semibold uppercase tracking-wide text-emerald-600 dark:text-emerald-400">
                         Applied · {myApplication.status}
                       </div>
+                    ) : isExpired ? (
+                      <div className="rounded-xl bg-slate-100 py-2.5 text-center text-xs font-semibold text-slate-500 dark:bg-slate-800 dark:text-slate-400">
+                        Applications Closed (Deadline Passed)
+                      </div>
                     ) : (
                       <ApplyButton listingId={l.id} />
                     ))}
                   {(user.role === "INDUSTRIES" || user.role === "INDUSTRY") && (
-                    <div className="rounded-xl bg-slate-50 px-3 py-2 dark:bg-slate-800">
-                      {l.applications.length === 0 ? (
-                        <p className="text-xs text-slate-400 dark:text-slate-500">No applicants yet</p>
-                      ) : (
-                        <ApplicantList listingId={l.id} applicants={l.applications} listingSkills={l.skills ?? ""} />
+                    <div className="space-y-2">
+                      <div className="rounded-xl bg-slate-50 px-3 py-2 dark:bg-slate-800">
+                        {l.applications.length === 0 ? (
+                          <p className="text-xs text-slate-400 dark:text-slate-500">No applicants yet</p>
+                        ) : (
+                          <ApplicantList listingId={l.id} applicants={l.applications} listingSkills={l.skills ?? ""} />
+                        )}
+                      </div>
+                      {l.companyId === user.id && (
+                        <DeleteOpportunityButton listingId={l.id} />
                       )}
                     </div>
                   )}

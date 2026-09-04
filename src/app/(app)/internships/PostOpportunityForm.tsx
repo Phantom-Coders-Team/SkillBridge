@@ -50,15 +50,21 @@ export default function PostOpportunityForm() {
 
       <div className="grid grid-cols-2 gap-3">
         <div>
-          <label htmlFor="duration" className="mb-1 block text-xs font-medium text-slate-600 dark:text-slate-300">Duration</label>
-          <input id="duration" name="duration" type="text" placeholder="e.g. 6 months"
+          <label htmlFor="duration" className="mb-1 block text-xs font-medium text-slate-600 dark:text-slate-300">Work Duration</label>
+          <input id="duration" name="duration" type="text" placeholder="e.g. 6 Months"
             className="h-10 w-full rounded-xl border border-slate-300 bg-white px-3 text-sm text-slate-900 placeholder:text-slate-400 focus:border-indigo-500 focus:ring-2 focus:ring-indigo-500/30 focus:outline-none dark:border-slate-600 dark:bg-surface dark:text-slate-100" />
         </div>
         <div>
-          <label htmlFor="skills" className="mb-1 block text-xs font-medium text-slate-600 dark:text-slate-300">Required skills</label>
-          <input id="skills" name="skills" type="text" placeholder="e.g. React, Node.js"
-            className="h-10 w-full rounded-xl border border-slate-300 bg-white px-3 text-sm text-slate-900 placeholder:text-slate-400 focus:border-indigo-500 focus:ring-2 focus:ring-indigo-500/30 focus:outline-none dark:border-slate-600 dark:bg-surface dark:text-slate-100" />
+          <label htmlFor="deadline" className="mb-1 block text-xs font-medium text-slate-600 dark:text-slate-300">Last Date to Apply (Deadline)</label>
+          <input id="deadline" name="deadline" type="date"
+            className="h-10 w-full rounded-xl border border-slate-300 bg-white px-3 text-sm text-slate-900 focus:border-indigo-500 focus:ring-2 focus:ring-indigo-500/30 focus:outline-none dark:border-slate-600 dark:bg-surface dark:text-slate-100" />
         </div>
+      </div>
+
+      <div>
+        <label htmlFor="skills" className="mb-1 block text-xs font-medium text-slate-600 dark:text-slate-300">Required skills</label>
+        <input id="skills" name="skills" type="text" placeholder="e.g. React, Node.js"
+          className="h-10 w-full rounded-xl border border-slate-300 bg-white px-3 text-sm text-slate-900 placeholder:text-slate-400 focus:border-indigo-500 focus:ring-2 focus:ring-indigo-500/30 focus:outline-none dark:border-slate-600 dark:bg-surface dark:text-slate-100" />
       </div>
 
       <label className="flex items-center gap-2 text-sm text-slate-700 dark:text-slate-300">
