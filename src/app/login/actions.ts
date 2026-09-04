@@ -2,7 +2,7 @@
 
 import { redirect } from "next/navigation";
 import { prisma } from "@/lib/prisma";
-import { verifyPassword, createSession } from "@/lib/auth";
+import { verifyPassword, createSession, create2faPendingSession } from "@/lib/auth";
 import type { Role } from "@/lib/types";
 
 export interface LoginState {
@@ -19,7 +19,7 @@ export async function loginAction(_prevState: LoginState | null, formData: FormD
 
   const user = await prisma.user.findUnique({
     where: { email },
-    select: { id: true, name: true, email: true, passwordHash: true, role: true, isActive: true },
+    select: { id: true, name: true, email: true, passwordHash: true, role: true, isActive: true, twoFactorEnabled: true },
   });
 
   if (!user || !user.isActive) {
@@ -29,6 +29,16 @@ export async function loginAction(_prevState: LoginState | null, formData: FormD
   const valid = await verifyPassword(password, user.passwordHash);
   if (!valid) {
     return { error: "Invalid email or password." };
+  }
+
+  if (user.twoFactorEnabled) {
+    await create2faPendingSession({
+      id: user.id,
+      name: user.name,
+      email: user.email,
+      role: user.role as Role,
+    });
+    redirect("/login/verify-2fa");
   }
 
   await createSession({
@@ -44,3 +54,4 @@ export async function loginAction(_prevState: LoginState | null, formData: FormD
 export async function plainLoginAction(formData: FormData): Promise<void> {
   await loginAction(null, formData);
 }
+

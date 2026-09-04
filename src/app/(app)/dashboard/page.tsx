@@ -1,6 +1,6 @@
 import { redirect } from "next/navigation";
 import { getCurrentUser, normalizeRole } from "@/lib/auth";
-import { prisma } from "@/lib/prisma";
+import { prisma, withRetry } from "@/lib/prisma";
 import { DashboardContent, type DashboardViewProps } from "./DashboardContent";
 
 export default async function DashboardPage() {
@@ -32,7 +32,7 @@ export default async function DashboardPage() {
         applicationsCount,
         acceptedOffersCount,
         recentApplications,
-      ] = await Promise.all([
+      ] = await withRetry(() => Promise.all([
         prisma.project.count({ where: { ownerId: user.id } }),
         prisma.proofOfWork.count({ where: { studentId: user.id } }),
         prisma.skillAssessment.count({ where: { studentId: user.id } }),
@@ -86,7 +86,7 @@ export default async function DashboardPage() {
           orderBy: { updatedAt: "desc" },
           take: 4,
         }),
-      ]);
+      ]));
 
       const data: DashboardViewProps = {
         role: "STUDENT",

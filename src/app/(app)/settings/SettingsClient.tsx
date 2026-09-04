@@ -2,24 +2,43 @@
 
 import { useState } from "react";
 import {
+  AlertCircle,
   Bell,
+  Check,
   CheckCircle2,
   ChevronDown,
+  Copy,
   Download,
   KeyRound,
   Laptop,
+  Loader2,
   Lock,
   LogOut,
+  QrCode,
   Shield,
+  ShieldCheck,
   Smartphone,
   Trash2,
   UserCheck,
+  X,
 } from "lucide-react";
 import { Button, Card } from "@/components/ui";
 import { cn } from "@/lib/cn";
 import type { SessionUser } from "@/lib/types";
+import {
+  initTwoFactorSetupAction,
+  confirmAndEnableTwoFactorAction,
+  disableTwoFactorAction,
+  TwoFactorSetupData,
+} from "./actions";
 
-export function SettingsClient({ user }: { user: SessionUser }) {
+export function SettingsClient({
+  user,
+  initialTwoFactor = false,
+}: {
+  user: SessionUser;
+  initialTwoFactor?: boolean;
+}) {
   // Accordion active sections
   const [openSection, setOpenSection] = useState<string | null>("notifications");
 
@@ -35,8 +54,17 @@ export function SettingsClient({ user }: { user: SessionUser }) {
   const [passwordState, setPasswordState] = useState({ current: "", newPass: "", confirm: "" });
   const [passMsg, setPassMsg] = useState<string | null>(null);
 
-  // Security toggles
-  const [twoFactor, setTwoFactor] = useState(false);
+  // Security 2FA state
+  const [twoFactorEnabled, setTwoFactorEnabled] = useState(initialTwoFactor);
+  const [setupStep, setSetupStep] = useState<"idle" | "scanning" | "backupCodes" | "disabling">("idle");
+  const [setupData, setSetupData] = useState<TwoFactorSetupData | null>(null);
+  const [confirmToken, setConfirmToken] = useState("");
+  const [backupCodes, setBackupCodes] = useState<string[]>([]);
+  const [disableToken, setDisableToken] = useState("");
+  const [loading2fa, setLoading2fa] = useState(false);
+  const [error2fa, setError2fa] = useState<string | null>(null);
+  const [copiedSecret, setCopiedSecret] = useState(false);
+
 
   // Devices list
   const [devices, setDevices] = useState([
@@ -264,17 +292,263 @@ export function SettingsClient({ user }: { user: SessionUser }) {
         {openSection === "security" && (
           <div className="border-t border-border-muted bg-surface px-5 py-4">
             <div className="space-y-4 divide-y divide-border-muted">
-              <div className="flex items-center justify-between pt-1">
-                <div>
-                  <p className="text-sm font-medium text-slate-800 dark:text-slate-200">Two-Factor Authentication (2FA)</p>
-                  <p className="text-xs text-slate-500 dark:text-slate-400">Secure sign-in with Google Authenticator or TOTP app</p>
+              {/* 2FA Status & Controls */}
+              <div className="pt-1 space-y-4">
+                <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3">
+                  <div>
+                    <div className="flex items-center gap-2">
+                      <p className="text-sm font-medium text-slate-800 dark:text-slate-200">Two-Factor Authentication (2FA)</p>
+                      {twoFactorEnabled ? (
+                        <span className="inline-flex items-center gap-1 rounded-full bg-emerald-500/10 px-2.5 py-0.5 text-xs font-semibold text-emerald-600 dark:text-emerald-400">
+                          <ShieldCheck className="size-3.5" /> Enabled
+                        </span>
+                      ) : (
+                        <span className="inline-flex items-center gap-1 rounded-full bg-slate-500/10 px-2.5 py-0.5 text-xs font-semibold text-slate-500 dark:text-slate-400">
+                          Disabled
+                        </span>
+                      )}
+                    </div>
+                    <p className="text-xs text-slate-500 dark:text-slate-400 mt-0.5">
+                      Secure sign-in with Google Authenticator or TOTP app
+                    </p>
+                  </div>
+
+                  {!twoFactorEnabled ? (
+                    <Button
+                      onClick={async () => {
+                        setLoading2fa(true);
+                        setError2fa(null);
+                        try {
+                          const data = await initTwoFactorSetupAction();
+                          setSetupData(data);
+                          setSetupStep("scanning");
+                        } catch (err: any) {
+                          setError2fa(err.message || "Failed to initialize 2FA setup");
+                        } finally {
+                          setLoading2fa(false);
+                        }
+                      }}
+                      disabled={loading2fa || setupStep === "scanning"}
+                      className="bg-emerald-600 hover:bg-emerald-500 text-white shrink-0 gap-1.5"
+                    >
+                      {loading2fa ? <Loader2 className="size-4 animate-spin" /> : <QrCode className="size-4" />}
+                      <span>Setup Google 2FA</span>
+                    </Button>
+                  ) : (
+                    <Button
+                      onClick={() => setSetupStep("disabling")}
+                      variant="secondary"
+                      className="text-rose-600 dark:text-rose-400 hover:bg-rose-50 dark:hover:bg-rose-950/40 border-rose-200 dark:border-rose-900 shrink-0 gap-1.5"
+                    >
+                      Disable 2FA
+                    </Button>
+                  )}
                 </div>
-                <input
-                  type="checkbox"
-                  checked={twoFactor}
-                  onChange={(e) => setTwoFactor(e.target.checked)}
-                  className="size-4.5 rounded border-border-muted text-emerald-600 focus:ring-emerald-500"
-                />
+
+                {error2fa && (
+                  <div className="flex items-center gap-2 p-3 bg-red-50 dark:bg-red-950/40 border border-red-200 dark:border-red-900 rounded-xl text-red-700 dark:text-red-300 text-xs">
+                    <AlertCircle className="size-4 shrink-0" />
+                    <span>{error2fa}</span>
+                  </div>
+                )}
+
+                {/* STEP 1: SCAN QR CODE & ENTER CONFIRMATION CODE */}
+                {setupStep === "scanning" && setupData && (
+                  <div className="p-4 bg-slate-50 dark:bg-slate-900/80 border border-slate-200 dark:border-slate-800 rounded-2xl space-y-4 animate-in fade-in">
+                    <div className="flex items-center justify-between">
+                      <h3 className="text-sm font-semibold text-slate-900 dark:text-slate-100 flex items-center gap-1.5">
+                        <QrCode className="size-4 text-emerald-500" />
+                        Scan QR Code with Authenticator App
+                      </h3>
+                      <button
+                        onClick={() => {
+                          setSetupStep("idle");
+                          setSetupData(null);
+                          setError2fa(null);
+                        }}
+                        className="text-slate-400 hover:text-slate-600 dark:hover:text-slate-200"
+                      >
+                        <X className="size-4" />
+                      </button>
+                    </div>
+
+                    <div className="grid grid-cols-1 md:grid-cols-2 gap-4 items-center">
+                      <div className="flex flex-col items-center justify-center p-3 bg-white dark:bg-slate-950 border border-slate-200 dark:border-slate-800 rounded-xl">
+                        {/* QR Code Image */}
+                        <img src={setupData.qrCodeUrl} alt="Google Authenticator QR Code" className="size-44 object-contain rounded" />
+                        <p className="text-[11px] text-slate-500 dark:text-slate-400 mt-1">Scan with Google Authenticator / Authy</p>
+                      </div>
+
+                      <div className="space-y-3">
+                        <div>
+                          <label className="block text-xs font-medium text-slate-500 dark:text-slate-400 mb-1">
+                            Or enter secret key manually:
+                          </label>
+                          <div className="flex items-center gap-2">
+                            <code className="flex-1 bg-white dark:bg-slate-950 px-2.5 py-1.5 rounded-lg border border-slate-200 dark:border-slate-800 font-mono text-xs font-semibold text-emerald-600 dark:text-emerald-400 break-all select-all">
+                              {setupData.secret}
+                            </code>
+                            <Button
+                              type="button"
+                              variant="secondary"
+                              size="sm"
+                              onClick={() => {
+                                navigator.clipboard.writeText(setupData.secret);
+                                setCopiedSecret(true);
+                                setTimeout(() => setCopiedSecret(false), 2000);
+                              }}
+                            >
+                              {copiedSecret ? <Check className="size-3.5 text-emerald-500" /> : <Copy className="size-3.5" />}
+                            </Button>
+                          </div>
+                        </div>
+
+                        <div>
+                          <label className="block text-xs font-medium text-slate-700 dark:text-slate-300 mb-1">
+                            Enter 6-Digit Authenticator Code to Confirm:
+                          </label>
+                          <input
+                            type="text"
+                            value={confirmToken}
+                            onChange={(e) => setConfirmToken(e.target.value)}
+                            placeholder="000000"
+                            maxLength={6}
+                            className="w-full bg-white dark:bg-slate-950 border border-slate-200 dark:border-slate-800 focus:border-emerald-500 rounded-xl px-3 py-2 text-center text-lg font-mono tracking-widest text-slate-900 dark:text-slate-100 outline-none"
+                          />
+                        </div>
+
+                        <Button
+                          onClick={async () => {
+                            setLoading2fa(true);
+                            setError2fa(null);
+                            try {
+                              const res = await confirmAndEnableTwoFactorAction(setupData.secret, confirmToken);
+                              if (res.success && res.backupCodes) {
+                                setTwoFactorEnabled(true);
+                                setBackupCodes(res.backupCodes);
+                                setSetupStep("backupCodes");
+                              } else {
+                                setError2fa(res.error || "Invalid 2FA verification code.");
+                              }
+                            } catch (err: any) {
+                              setError2fa(err.message || "Failed to confirm 2FA");
+                            } finally {
+                              setLoading2fa(false);
+                            }
+                          }}
+                          disabled={loading2fa || confirmToken.trim().length !== 6}
+                          className="w-full bg-emerald-600 hover:bg-emerald-500 text-white"
+                        >
+                          {loading2fa ? <Loader2 className="size-4 animate-spin" /> : "Verify & Activate 2FA"}
+                        </Button>
+                      </div>
+                    </div>
+                  </div>
+                )}
+
+                {/* STEP 2: DISPLAY EMERGENCY BACKUP CODES */}
+                {setupStep === "backupCodes" && (
+                  <div className="p-4 bg-emerald-50/50 dark:bg-emerald-950/30 border border-emerald-200 dark:border-emerald-900 rounded-2xl space-y-3 animate-in fade-in">
+                    <div className="flex items-center justify-between">
+                      <div className="flex items-center gap-2">
+                        <CheckCircle2 className="size-5 text-emerald-600 dark:text-emerald-400" />
+                        <h3 className="text-sm font-semibold text-emerald-900 dark:text-emerald-200">
+                          2FA Activated Successfully!
+                        </h3>
+                      </div>
+                      <button onClick={() => setSetupStep("idle")} className="text-slate-400 hover:text-slate-600">
+                        <X className="size-4" />
+                      </button>
+                    </div>
+
+                    <p className="text-xs text-slate-600 dark:text-slate-400">
+                      Save these 8 single-use emergency backup codes in a safe place. If you lose your phone, you can use one of these codes to log in.
+                    </p>
+
+                    <div className="grid grid-cols-2 sm:grid-cols-4 gap-2 py-2">
+                      {backupCodes.map((code, idx) => (
+                        <div key={idx} className="bg-white dark:bg-slate-900 border border-emerald-200 dark:border-emerald-900/60 rounded-lg py-1.5 px-2.5 text-center font-mono text-xs font-bold text-slate-800 dark:text-slate-200">
+                          {code}
+                        </div>
+                      ))}
+                    </div>
+
+                    <div className="flex gap-2">
+                      <Button
+                        type="button"
+                        variant="secondary"
+                        size="sm"
+                        onClick={() => {
+                          navigator.clipboard.writeText(backupCodes.join("\n"));
+                          setCopiedSecret(true);
+                          setTimeout(() => setCopiedSecret(false), 2000);
+                        }}
+                        className="gap-1.5"
+                      >
+                        {copiedSecret ? <Check className="size-3.5 text-emerald-500" /> : <Copy className="size-3.5" />}
+                        <span>Copy Codes</span>
+                      </Button>
+
+                      <Button
+                        type="button"
+                        size="sm"
+                        onClick={() => setSetupStep("idle")}
+                        className="bg-emerald-600 hover:bg-emerald-500 text-white ml-auto"
+                      >
+                        Done
+                      </Button>
+                    </div>
+                  </div>
+                )}
+
+                {/* DISABLE 2FA CONFIRMATION */}
+                {setupStep === "disabling" && (
+                  <div className="p-4 bg-rose-50 dark:bg-rose-950/30 border border-rose-200 dark:border-rose-900 rounded-2xl space-y-3 animate-in fade-in">
+                    <div className="flex items-center justify-between">
+                      <h3 className="text-sm font-semibold text-rose-900 dark:text-rose-200">Disable Two-Factor Authentication</h3>
+                      <button onClick={() => setSetupStep("idle")} className="text-slate-400 hover:text-slate-600">
+                        <X className="size-4" />
+                      </button>
+                    </div>
+                    <p className="text-xs text-rose-700 dark:text-rose-300">
+                      Enter your current 6-digit authenticator code to confirm disabling 2FA:
+                    </p>
+                    <div className="flex items-center gap-2">
+                      <input
+                        type="text"
+                        value={disableToken}
+                        onChange={(e) => setDisableToken(e.target.value)}
+                        placeholder="000000"
+                        maxLength={6}
+                        className="flex-1 bg-white dark:bg-slate-900 border border-rose-300 dark:border-rose-800 rounded-xl px-3 py-2 text-center text-sm font-mono tracking-widest text-slate-900 dark:text-slate-100 outline-none"
+                      />
+                      <Button
+                        onClick={async () => {
+                          setLoading2fa(true);
+                          setError2fa(null);
+                          try {
+                            const res = await disableTwoFactorAction(disableToken);
+                            if (res.success) {
+                              setTwoFactorEnabled(false);
+                              setSetupStep("idle");
+                              setDisableToken("");
+                            } else {
+                              setError2fa(res.error || "Invalid 2FA token.");
+                            }
+                          } catch (err: any) {
+                            setError2fa(err.message || "Failed to disable 2FA");
+                          } finally {
+                            setLoading2fa(false);
+                          }
+                        }}
+                        disabled={loading2fa || !disableToken.trim()}
+                        className="bg-rose-600 hover:bg-rose-500 text-white gap-1.5"
+                      >
+                        {loading2fa ? <Loader2 className="size-4 animate-spin" /> : "Confirm Disable"}
+                      </Button>
+                    </div>
+                  </div>
+                )}
               </div>
 
               <div className="pt-3">

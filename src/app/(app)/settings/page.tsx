@@ -1,5 +1,6 @@
 import { redirect } from "next/navigation";
 import { getCurrentUser } from "@/lib/auth";
+import { prisma } from "@/lib/prisma";
 import { PageHeader } from "@/components/ui";
 import { Settings } from "lucide-react";
 import { SettingsClient } from "./SettingsClient";
@@ -8,6 +9,11 @@ export default async function SettingsPage() {
   const user = await getCurrentUser();
   if (!user) redirect("/login");
 
+  const dbUser = await prisma.user.findUnique({
+    where: { id: user.id },
+    select: { twoFactorEnabled: true },
+  });
+
   return (
     <div className="mx-auto max-w-4xl">
       <PageHeader
@@ -15,7 +21,8 @@ export default async function SettingsPage() {
         title="Settings"
         subtitle="Manage your notifications, security, password, account preferences, and authorized devices."
       />
-      <SettingsClient user={user} />
+      <SettingsClient user={user} initialTwoFactor={dbUser?.twoFactorEnabled ?? false} />
     </div>
   );
 }
+
