@@ -105,12 +105,6 @@ const LIFECYCLE_PHASES = [
   },
 ];
 
-const INSTITUTION_METRICS = [
-  { n: "2,140", c: "students assessed this semester" },
-  { n: "63%", c: "internship participation · up from 41%" },
-  { n: "318", c: "active industry partners" },
-  { n: "SQL", c: "top skill gap across 5 departments" },
-];
 
 const INSTITUTION_CAPSULES = [
   { label: "Role-based access control", icon: Lock },
@@ -459,22 +453,6 @@ export default async function Home() {
                 internships, and enterprise placements.
               </p>
 
-              {/* Metrics Grid */}
-              <div className="mt-10 grid grid-cols-2 gap-4 sm:grid-cols-4 sm:gap-6">
-                {INSTITUTION_METRICS.map((m) => (
-                  <div
-                    key={m.c}
-                    className="rounded-2xl border border-border-muted bg-surface/80 p-5 backdrop-blur-md dark:bg-surface/80"
-                  >
-                    <p className="text-3xl font-extrabold tracking-tight sm:text-4xl bg-gradient-to-r from-indigo-600 via-purple-600 to-amber-500 bg-clip-text text-transparent dark:from-indigo-400 dark:via-purple-400 dark:to-amber-400">
-                      {m.n}
-                    </p>
-                    <p className="mt-2 text-xs font-medium text-slate-500 dark:text-slate-400 leading-snug">
-                      {m.c}
-                    </p>
-                  </div>
-                ))}
-              </div>
 
               {/* Capability Capsules */}
               <div className="mt-8 flex flex-wrap gap-2.5">
