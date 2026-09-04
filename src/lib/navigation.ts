@@ -6,11 +6,8 @@ import {
   Building2,
   CalendarClock,
   ClipboardCheck,
-  ClipboardList,
   Coins,
   FlaskConical,
-  FolderKanban,
-  Handshake,
   LayoutDashboard,
   Radar,
   Scale,
@@ -18,7 +15,6 @@ import {
   Sparkles,
   Target,
   TrendingUp,
-  User,
   type LucideIcon,
 } from "lucide-react";
 import type { Role } from "@/lib/types";
@@ -31,9 +27,12 @@ export interface NavItem {
 
 const STUDENT_NAV: NavItem[] = [
   { label: "Dashboard", href: "/dashboard", icon: LayoutDashboard },
-  { label: "Skill Radar & Diagnostic", href: "/skills", icon: Radar },
+  { label: "Skill Radar & Freshness", href: "/skills", icon: Radar },
+  { label: "Skill Assessments", href: "/assessments", icon: ClipboardCheck },
   { label: "Internships & Jobs", href: "/internships", icon: Briefcase },
+  { label: "Challenge Marketplace", href: "/challenges", icon: Sparkles },
   { label: "Proof of Work & Badges", href: "/proof-of-work", icon: Award },
+  { label: "Skill Tokens", href: "/tokens", icon: Coins },
   { label: "Mentor Office Hours", href: "/office-hours", icon: CalendarClock },
   { label: "Reverse Placement", href: "/reverse-placement", icon: TrendingUp },
   { label: "Digital Portfolio", href: "/portfolio", icon: ScrollText },
@@ -43,9 +42,11 @@ const ACADEMICIAN_NAV: NavItem[] = [
   { label: "Dashboard", href: "/dashboard", icon: LayoutDashboard },
   { label: "AI Syllabus Gap Audit", href: "/syllabus", icon: BookOpen },
   { label: "R&D Lab Units", href: "/lab-units", icon: FlaskConical },
+  { label: "Challenge Marketplace", href: "/challenges", icon: Sparkles },
   { label: "Dual Grading", href: "/dual-grading", icon: Scale },
   { label: "Academician Development", href: "/faculty-portal", icon: Building2 },
   { label: "Proof of Work Review", href: "/proof-of-work", icon: Award },
+  { label: "Candidate Talent Radar", href: "/reverse-placement", icon: TrendingUp },
 ];
 
 const INDUSTRIES_NAV: NavItem[] = [
@@ -62,6 +63,7 @@ const INSTITUTIONS_NAV: NavItem[] = [
   { label: "Skill Deficit Heatmap", href: "/heatmap", icon: BarChart3 },
   { label: "Placement Records", href: "/placements", icon: Target },
   { label: "Corporate Partners", href: "/partners", icon: Building2 },
+  { label: "Reverse Placement Radar", href: "/reverse-placement", icon: TrendingUp },
   { label: "Cohort Analytics", href: "/analytics", icon: ClipboardCheck },
 ];
 
