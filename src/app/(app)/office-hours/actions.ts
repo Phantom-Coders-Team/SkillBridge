@@ -59,6 +59,36 @@ export async function bookOfficeHour(
     }),
   ]);
 
+  // Dispatch confirmation emails to both student and mentor
+  try {
+    const mentor = await prisma.user.findUnique({
+      where: { id: slot.industryId },
+      select: { id: true, name: true, email: true, profile: { select: { companyName: true } } },
+    });
+
+    if (mentor) {
+      const timeLabel = new Date(slot.timeSlot).toLocaleString("en-IN", {
+        dateStyle: "medium",
+        timeStyle: "short",
+      });
+      const mentorDisplayName = mentor.profile?.companyName || mentor.name;
+      const { notifyMentorBooking } = await import("@/lib/notifications");
+
+      notifyMentorBooking({
+        studentId: user.id,
+        studentEmail: user.email,
+        studentName: user.name,
+        mentorId: mentor.id,
+        mentorEmail: mentor.email,
+        mentorName: mentorDisplayName,
+        topic: slot.topic || "Technical Mentorship & Career Guidance",
+        timeLabel,
+      }).catch((err) => console.error("Failed to dispatch mentor booking emails:", err));
+    }
+  } catch (err) {
+    console.error("Error retrieving mentor for booking notification:", err);
+  }
+
   revalidatePath("/office-hours");
   revalidatePath("/tokens");
   revalidatePath("/dashboard");

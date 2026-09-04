@@ -25,6 +25,7 @@
 *.pem
 *.db
 *.db-journal
+.notifications.json
 
 # debug
 npm-debug.log*

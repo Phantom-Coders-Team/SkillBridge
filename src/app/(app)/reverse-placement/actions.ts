@@ -53,6 +53,24 @@ export async function pitchTopCandidate(
     },
   });
 
+  // Dispatch email notification to student
+  if (student.email) {
+    const company = await prisma.user.findUnique({
+      where: { id: user.id },
+      include: { profile: true },
+    });
+    const companyName = company?.profile?.companyName || company?.name || "Corporate Recruiter";
+    const { notifyRecruiterPitch } = await import("@/lib/notifications");
+    notifyRecruiterPitch({
+      studentId: student.id,
+      studentEmail: student.email,
+      studentName: student.name,
+      companyName,
+      roleDetails,
+      stipend,
+    }).catch((err) => console.error("Failed to dispatch pitch notification:", err));
+  }
+
   revalidatePath("/reverse-placement");
   revalidatePath("/job-pitches");
   revalidatePath("/dashboard");

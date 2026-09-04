@@ -10,6 +10,7 @@ import { NAV_ITEMS } from "@/lib/navigation";
 import { LogoutButton } from "@/components/LogoutButton";
 import { Avatar } from "@/components/ui";
 import ThemeToggle from "@/components/ThemeToggle";
+import { NotificationCenter } from "@/components/NotificationCenter";
 import { DemoSwitcher } from "@/components/DemoSwitcher";
 import { cn } from "@/lib/cn";
 
@@ -245,6 +246,7 @@ export function AppShell({ user, children }: { user: SessionUser; children: Reac
           </div>
 
           <div className="flex items-center gap-2">
+            <NotificationCenter userEmail={user.email} />
             <ThemeToggle />
             <span
               className={cn(

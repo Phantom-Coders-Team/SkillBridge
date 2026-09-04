@@ -49,6 +49,11 @@ export async function postOpportunity(
   }
 }
 
+import {
+  notifyNewApplicationSubmitted,
+  notifyApplicationStatusChange,
+} from "@/lib/notifications";
+
 export async function applyToOpportunity(
   _prev: ActionState | null,
   formData: FormData,
@@ -60,11 +65,28 @@ export async function applyToOpportunity(
   if (!listingId) return { error: "Missing listing." };
 
   try {
+    const listing = await prisma.learningProgram.findUnique({
+      where: { id: listingId },
+      include: { company: { select: { id: true, email: true, name: true } } },
+    });
+
     await prisma.internshipApplication.upsert({
       where: { listingId_studentId: { listingId, studentId: user.id } },
       update: { message: message || null, status: "APPLIED" },
       create: { listingId, studentId: user.id, message: message || null },
     });
+
+    // Send email notification to recruiter
+    if (listing?.company?.email) {
+      notifyNewApplicationSubmitted({
+        recruiterId: listing.company.id,
+        recruiterEmail: listing.company.email,
+        recruiterName: listing.company.name,
+        studentName: user.name,
+        listingTitle: listing.title,
+      }).catch((err) => console.error("Failed to notify recruiter of new application:", err));
+    }
+
     revalidatePath("/internships");
     revalidatePath("/dashboard");
     return { success: true };
@@ -84,10 +106,36 @@ export async function updateApplicationStatus(
   if (!appId || !status) return { error: "Missing fields." };
 
   try {
-    await prisma.internshipApplication.update({
+    const updatedApp = await prisma.internshipApplication.update({
       where: { id: appId },
       data: { status },
+      include: {
+        student: { select: { id: true, email: true, name: true } },
+        listing: {
+          include: {
+            company: { select: { name: true, profile: { select: { companyName: true } } } },
+          },
+        },
+      },
     });
+
+    // Send email notification to student
+    if (updatedApp.student?.email) {
+      const companyName =
+        updatedApp.listing.company.profile?.companyName ||
+        updatedApp.listing.company.name ||
+        "Industry Partner";
+
+      notifyApplicationStatusChange({
+        studentId: updatedApp.student.id,
+        studentEmail: updatedApp.student.email,
+        studentName: updatedApp.student.name,
+        listingTitle: updatedApp.listing.title,
+        companyName,
+        status,
+      }).catch((err) => console.error("Failed to dispatch status email to student:", err));
+    }
+
     revalidatePath("/internships");
     revalidatePath("/dashboard");
     return { success: true };
