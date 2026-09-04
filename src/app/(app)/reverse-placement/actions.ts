@@ -55,8 +55,37 @@ export async function pitchTopCandidate(
 
   revalidatePath("/reverse-placement");
   revalidatePath("/job-pitches");
+  revalidatePath("/dashboard");
   return { ok: true, created: true };
 }
+
+export async function respondToPitch(
+  pitchId: string,
+  status: "ACCEPTED" | "REJECTED",
+): Promise<{ ok: boolean; error?: string }> {
+  const user = await getCurrentUser();
+  if (!user || user.role !== "STUDENT") {
+    return { ok: false, error: "Only students can respond to direct pitches." };
+  }
+
+  const pitch = await prisma.jobPitch.findUnique({
+    where: { id: pitchId },
+  });
+  if (!pitch || pitch.studentId !== user.id) {
+    return { ok: false, error: "Pitch not found or unauthorized." };
+  }
+
+  await prisma.jobPitch.update({
+    where: { id: pitchId },
+    data: { status },
+  });
+
+  revalidatePath("/reverse-placement");
+  revalidatePath("/job-pitches");
+  revalidatePath("/dashboard");
+  return { ok: true };
+}
+
 
 export async function computeStudentPri(studentId: string) {
   const [assessments, projects, proofs, gradings, ledger, challengeCount] = await Promise.all([

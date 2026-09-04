@@ -57,7 +57,7 @@ export default async function JobPitchesPage() {
         <div className="space-y-4">
           {pitches.map((p) => {
             const company = p.industry.profile?.companyName || "an industry partner";
-            const match = Math.round(p.priScore * 100);
+            const match = p.priScore > 1 ? Math.min(100, Math.round(p.priScore / 10)) : Math.round(p.priScore * 100);
             return (
               <Card key={p.id} hover className="p-5">
                 <div className="flex flex-wrap items-start justify-between gap-3">
