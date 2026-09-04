@@ -5,7 +5,7 @@ import { AppShell } from "@/components/AppShell";
 export default async function ProtectedLayout({ children }: { children: React.ReactNode }) {
   const user = await getCurrentUser();
   if (!user) {
-    redirect("/login");
+    redirect("/login?from=/dashboard");
   }
 
   return <AppShell user={user}>{children}</AppShell>;

@@ -3,6 +3,7 @@
 import { useEffect, useState } from "react";
 import Link from "next/link";
 import { ArrowRight, GraduationCap } from "lucide-react";
+import ThemeToggle from "@/components/ThemeToggle";
 import type { SessionUser } from "@/lib/types";
 
 export default function LandingNav({ user }: { user: SessionUser | null }) {
@@ -19,13 +20,13 @@ export default function LandingNav({ user }: { user: SessionUser | null }) {
     <header
       className={`sticky top-0 z-50 border-b backdrop-blur-xl transition-all duration-300 ${
         scrolled
-          ? "border-slate-200/80 bg-white/75 shadow-sm shadow-slate-900/5 dark:border-slate-800 dark:bg-slate-950/75"
-          : "border-transparent bg-white/50 dark:bg-slate-950/40"
+          ? "border-slate-200/80 bg-white/80 shadow-sm shadow-slate-900/5 dark:border-slate-800/90 dark:bg-slate-950/80"
+          : "border-transparent bg-white/40 dark:bg-slate-950/40"
       }`}
     >
       <nav className="mx-auto flex h-16 max-w-6xl items-center justify-between px-4 sm:px-6">
-        <Link href="/" className="flex items-center gap-3">
-          <span className="flex size-9 items-center justify-center rounded-xl bg-gradient-to-br from-indigo-600 to-violet-600 text-white shadow-sm">
+        <Link href="/" className="flex items-center gap-3 group">
+          <span className="flex size-9 items-center justify-center rounded-xl bg-gradient-to-br from-indigo-600 to-violet-600 text-white shadow-sm transition-transform duration-200 group-hover:scale-105">
             <GraduationCap aria-hidden className="size-5" />
           </span>
           <span className="leading-tight">
@@ -33,29 +34,49 @@ export default function LandingNav({ user }: { user: SessionUser | null }) {
             <span className="block text-[11px] font-medium text-slate-500 dark:text-slate-400">Academia × Industry</span>
           </span>
         </Link>
-        {user ? (
-          <Link
-            href="/dashboard"
-            className="inline-flex h-10 items-center gap-2 rounded-full bg-indigo-600 px-5 text-sm font-semibold text-white shadow-sm transition-all hover:bg-indigo-700 active:scale-[0.98]"
-          >
-            Go to Dashboard <ArrowRight aria-hidden className="size-4" />
-          </Link>
-        ) : (
-          <div className="flex items-center gap-2">
+
+        {/* Section anchor links for quick navigation */}
+        <div className="hidden md:flex items-center gap-6 text-sm font-medium text-slate-600 dark:text-slate-400">
+          <a href="#features" className="transition-colors hover:text-indigo-600 dark:hover:text-indigo-400">
+            Features
+          </a>
+          <a href="#how-it-works" className="transition-colors hover:text-indigo-600 dark:hover:text-indigo-400">
+            How It Works
+          </a>
+          <a href="#testimonials" className="transition-colors hover:text-indigo-600 dark:hover:text-indigo-400">
+            Success Stories
+          </a>
+          <a href="#roles" className="transition-colors hover:text-indigo-600 dark:hover:text-indigo-400">
+            For Roles
+          </a>
+        </div>
+
+        <div className="flex items-center gap-2.5">
+          <ThemeToggle />
+          {user ? (
             <Link
-              href="/login"
-              className="inline-flex h-10 items-center rounded-full px-4 text-sm font-semibold text-slate-700 transition-colors hover:text-slate-900 dark:text-slate-200 dark:hover:text-white"
+              href="/dashboard"
+              className="inline-flex h-9 items-center gap-2 rounded-full bg-indigo-600 px-4 text-xs font-semibold text-white shadow-sm transition-all hover:bg-indigo-700 active:scale-[0.98] sm:h-10 sm:px-5 sm:text-sm"
             >
-              Sign in
+              Dashboard <ArrowRight aria-hidden className="size-4" />
             </Link>
-            <Link
-              href="/signup"
-              className="inline-flex h-10 items-center rounded-full bg-indigo-600 px-5 text-sm font-semibold text-white shadow-sm transition-all hover:bg-indigo-700 active:scale-[0.98]"
-            >
-              Sign up
-            </Link>
-          </div>
-        )}
+          ) : (
+            <div className="flex items-center gap-1.5 sm:gap-2">
+              <Link
+                href="/login"
+                className="inline-flex h-9 items-center rounded-full px-3 text-xs font-semibold text-slate-700 transition-colors hover:text-slate-900 dark:text-slate-200 dark:hover:text-white sm:h-10 sm:px-4 sm:text-sm"
+              >
+                Sign in
+              </Link>
+              <Link
+                href="/signup"
+                className="inline-flex h-9 items-center rounded-full bg-indigo-600 px-4 text-xs font-semibold text-white shadow-sm transition-all hover:bg-indigo-700 active:scale-[0.98] sm:h-10 sm:px-5 sm:text-sm"
+              >
+                Sign up
+              </Link>
+            </div>
+          )}
+        </div>
       </nav>
     </header>
   );

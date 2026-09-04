@@ -1,24 +1,35 @@
 @import "tailwindcss";
 
+@custom-variant dark (&:where(.dark, .dark *));
+
 :root {
-  --background: #f7f8fc;
+  --background: #f8fafc;
   --foreground: #0f172a;
   --surface: #ffffff;
-  --border-muted: #e7e9f2;
+  --surface-subtle: #f1f5f9;
+  --border-muted: #e2e8f0;
+  --color-primary: #6366f1;
+  --color-primary-hover: #4f46e5;
+  --color-accent: #16a34a;
 }
 
 .dark {
-  --background: #0b0f1a;
-  --foreground: #e2e8f0;
-  --surface: #131825;
-  --border-muted: #1e293b;
+  --background: #060911;
+  --foreground: #f8fafc;
+  --surface: #0d1322;
+  --surface-subtle: #141c32;
+  --border-muted: #1e283e;
+  --color-primary: #818cf8;
+  --color-primary-hover: #a5b4fc;
+  --color-accent: #10b981;
 }
 
 @theme inline {
   --color-background: var(--background);
   --color-foreground: var(--foreground);
   --color-surface: var(--surface);
-  --color-border-muted: #e7e9f2;
+  --color-surface-subtle: var(--surface-subtle);
+  --color-border-muted: var(--border-muted);
 
   --font-sans: var(--font-geist-sans);
   --font-mono: var(--font-geist-mono);
@@ -49,10 +60,11 @@
   --color-indigo-900: #312e81;
   --color-indigo-950: #1e1b4b;
 
-  /* Elevation */
-  --shadow-card: 0 1px 2px rgba(15, 23, 42, 0.04), 0 1px 3px rgba(15, 23, 42, 0.06);
-  --shadow-card-hover: 0 6px 16px -4px rgba(15, 23, 42, 0.1), 0 2px 4px -2px rgba(15, 23, 42, 0.06);
-  --shadow-pop: 0 12px 32px -8px rgba(15, 23, 42, 0.18), 0 4px 8px -4px rgba(15, 23, 42, 0.08);
+  /* Elevation & Glow */
+  --shadow-card: 0 1px 3px rgba(15, 23, 42, 0.05), 0 1px 2px rgba(15, 23, 42, 0.03);
+  --shadow-card-hover: 0 12px 28px -6px rgba(99, 102, 241, 0.12), 0 4px 10px -2px rgba(15, 23, 42, 0.05);
+  --shadow-pop: 0 20px 40px -12px rgba(15, 23, 42, 0.18), 0 8px 16px -6px rgba(15, 23, 42, 0.08);
+  --shadow-glow: 0 0 24px -4px rgba(99, 102, 241, 0.35);
 
   /* Motion */
   --animate-fade-up: fade-up 0.5s cubic-bezier(0.16, 1, 0.3, 1);
@@ -172,4 +184,33 @@ input,
 select,
 textarea {
   background-color: var(--surface);
+}
+
+html {
+  -webkit-text-size-adjust: 100%;
+  transition: background-color 0.25s ease, color 0.25s ease;
+}
+
+button,
+[role="button"],
+a[href],
+select,
+summary {
+  cursor: pointer;
+}
+
+.glass-card {
+  background: rgba(255, 255, 255, 0.82);
+  backdrop-filter: blur(14px);
+  -webkit-backdrop-filter: blur(14px);
+  border: 1px solid rgba(226, 232, 240, 0.85);
+  box-shadow: 0 4px 20px -2px rgba(99, 102, 241, 0.05);
+}
+
+.dark .glass-card {
+  background: rgba(17, 23, 38, 0.82);
+  backdrop-filter: blur(14px);
+  -webkit-backdrop-filter: blur(14px);
+  border: 1px solid rgba(255, 255, 255, 0.08);
+  box-shadow: 0 8px 28px -4px rgba(0, 0, 0, 0.45);
 }

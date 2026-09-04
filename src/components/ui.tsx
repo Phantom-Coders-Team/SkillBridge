@@ -61,13 +61,13 @@ type ButtonSize = "sm" | "md" | "lg";
 
 const BUTTON_VARIANTS: Record<ButtonVariant, string> = {
   primary:
-    "bg-indigo-600 text-white shadow-sm hover:bg-indigo-700 active:bg-indigo-800 disabled:hover:bg-indigo-600",
+    "bg-indigo-600 text-white shadow-sm hover:bg-indigo-700 hover:shadow-md active:bg-indigo-800 disabled:hover:bg-indigo-600 focus-visible:ring-2 focus-visible:ring-indigo-500 focus-visible:ring-offset-2",
   secondary:
-    "bg-indigo-50 text-indigo-700 hover:bg-indigo-100 active:bg-indigo-200 disabled:hover:bg-indigo-50 dark:bg-indigo-500/15 dark:text-indigo-300 dark:hover:bg-indigo-500/25 dark:active:bg-indigo-500/30 dark:disabled:hover:bg-indigo-500/15",
+    "bg-indigo-50 text-indigo-700 hover:bg-indigo-100/90 active:bg-indigo-200 disabled:hover:bg-indigo-50 dark:bg-indigo-500/15 dark:text-indigo-300 dark:hover:bg-indigo-500/25 dark:active:bg-indigo-500/30 dark:disabled:hover:bg-indigo-500/15 focus-visible:ring-2 focus-visible:ring-indigo-500/50",
   outline:
-    "border border-slate-300 bg-white text-slate-700 hover:border-slate-400 hover:bg-slate-50 disabled:hover:bg-white dark:border-slate-600 dark:bg-surface dark:text-slate-300 dark:hover:border-slate-500 dark:hover:bg-slate-700 dark:disabled:hover:bg-surface",
-  ghost: "text-slate-600 hover:bg-slate-100 hover:text-slate-900 dark:text-slate-300 dark:hover:bg-slate-700 dark:hover:text-slate-100",
-  danger: "bg-red-600 text-white shadow-sm hover:bg-red-700 disabled:hover:bg-red-600",
+    "border border-slate-300/80 bg-white text-slate-700 hover:border-indigo-400 hover:bg-slate-50/80 hover:text-slate-900 disabled:hover:bg-white dark:border-slate-700 dark:bg-surface dark:text-slate-200 dark:hover:border-indigo-500/60 dark:hover:bg-slate-800/60 dark:disabled:hover:bg-surface focus-visible:ring-2 focus-visible:ring-indigo-500/50",
+  ghost: "text-slate-600 hover:bg-slate-100 hover:text-slate-900 dark:text-slate-300 dark:hover:bg-slate-800 dark:hover:text-slate-100 focus-visible:ring-2 focus-visible:ring-indigo-500/50",
+  danger: "bg-red-600 text-white shadow-sm hover:bg-red-700 active:bg-red-800 disabled:hover:bg-red-600 focus-visible:ring-2 focus-visible:ring-red-500 focus-visible:ring-offset-2",
 };
 
 const BUTTON_SIZES: Record<ButtonSize, string> = {
@@ -77,7 +77,7 @@ const BUTTON_SIZES: Record<ButtonSize, string> = {
 };
 
 const BUTTON_BASE =
-  "inline-flex items-center justify-center rounded-lg font-semibold transition-all duration-150 select-none disabled:cursor-not-allowed disabled:opacity-60 active:scale-[0.98]";
+  "inline-flex items-center justify-center rounded-xl font-semibold transition-all duration-200 select-none cursor-pointer disabled:cursor-not-allowed disabled:opacity-60 active:scale-[0.98]";
 
 type ButtonProps = {
   variant?: ButtonVariant;
@@ -128,8 +128,8 @@ export function Card({
   return (
     <div
       className={cn(
-        "rounded-2xl border border-border-muted bg-surface shadow-card",
-        hover && "transition-all duration-200 hover:-translate-y-0.5 hover:shadow-card-hover",
+        "rounded-2xl border border-border-muted bg-surface/95 backdrop-blur-xs shadow-card",
+        hover && "transition-all duration-200 hover:-translate-y-1 hover:shadow-card-hover hover:border-indigo-200/80 dark:hover:border-indigo-900/60",
         className,
       )}
       {...props}
@@ -188,10 +188,10 @@ export function StatCard({
   className?: string;
 }) {
   return (
-    <Card className={cn("flex items-start gap-4 p-5", className)}>
+    <Card hover className={cn("flex items-start gap-4 p-5", className)}>
       <div
         className={cn(
-          "flex size-11 shrink-0 items-center justify-center rounded-xl",
+          "flex size-11 shrink-0 items-center justify-center rounded-xl shadow-xs",
           BADGE_TONES[tone],
         )}
       >

@@ -2,40 +2,19 @@
 
 import Link from "next/link";
 import { usePathname } from "next/navigation";
-import { useEffect, useState } from "react";
-import { useTheme } from "next-themes";
-import { GraduationCap, Menu, X, Sun, Moon, Monitor, ChevronLeft, ChevronRight, Sparkles, User, Settings } from "lucide-react";
+import { useState } from "react";
+import { GraduationCap, Menu, X, ChevronLeft, ChevronRight, Sparkles, User, Settings } from "lucide-react";
 import type { SessionUser } from "@/lib/types";
 import { ROLE_LABELS, ROLE_COLORS } from "@/lib/types";
 import { NAV_ITEMS } from "@/lib/navigation";
 import { LogoutButton } from "@/components/LogoutButton";
 import { Avatar } from "@/components/ui";
+import ThemeToggle from "@/components/ThemeToggle";
 import { cn } from "@/lib/cn";
 
 function isActive(href: string, pathname: string): boolean {
   if (href === "/dashboard") return pathname === href;
   return pathname === href || pathname.startsWith(`${href}/`);
-}
-
-function ThemeToggle() {
-  const { theme, resolvedTheme, setTheme } = useTheme();
-  const [mounted, setMounted] = useState(false);
-  useEffect(() => {
-    const id = requestAnimationFrame(() => setMounted(true));
-    return () => cancelAnimationFrame(id);
-  }, []);
-
-  const current = resolvedTheme ?? theme ?? "light";
-
-  return (
-    <button
-      onClick={() => setTheme(current === "dark" ? "light" : current === "light" ? "system" : "dark")}
-      aria-label="Toggle theme"
-      className="flex size-8 items-center justify-center rounded-lg text-slate-500 transition-colors hover:bg-slate-100 dark:text-slate-400 dark:hover:bg-slate-700"
-    >
-      {!mounted ? <Monitor className="size-4" /> : current === "dark" ? <Sun className="size-4" /> : <Moon className="size-4" />}
-    </button>
-  );
 }
 
 function NavList({
@@ -68,11 +47,11 @@ function NavList({
             title={collapsed ? item.label : undefined}
             aria-current={active ? "page" : undefined}
             className={cn(
-              "group flex items-center rounded-xl text-sm font-medium transition-all",
+              "group flex items-center rounded-xl text-sm font-medium transition-all duration-150 cursor-pointer select-none",
               collapsed ? "justify-center p-2.5" : "gap-3 px-3 py-2.5",
               active
-                ? "bg-indigo-50 text-indigo-700 shadow-xs dark:bg-indigo-500/15 dark:text-indigo-400"
-                : "text-slate-600 hover:bg-slate-100 hover:text-slate-900 dark:text-slate-400 dark:hover:bg-slate-800 dark:hover:text-slate-200",
+                ? "bg-indigo-50/90 text-indigo-700 shadow-xs dark:bg-indigo-500/15 dark:text-indigo-300 font-semibold"
+                : "text-slate-600 hover:bg-slate-100/80 hover:text-slate-900 dark:text-slate-400 dark:hover:bg-slate-800/70 dark:hover:text-slate-200",
             )}
           >
             <Icon
@@ -85,7 +64,7 @@ function NavList({
               )}
             />
             {!collapsed && <span className="truncate">{item.label}</span>}
-            {!collapsed && active && <span className="ml-auto size-1.5 rounded-full bg-indigo-500 dark:bg-indigo-400" />}
+            {!collapsed && active && <span className="ml-auto size-1.5 rounded-full bg-indigo-500 shadow-xs dark:bg-indigo-400" />}
           </Link>
         );
       })}
@@ -279,7 +258,8 @@ export function AppShell({ user, children }: { user: SessionUser; children: Reac
                 onClick={() => setMenuOpen((v) => !v)}
                 aria-haspopup="menu"
                 aria-expanded={menuOpen}
-                className="flex items-center gap-2 rounded-full border border-transparent p-1 transition-colors hover:border-border-muted"
+                aria-label="User profile menu"
+                className="flex cursor-pointer items-center gap-2 rounded-full border border-transparent p-1 transition-all hover:border-border-muted hover:shadow-xs focus-visible:ring-2 focus-visible:ring-indigo-500"
               >
                 <UserAvatar user={user} />
               </button>
