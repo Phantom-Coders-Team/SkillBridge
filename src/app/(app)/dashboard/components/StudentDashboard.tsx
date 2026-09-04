@@ -191,8 +191,8 @@ export function StudentDashboard({
         </div>
       )}
 
-      {/* Primary KPI Stats */}
-      <section className="grid grid-cols-2 gap-4 sm:grid-cols-3 lg:grid-cols-6">
+      {/* Primary KPI Stats - 2 Rows of 3 Cards */}
+      <section className="grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-3">
         <StatCard
           label="My Applications"
           value={stats.applicationsCount ?? 0}
