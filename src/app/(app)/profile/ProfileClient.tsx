@@ -1,9 +1,10 @@
 "use client";
 
 import { useRef, useState, useTransition } from "react";
-import { Camera, CheckCircle, FileText, Loader2, Trash2, Upload, User, X } from "lucide-react";
+import { Camera, CheckCircle, FileText, Loader2, Trash2, Upload, User, X, GraduationCap, BookOpen, Briefcase, School, Globe, Building2 } from "lucide-react";
 import { updateProfileAction, uploadDocumentAction, deleteDocumentAction, type ProfileState } from "./actions";
 import { Avatar, Card, CardHeader } from "@/components/ui";
+import { cn } from "@/lib/cn";
 
 interface ProfileDoc {
   id: string;
@@ -16,6 +17,9 @@ interface ProfileData {
   name: string;
   email: string;
   role: string;
+  rawRole?: string;
+  companyName?: string;
+  designation?: string;
   bio: string;
   phone: string;
   location: string;
@@ -66,10 +70,19 @@ export default function ProfileClient({ profile }: { profile: ProfileData }) {
   const fileRef = useRef<HTMLInputElement>(null);
   const docFormRef = useRef<HTMLFormElement>(null);
 
+  const normalizedRole = (profile.rawRole || profile.role || "").toUpperCase();
+  const isStudent = normalizedRole === "STUDENT" || normalizedRole === "STUDENTS";
+  const isAcademician =
+    normalizedRole === "ACADEMICIAN" ||
+    normalizedRole === "FACULTY" ||
+    normalizedRole === "ACADEMICIANS";
+  const isIndustry =
+    normalizedRole === "INDUSTRY" ||
+    normalizedRole === "INDUSTRIES";
   const isInstitution =
-    profile.role === "Institution" ||
-    profile.role === "Institutions" ||
-    profile.role === "INSTITUTION";
+    normalizedRole === "INSTITUTION" ||
+    normalizedRole === "INSTITUTIONS" ||
+    normalizedRole === "TPO";
 
   function handleFileChange(e: React.ChangeEvent<HTMLInputElement>) {
     const file = e.target.files?.[0];
@@ -153,27 +166,115 @@ export default function ProfileClient({ profile }: { profile: ProfileData }) {
           )}
           <h2 className="mt-4 text-lg font-bold text-slate-900 dark:text-slate-100">{profile.name}</h2>
           <p className="mt-1 text-sm text-slate-500 dark:text-slate-400">{profile.email}</p>
-          <span className="mt-3 inline-flex items-center rounded-full bg-blue-100 px-3 py-1 text-xs font-semibold text-blue-700 dark:bg-blue-500/15 dark:text-blue-300">
+          <span
+            className={cn(
+              "mt-3 inline-flex items-center rounded-full px-3 py-1 text-xs font-semibold",
+              isStudent && "bg-blue-100 text-blue-700 dark:bg-blue-500/15 dark:text-blue-300",
+              isAcademician && "bg-emerald-100 text-emerald-700 dark:bg-emerald-500/15 dark:text-emerald-300",
+              isIndustry && "bg-purple-100 text-purple-700 dark:bg-purple-500/15 dark:text-purple-300",
+              isInstitution && "bg-amber-100 text-amber-700 dark:bg-amber-500/15 dark:text-amber-300"
+            )}
+          >
             {profile.role}
           </span>
-          {profile.department && (
-            <p className="mt-4 text-sm text-slate-600 dark:text-slate-300">
-              {profile.department}
-              {profile.year ? ` - Year ${profile.year}` : ""}
-            </p>
+
+          {/* Student details */}
+          {isStudent && (
+            <div className="mt-4 space-y-1 text-center">
+              {profile.department && (
+                <p className="text-sm font-semibold text-slate-700 dark:text-slate-300">
+                  {profile.department}
+                  {profile.year ? ` · Year ${profile.year}` : ""}
+                </p>
+              )}
+              {profile.collegeName && (
+                <p className="text-xs text-slate-600 dark:text-slate-400">
+                  {profile.collegeName}
+                </p>
+              )}
+              {profile.rollNumber && (
+                <p className="text-xs text-slate-400 dark:text-slate-500">Roll: {profile.rollNumber}</p>
+              )}
+            </div>
           )}
-          {profile.collegeName && (
-            <p className="mt-1 text-sm text-slate-600 dark:text-slate-300">
-              {profile.collegeName}
-            </p>
+
+          {/* Academician details */}
+          {isAcademician && (
+            <div className="mt-4 space-y-1 text-center">
+              {profile.designation && (
+                <p className="text-sm font-bold text-slate-800 dark:text-slate-200">
+                  {profile.designation}
+                </p>
+              )}
+              {profile.department && (
+                <p className="text-xs font-medium text-slate-600 dark:text-slate-400">
+                  {profile.department}
+                </p>
+              )}
+              {profile.collegeName && (
+                <p className="text-xs text-slate-500 dark:text-slate-400">
+                  {profile.collegeName}
+                </p>
+              )}
+            </div>
           )}
-          {isInstitution && profile.institutionType && (
-            <p className="mt-1 text-xs text-slate-500 dark:text-slate-400">
-              {profile.institutionType}
-            </p>
+
+          {/* Industry details */}
+          {isIndustry && (
+            <div className="mt-4 space-y-1 text-center">
+              {profile.designation && (
+                <p className="text-sm font-bold text-slate-800 dark:text-slate-200">
+                  {profile.designation}
+                </p>
+              )}
+              {profile.companyName && (
+                <p className="text-xs font-semibold text-purple-600 dark:text-purple-400">
+                  {profile.companyName}
+                </p>
+              )}
+              {profile.department && (
+                <p className="text-xs text-slate-500 dark:text-slate-400">
+                  {profile.department}
+                </p>
+              )}
+              {profile.websiteUrl && (
+                <a
+                  href={profile.websiteUrl}
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className="mt-1 inline-flex items-center gap-1 text-[11px] font-medium text-indigo-600 hover:underline dark:text-indigo-400"
+                >
+                  <Globe className="size-3" />
+                  <span>Company Website</span>
+                </a>
+              )}
+            </div>
           )}
-          {profile.rollNumber && (
-            <p className="mt-1 text-xs text-slate-400 dark:text-slate-500">Roll: {profile.rollNumber}</p>
+
+          {/* Institution details */}
+          {isInstitution && (
+            <div className="mt-4 space-y-1 text-center">
+              {profile.collegeName && (
+                <p className="text-sm font-bold text-slate-800 dark:text-slate-200">
+                  {profile.collegeName}
+                </p>
+              )}
+              {profile.institutionType && (
+                <p className="text-xs font-semibold text-amber-600 dark:text-amber-400">
+                  {profile.institutionType}
+                </p>
+              )}
+              {profile.tpoName && (
+                <p className="text-xs text-slate-500 dark:text-slate-400">
+                  TPO Head: {profile.tpoName}
+                </p>
+              )}
+              {profile.city && (
+                <p className="text-[11px] text-slate-400 dark:text-slate-500">
+                  {profile.city}{profile.state ? `, ${profile.state}` : ""}
+                </p>
+              )}
+            </div>
           )}
         </Card>
 
@@ -272,93 +373,336 @@ export default function ProfileClient({ profile }: { profile: ProfileData }) {
                 />
               </div>
 
-              <div className="grid gap-4 sm:grid-cols-2">
-                <div>
-                  <label htmlFor="department" className="mb-1.5 block text-sm font-medium text-slate-700 dark:text-slate-300">
-                    Department
-                  </label>
-                  <input
-                    id="department"
-                    name="department"
-                    type="text"
-                    defaultValue={profile.department}
-                    placeholder="e.g. Computer Science"
-                    className="h-10 w-full rounded-xl border border-slate-300 bg-white px-3 text-sm text-slate-900 placeholder:text-slate-400 transition-colors focus:border-indigo-500 focus:ring-2 focus:ring-indigo-500/30 focus:outline-none dark:border-slate-600 dark:bg-surface dark:text-slate-100 dark:placeholder:text-slate-500"
-                  />
-                </div>
-                <div>
-                  <label htmlFor="collegeName" className="mb-1.5 block text-sm font-medium text-slate-700 dark:text-slate-300">
-                    College Name
-                  </label>
-                  <input
-                    id="collegeName"
-                    name="collegeName"
-                    type="text"
-                    defaultValue={profile.collegeName}
-                    placeholder="e.g. IIT Bombay"
-                    className="h-10 w-full rounded-xl border border-slate-300 bg-white px-3 text-sm text-slate-900 placeholder:text-slate-400 transition-colors focus:border-indigo-500 focus:ring-2 focus:ring-indigo-500/30 focus:outline-none dark:border-slate-600 dark:bg-surface dark:text-slate-100 dark:placeholder:text-slate-500"
-                  />
-                </div>
-              </div>
+              {/* 1. STUDENT EDIT FIELDS */}
+              {isStudent && (
+                <div className="space-y-4 pt-1">
+                  <div className="flex items-center gap-2 text-xs font-bold text-blue-900 dark:text-blue-300">
+                    <GraduationCap className="size-4 text-blue-600" />
+                    <span>Student Academic Credentials</span>
+                  </div>
 
-              <div className="grid gap-4 sm:grid-cols-2">
-                <div>
-                  <label htmlFor="year" className="mb-1.5 block text-sm font-medium text-slate-700 dark:text-slate-300">
-                    Year
-                  </label>
-                  <input
-                    id="year"
-                    name="year"
-                    type="number"
-                    min={1}
-                    max={5}
-                    defaultValue={profile.year ?? ""}
-                    placeholder="e.g. 4"
-                    className="h-10 w-full rounded-xl border border-slate-300 bg-white px-3 text-sm text-slate-900 placeholder:text-slate-400 transition-colors focus:border-indigo-500 focus:ring-2 focus:ring-indigo-500/30 focus:outline-none dark:border-slate-600 dark:bg-surface dark:text-slate-100 dark:placeholder:text-slate-500"
-                  />
-                </div>
-                <div>
-                  <label htmlFor="rollNumber" className="mb-1.5 block text-sm font-medium text-slate-700 dark:text-slate-300">
-                    Roll Number
-                  </label>
-                  <input
-                    id="rollNumber"
-                    name="rollNumber"
-                    type="text"
-                    defaultValue={profile.rollNumber}
-                    placeholder="e.g. CS21B001"
-                    className="h-10 w-full rounded-xl border border-slate-300 bg-white px-3 text-sm text-slate-900 placeholder:text-slate-400 transition-colors focus:border-indigo-500 focus:ring-2 focus:ring-indigo-500/30 focus:outline-none dark:border-slate-600 dark:bg-surface dark:text-slate-100 dark:placeholder:text-slate-500"
-                  />
-                </div>
-              </div>
+                  <div className="grid gap-4 sm:grid-cols-2">
+                    <div>
+                      <label htmlFor="collegeName" className="mb-1.5 block text-sm font-medium text-slate-700 dark:text-slate-300">
+                        College / University Name
+                      </label>
+                      <input
+                        id="collegeName"
+                        name="collegeName"
+                        type="text"
+                        defaultValue={profile.collegeName}
+                        placeholder="e.g. IIT Delhi / DTU"
+                        className="h-10 w-full rounded-xl border border-slate-300 bg-white px-3 text-sm text-slate-900 placeholder:text-slate-400 transition-colors focus:border-indigo-500 focus:ring-2 focus:ring-indigo-500/30 focus:outline-none dark:border-slate-600 dark:bg-surface dark:text-slate-100 dark:placeholder:text-slate-500"
+                      />
+                    </div>
+                    <div>
+                      <label htmlFor="department" className="mb-1.5 block text-sm font-medium text-slate-700 dark:text-slate-300">
+                        Degree & Department
+                      </label>
+                      <input
+                        id="department"
+                        name="department"
+                        type="text"
+                        defaultValue={profile.department}
+                        placeholder="e.g. B.Tech Computer Science"
+                        className="h-10 w-full rounded-xl border border-slate-300 bg-white px-3 text-sm text-slate-900 placeholder:text-slate-400 transition-colors focus:border-indigo-500 focus:ring-2 focus:ring-indigo-500/30 focus:outline-none dark:border-slate-600 dark:bg-surface dark:text-slate-100 dark:placeholder:text-slate-500"
+                      />
+                    </div>
+                  </div>
 
-              <div>
-                <label htmlFor="skills" className="mb-1.5 block text-sm font-medium text-slate-700 dark:text-slate-300">
-                  Skills
-                </label>
-                <input
-                  id="skills"
-                  name="skills"
-                  type="text"
-                  defaultValue={profile.skills}
-                  placeholder="e.g. React, Python, Machine Learning"
-                  className="h-10 w-full rounded-xl border border-slate-300 bg-white px-3 text-sm text-slate-900 placeholder:text-slate-400 transition-colors focus:border-indigo-500 focus:ring-2 focus:ring-indigo-500/30 focus:outline-none dark:border-slate-600 dark:bg-surface dark:text-slate-100 dark:placeholder:text-slate-500"
-                />
-              </div>
+                  <div className="grid gap-4 sm:grid-cols-2">
+                    <div>
+                      <label htmlFor="year" className="mb-1.5 block text-sm font-medium text-slate-700 dark:text-slate-300">
+                        Current Year of Study
+                      </label>
+                      <select
+                        id="year"
+                        name="year"
+                        defaultValue={profile.year ?? 4}
+                        className="h-10 w-full rounded-xl border border-slate-300 bg-white px-3 text-sm text-slate-900 transition-colors focus:border-indigo-500 focus:ring-2 focus:ring-indigo-500/30 focus:outline-none dark:border-slate-600 dark:bg-surface dark:text-slate-100 cursor-pointer"
+                      >
+                        <option value="1">1st Year</option>
+                        <option value="2">2nd Year</option>
+                        <option value="3">3rd Year</option>
+                        <option value="4">4th Year (Final)</option>
+                        <option value="5">Postgraduate (M.Tech / MS / PhD)</option>
+                      </select>
+                    </div>
+                    <div>
+                      <label htmlFor="rollNumber" className="mb-1.5 block text-sm font-medium text-slate-700 dark:text-slate-300">
+                        Roll Number / Student ID
+                      </label>
+                      <input
+                        id="rollNumber"
+                        name="rollNumber"
+                        type="text"
+                        defaultValue={profile.rollNumber}
+                        placeholder="e.g. 21CS045"
+                        className="h-10 w-full rounded-xl border border-slate-300 bg-white px-3 text-sm text-slate-900 placeholder:text-slate-400 transition-colors focus:border-indigo-500 focus:ring-2 focus:ring-indigo-500/30 focus:outline-none dark:border-slate-600 dark:bg-surface dark:text-slate-100 dark:placeholder:text-slate-500"
+                      />
+                    </div>
+                  </div>
 
-              <div>
-                <label htmlFor="bio" className="mb-1.5 block text-sm font-medium text-slate-700 dark:text-slate-300">
-                  Bio
-                </label>
-                <textarea
-                  id="bio"
-                  name="bio"
-                  rows={3}
-                  defaultValue={profile.bio}
-                  placeholder="Tell us about yourself…"
-                  className="w-full rounded-xl border border-slate-300 bg-white px-3 py-2.5 text-sm text-slate-900 placeholder:text-slate-400 transition-colors focus:border-indigo-500 focus:ring-2 focus:ring-indigo-500/30 focus:outline-none dark:border-slate-600 dark:bg-surface dark:text-slate-100 dark:placeholder:text-slate-500"
-                />
-              </div>
+                  <div>
+                    <label htmlFor="skills" className="mb-1.5 block text-sm font-medium text-slate-700 dark:text-slate-300">
+                      Technical Skills & Competencies (comma separated)
+                    </label>
+                    <input
+                      id="skills"
+                      name="skills"
+                      type="text"
+                      defaultValue={profile.skills}
+                      placeholder="e.g. React, Python, Machine Learning, TypeScript"
+                      className="h-10 w-full rounded-xl border border-slate-300 bg-white px-3 text-sm text-slate-900 placeholder:text-slate-400 transition-colors focus:border-indigo-500 focus:ring-2 focus:ring-indigo-500/30 focus:outline-none dark:border-slate-600 dark:bg-surface dark:text-slate-100 dark:placeholder:text-slate-500"
+                    />
+                  </div>
+
+                  <div>
+                    <label htmlFor="bio" className="mb-1.5 block text-sm font-medium text-slate-700 dark:text-slate-300">
+                      Career Objective / About Me
+                    </label>
+                    <textarea
+                      id="bio"
+                      name="bio"
+                      rows={3}
+                      defaultValue={profile.bio}
+                      placeholder="Brief overview of your career aspirations and key project highlights…"
+                      className="w-full rounded-xl border border-slate-300 bg-white px-3 py-2.5 text-sm text-slate-900 placeholder:text-slate-400 transition-colors focus:border-indigo-500 focus:ring-2 focus:ring-indigo-500/30 focus:outline-none dark:border-slate-600 dark:bg-surface dark:text-slate-100 dark:placeholder:text-slate-500"
+                    />
+                  </div>
+                </div>
+              )}
+
+              {/* 2. ACADEMICIAN EDIT FIELDS */}
+              {isAcademician && (
+                <div className="space-y-4 pt-1">
+                  <div className="flex items-center gap-2 text-xs font-bold text-emerald-900 dark:text-emerald-300">
+                    <BookOpen className="size-4 text-emerald-600" />
+                    <span>Academician & Faculty Credentials</span>
+                  </div>
+
+                  <div className="grid gap-4 sm:grid-cols-2">
+                    <div>
+                      <label htmlFor="collegeName" className="mb-1.5 block text-sm font-medium text-slate-700 dark:text-slate-300">
+                        Academic Institution / University
+                      </label>
+                      <input
+                        id="collegeName"
+                        name="collegeName"
+                        type="text"
+                        defaultValue={profile.collegeName}
+                        placeholder="e.g. IIT Bombay / NIT Trichy"
+                        className="h-10 w-full rounded-xl border border-slate-300 bg-white px-3 text-sm text-slate-900 placeholder:text-slate-400 transition-colors focus:border-indigo-500 focus:ring-2 focus:ring-indigo-500/30 focus:outline-none dark:border-slate-600 dark:bg-surface dark:text-slate-100 dark:placeholder:text-slate-500"
+                      />
+                    </div>
+                    <div>
+                      <label htmlFor="department" className="mb-1.5 block text-sm font-medium text-slate-700 dark:text-slate-300">
+                        Academic Department
+                      </label>
+                      <input
+                        id="department"
+                        name="department"
+                        type="text"
+                        defaultValue={profile.department}
+                        placeholder="e.g. Dept of Computer Science & Engineering"
+                        className="h-10 w-full rounded-xl border border-slate-300 bg-white px-3 text-sm text-slate-900 placeholder:text-slate-400 transition-colors focus:border-indigo-500 focus:ring-2 focus:ring-indigo-500/30 focus:outline-none dark:border-slate-600 dark:bg-surface dark:text-slate-100 dark:placeholder:text-slate-500"
+                      />
+                    </div>
+                  </div>
+
+                  <div className="grid gap-4 sm:grid-cols-2">
+                    <div>
+                      <label htmlFor="designation" className="mb-1.5 block text-sm font-medium text-slate-700 dark:text-slate-300">
+                        Academic Title / Designation
+                      </label>
+                      <input
+                        id="designation"
+                        name="designation"
+                        type="text"
+                        defaultValue={profile.designation}
+                        placeholder="e.g. Associate Professor / Head of Department"
+                        className="h-10 w-full rounded-xl border border-slate-300 bg-white px-3 text-sm text-slate-900 placeholder:text-slate-400 transition-colors focus:border-indigo-500 focus:ring-2 focus:ring-indigo-500/30 focus:outline-none dark:border-slate-600 dark:bg-surface dark:text-slate-100 dark:placeholder:text-slate-500"
+                      />
+                    </div>
+                    <div>
+                      <label htmlFor="skills" className="mb-1.5 block text-sm font-medium text-slate-700 dark:text-slate-300">
+                        Research Areas & Specializations
+                      </label>
+                      <input
+                        id="skills"
+                        name="skills"
+                        type="text"
+                        defaultValue={profile.skills}
+                        placeholder="e.g. Distributed Systems, Machine Learning, IoT"
+                        className="h-10 w-full rounded-xl border border-slate-300 bg-white px-3 text-sm text-slate-900 placeholder:text-slate-400 transition-colors focus:border-indigo-500 focus:ring-2 focus:ring-indigo-500/30 focus:outline-none dark:border-slate-600 dark:bg-surface dark:text-slate-100 dark:placeholder:text-slate-500"
+                      />
+                    </div>
+                  </div>
+
+                  <div>
+                    <label htmlFor="bio" className="mb-1.5 block text-sm font-medium text-slate-700 dark:text-slate-300">
+                      Academic Bio & Research Summary
+                    </label>
+                    <textarea
+                      id="bio"
+                      name="bio"
+                      rows={3}
+                      defaultValue={profile.bio}
+                      placeholder="Outline your research focus, courses taught, and collaborative interests…"
+                      className="w-full rounded-xl border border-slate-300 bg-white px-3 py-2.5 text-sm text-slate-900 placeholder:text-slate-400 transition-colors focus:border-indigo-500 focus:ring-2 focus:ring-indigo-500/30 focus:outline-none dark:border-slate-600 dark:bg-surface dark:text-slate-100 dark:placeholder:text-slate-500"
+                    />
+                  </div>
+                </div>
+              )}
+
+              {/* 3. INDUSTRY EDIT FIELDS */}
+              {isIndustry && (
+                <div className="space-y-4 pt-1">
+                  <div className="flex items-center gap-2 text-xs font-bold text-purple-900 dark:text-purple-300">
+                    <Briefcase className="size-4 text-purple-600" />
+                    <span>Company & Recruiter Details</span>
+                  </div>
+
+                  <div className="grid gap-4 sm:grid-cols-2">
+                    <div>
+                      <label htmlFor="companyName" className="mb-1.5 block text-sm font-medium text-slate-700 dark:text-slate-300">
+                        Company / Organization Name
+                      </label>
+                      <input
+                        id="companyName"
+                        name="companyName"
+                        type="text"
+                        defaultValue={profile.companyName}
+                        placeholder="e.g. Infosys / Google / Razorpay"
+                        className="h-10 w-full rounded-xl border border-slate-300 bg-white px-3 text-sm text-slate-900 placeholder:text-slate-400 transition-colors focus:border-indigo-500 focus:ring-2 focus:ring-indigo-500/30 focus:outline-none dark:border-slate-600 dark:bg-surface dark:text-slate-100 dark:placeholder:text-slate-500"
+                      />
+                    </div>
+                    <div>
+                      <label htmlFor="designation" className="mb-1.5 block text-sm font-medium text-slate-700 dark:text-slate-300">
+                        Your Job Title / Recruiter Role
+                      </label>
+                      <input
+                        id="designation"
+                        name="designation"
+                        type="text"
+                        defaultValue={profile.designation}
+                        placeholder="e.g. Talent Acquisition Lead / Director"
+                        className="h-10 w-full rounded-xl border border-slate-300 bg-white px-3 text-sm text-slate-900 placeholder:text-slate-400 transition-colors focus:border-indigo-500 focus:ring-2 focus:ring-indigo-500/30 focus:outline-none dark:border-slate-600 dark:bg-surface dark:text-slate-100 dark:placeholder:text-slate-500"
+                      />
+                    </div>
+                  </div>
+
+                  <div className="grid gap-4 sm:grid-cols-2">
+                    <div>
+                      <label htmlFor="department" className="mb-1.5 block text-sm font-medium text-slate-700 dark:text-slate-300">
+                        Industry Domain / Sector
+                      </label>
+                      <input
+                        id="department"
+                        name="department"
+                        type="text"
+                        defaultValue={profile.department}
+                        placeholder="e.g. Fintech / SaaS / AI & Data"
+                        className="h-10 w-full rounded-xl border border-slate-300 bg-white px-3 text-sm text-slate-900 placeholder:text-slate-400 transition-colors focus:border-indigo-500 focus:ring-2 focus:ring-indigo-500/30 focus:outline-none dark:border-slate-600 dark:bg-surface dark:text-slate-100 dark:placeholder:text-slate-500"
+                      />
+                    </div>
+                    <div>
+                      <label htmlFor="websiteUrl" className="mb-1.5 block text-sm font-medium text-slate-700 dark:text-slate-300">
+                        Company Website URL
+                      </label>
+                      <input
+                        id="websiteUrl"
+                        name="websiteUrl"
+                        type="url"
+                        defaultValue={profile.websiteUrl}
+                        placeholder="https://company.com"
+                        className="h-10 w-full rounded-xl border border-slate-300 bg-white px-3 text-sm text-slate-900 placeholder:text-slate-400 transition-colors focus:border-indigo-500 focus:ring-2 focus:ring-indigo-500/30 focus:outline-none dark:border-slate-600 dark:bg-surface dark:text-slate-100 dark:placeholder:text-slate-500"
+                      />
+                    </div>
+                  </div>
+
+                  <div>
+                    <label htmlFor="skills" className="mb-1.5 block text-sm font-medium text-slate-700 dark:text-slate-300">
+                      Hiring Tech Stack & Evaluated Skills
+                    </label>
+                    <input
+                      id="skills"
+                      name="skills"
+                      type="text"
+                      defaultValue={profile.skills}
+                      placeholder="e.g. React, Node.js, Python, AWS, Docker"
+                      className="h-10 w-full rounded-xl border border-slate-300 bg-white px-3 text-sm text-slate-900 placeholder:text-slate-400 transition-colors focus:border-indigo-500 focus:ring-2 focus:ring-indigo-500/30 focus:outline-none dark:border-slate-600 dark:bg-surface dark:text-slate-100 dark:placeholder:text-slate-500"
+                    />
+                  </div>
+
+                  <div>
+                    <label htmlFor="bio" className="mb-1.5 block text-sm font-medium text-slate-700 dark:text-slate-300">
+                      About Company & Engineering Culture
+                    </label>
+                    <textarea
+                      id="bio"
+                      name="bio"
+                      rows={3}
+                      defaultValue={profile.bio}
+                      placeholder="Share your company mission, hiring ethos, and growth opportunities…"
+                      className="w-full rounded-xl border border-slate-300 bg-white px-3 py-2.5 text-sm text-slate-900 placeholder:text-slate-400 transition-colors focus:border-indigo-500 focus:ring-2 focus:ring-indigo-500/30 focus:outline-none dark:border-slate-600 dark:bg-surface dark:text-slate-100 dark:placeholder:text-slate-500"
+                    />
+                  </div>
+                </div>
+              )}
+
+              {/* 4. INSTITUTION BASIC EDIT FIELDS */}
+              {isInstitution && (
+                <div className="space-y-4 pt-1">
+                  <div className="flex items-center gap-2 text-xs font-bold text-amber-900 dark:text-amber-300">
+                    <School className="size-4 text-amber-600" />
+                    <span>Campus & Institutional Identity</span>
+                  </div>
+
+                  <div className="grid gap-4 sm:grid-cols-2">
+                    <div>
+                      <label htmlFor="collegeName" className="mb-1.5 block text-sm font-medium text-slate-700 dark:text-slate-300">
+                        Institution / University Full Name
+                      </label>
+                      <input
+                        id="collegeName"
+                        name="collegeName"
+                        type="text"
+                        defaultValue={profile.collegeName}
+                        placeholder="e.g. National Institute of Technology Warangal"
+                        className="h-10 w-full rounded-xl border border-slate-300 bg-white px-3 text-sm text-slate-900 placeholder:text-slate-400 transition-colors focus:border-indigo-500 focus:ring-2 focus:ring-indigo-500/30 focus:outline-none dark:border-slate-600 dark:bg-surface dark:text-slate-100 dark:placeholder:text-slate-500"
+                      />
+                    </div>
+                    <div>
+                      <label htmlFor="websiteUrl" className="mb-1.5 block text-sm font-medium text-slate-700 dark:text-slate-300">
+                        Official Campus Website
+                      </label>
+                      <input
+                        id="websiteUrl"
+                        name="websiteUrl"
+                        type="url"
+                        defaultValue={profile.websiteUrl}
+                        placeholder="https://college.ac.in"
+                        className="h-10 w-full rounded-xl border border-slate-300 bg-white px-3 text-sm text-slate-900 placeholder:text-slate-400 transition-colors focus:border-indigo-500 focus:ring-2 focus:ring-indigo-500/30 focus:outline-none dark:border-slate-600 dark:bg-surface dark:text-slate-100 dark:placeholder:text-slate-500"
+                      />
+                    </div>
+                  </div>
+
+                  <div>
+                    <label htmlFor="bio" className="mb-1.5 block text-sm font-medium text-slate-700 dark:text-slate-300">
+                      Institutional Overview
+                    </label>
+                    <textarea
+                      id="bio"
+                      name="bio"
+                      rows={3}
+                      defaultValue={profile.bio}
+                      placeholder="Brief overview of the institution, legacy, and academic standing…"
+                      className="w-full rounded-xl border border-slate-300 bg-white px-3 py-2.5 text-sm text-slate-900 placeholder:text-slate-400 transition-colors focus:border-indigo-500 focus:ring-2 focus:ring-indigo-500/30 focus:outline-none dark:border-slate-600 dark:bg-surface dark:text-slate-100 dark:placeholder:text-slate-500"
+                    />
+                  </div>
+                </div>
+              )}
 
               {isInstitution && (
                 <>
@@ -802,17 +1146,32 @@ export default function ProfileClient({ profile }: { profile: ProfileData }) {
 
           {/* Documents */}
           <Card>
-            <CardHeader title="My Documents" subtitle="Upload your resume, certificates, and academic records." icon={FileText} />
+            <CardHeader
+              title="Verified Documents & Records"
+              subtitle={
+                isStudent
+                  ? "Upload your resume, certificates, and academic transcripts."
+                  : isAcademician
+                  ? "Upload research publications, course syllabi, and academic credentials."
+                  : isIndustry
+                  ? "Upload company brochures, hiring guidelines, and MoUs."
+                  : "Upload accreditation certificates, placement reports, and institutional MoUs."
+              }
+              icon={FileText}
+            />
             <div className="p-5">
               <form ref={docFormRef} onSubmit={handleDocUpload} className="flex flex-wrap items-end gap-3">
                 <div className="min-w-[140px] flex-1">
                   <label htmlFor="docType" className="mb-1 block text-xs font-medium text-slate-600 dark:text-slate-300">Type</label>
                   <select id="docType" name="type"
                     className="h-10 w-full rounded-xl border border-slate-300 bg-white px-3 text-sm text-slate-900 focus:border-indigo-500 focus:outline-none dark:border-slate-600 dark:bg-surface dark:text-slate-100">
-                    <option value="Resume">Resume</option>
-                    <option value="Certificate">Certificate</option>
-                    <option value="Internship Report">Internship Report</option>
-                    <option value="Academic Record">Academic Record</option>
+                    <option value="Resume">Resume / CV</option>
+                    <option value="Certificate">Certificate / Credential</option>
+                    <option value="Research Paper">Research Paper / Publication</option>
+                    <option value="MoU / Agreement">MoU / Partnership Agreement</option>
+                    <option value="Placement Report">Placement Report / Brochure</option>
+                    <option value="Academic Record">Academic Record / Transcript</option>
+                    <option value="Accreditation Proof">Accreditation Proof (NAAC/NBA/AICTE)</option>
                     <option value="Other">Other</option>
                   </select>
                 </div>

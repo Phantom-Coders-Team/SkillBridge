@@ -26,6 +26,22 @@ export async function signupAction(_prevState: SignupState | null, formData: For
   const password = String(formData.get("password") || "");
   const role = normalizeRole(String(formData.get("role") || "STUDENT"));
 
+  // Role-specific onboarding fields
+  const collegeName = String(formData.get("collegeName") || "").trim() || null;
+  const department = String(formData.get("department") || "").trim() || null;
+  const yearInput = formData.get("year");
+  const year = yearInput && !isNaN(Number(yearInput)) ? Number(yearInput) : null;
+  const rollNumber = String(formData.get("rollNumber") || "").trim() || null;
+  const skills = String(formData.get("skills") || "").trim() || null;
+  const companyName = String(formData.get("companyName") || "").trim() || null;
+  const designation = String(formData.get("designation") || "").trim() || null;
+  const websiteUrl = String(formData.get("websiteUrl") || "").trim() || null;
+  const institutionType = String(formData.get("institutionType") || "").trim() || null;
+  const tpoName = String(formData.get("tpoName") || "").trim() || null;
+  const location = String(formData.get("location") || "").trim() || null;
+  const city = String(formData.get("city") || "").trim() || null;
+  const state = String(formData.get("state") || "").trim() || null;
+
   if (!name || !email || !password) {
     return { error: "Name, email, and password are required." };
   }
@@ -53,6 +69,23 @@ export async function signupAction(_prevState: SignupState | null, formData: For
 
   const passwordHash = await hashPassword(password);
 
+  // Build profile based on role
+  const profileData = {
+    collegeName,
+    department,
+    year: role === "STUDENT" ? year : null,
+    rollNumber: role === "STUDENT" ? rollNumber : null,
+    skills,
+    companyName: (role === "INDUSTRY" || role === "INDUSTRIES") ? companyName : null,
+    designation,
+    websiteUrl,
+    institutionType: (role === "INSTITUTION" || role === "INSTITUTIONS") ? institutionType : null,
+    tpoName: (role === "INSTITUTION" || role === "INSTITUTIONS") ? tpoName : null,
+    location,
+    city,
+    state,
+  };
+
   const user = await prisma.user.create({
     data: {
       name,
@@ -60,7 +93,7 @@ export async function signupAction(_prevState: SignupState | null, formData: For
       passwordHash,
       role,
       profile: {
-        create: {},
+        create: profileData,
       },
       ...(role === "STUDENT"
         ? {

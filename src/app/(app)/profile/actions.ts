@@ -29,6 +29,8 @@ export async function updateProfileAction(_prevState: ProfileState | null, formD
   const year = formData.get("year") ? Number(formData.get("year")) : null;
   const rollNumber = String(formData.get("rollNumber") || "").trim() || null;
   const skills = String(formData.get("skills") || "").trim() || null;
+  const companyName = String(formData.get("companyName") || "").trim() || null;
+  const designation = String(formData.get("designation") || "").trim() || null;
 
   const institutionType = String(formData.get("institutionType") || "").trim() || null;
   const establishedYear = formData.get("establishedYear") ? Number(formData.get("establishedYear")) : null;
@@ -95,6 +97,8 @@ export async function updateProfileAction(_prevState: ProfileState | null, formD
       year,
       rollNumber,
       skills,
+      companyName,
+      designation,
       institutionType,
       establishedYear,
       websiteUrl,
@@ -134,6 +138,8 @@ export async function updateProfileAction(_prevState: ProfileState | null, formD
       year,
       rollNumber,
       skills,
+      companyName,
+      designation,
       institutionType,
       establishedYear,
       websiteUrl,
