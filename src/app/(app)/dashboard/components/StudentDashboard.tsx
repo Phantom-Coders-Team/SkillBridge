@@ -145,7 +145,7 @@ export function StudentDashboard({
       </section>
 
       {/* Primary KPI Stats */}
-      <section className="grid grid-cols-2 gap-4 sm:grid-cols-3 lg:grid-cols-6">
+      <section className="grid grid-cols-2 gap-4 sm:grid-cols-3">
         <StatCard
           label="My Projects"
           value={stats.projectsCount}
