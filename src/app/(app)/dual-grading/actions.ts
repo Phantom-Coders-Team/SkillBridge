@@ -8,7 +8,7 @@ export async function submitGrading(
   _prev: { error?: string; success?: boolean } | null,
   formData: FormData,
 ): Promise<{ error?: string; success?: boolean }> {
-  const user = await requireRole(["FACULTY", "INDUSTRY"]);
+  const user = await requireRole(["ACADEMICIAN", "FACULTY", "INDUSTRIES", "INDUSTRY"]);
 
   const gradingId = formData.get("gradingId") as string | null;
   const remarks = formData.get("remarks") as string | null;
@@ -18,7 +18,7 @@ export async function submitGrading(
   const grading = await prisma.dualGrading.findUnique({ where: { id: gradingId } });
   if (!grading) return { error: "Grading record not found." };
 
-  if (user.role === "FACULTY") {
+  if (user.role === "ACADEMICIAN" || user.role === "FACULTY") {
     const marks = formData.get("academicMarks") as string | null;
     if (!marks) return { error: "Academic marks are required." };
 
@@ -31,7 +31,7 @@ export async function submitGrading(
         submittedAt: grading.submittedAt ?? new Date(),
       },
     });
-  } else if (user.role === "INDUSTRY") {
+  } else if (user.role === "INDUSTRIES" || user.role === "INDUSTRY") {
     const score = formData.get("jobReadinessScore") as string | null;
     if (!score) return { error: "Job readiness score is required." };
 
@@ -54,7 +54,7 @@ export async function createGradingRecord(
   _prev: { error?: string; success?: boolean } | null,
   formData: FormData,
 ): Promise<{ error?: string; success?: boolean }> {
-  await requireRole(["FACULTY", "INDUSTRY"]);
+  await requireRole(["ACADEMICIAN", "FACULTY", "INDUSTRIES", "INDUSTRY"]);
 
   const challengeId = formData.get("challengeId") as string | null;
   const labUnitId = formData.get("labUnitId") as string | null;

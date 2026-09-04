@@ -9,17 +9,17 @@ import ThemeToggle from "@/components/ThemeToggle";
 
 const DEMO_ACCOUNTS = [
   {
-    role: "Student",
+    role: "Students",
     email: "aarav.sharma@student.edu",
     tone: "bg-blue-50 text-blue-700 ring-blue-200 hover:bg-blue-100 dark:bg-blue-500/15 dark:text-blue-300 dark:ring-blue-500/40 dark:hover:bg-blue-500/25",
   },
   {
-    role: "Faculty",
+    role: "Academicians",
     email: "rajesh.kumar@faculty.edu",
     tone: "bg-emerald-50 text-emerald-700 ring-emerald-200 hover:bg-emerald-100 dark:bg-emerald-500/15 dark:text-emerald-300 dark:ring-emerald-500/40 dark:hover:bg-emerald-500/25",
   },
   {
-    role: "Industry",
+    role: "Industries",
     email: "recruit@infosys.com",
     tone: "bg-purple-50 text-purple-700 ring-purple-200 hover:bg-purple-100 dark:bg-purple-500/15 dark:text-purple-300 dark:ring-purple-500/40 dark:hover:bg-purple-500/25",
   },
@@ -86,7 +86,7 @@ export default function LoginPage() {
             Where academia meets industry for real impact.
           </h1>
           <p className="mt-4 max-w-md text-slate-600 dark:text-slate-400 leading-relaxed">
-            One portal connecting students, faculty, industry partners, and placement officers — from verified skill
+            One portal connecting students, academicians, industries, and institutions — from verified skill
             badges to signed placement offers.
           </p>
 

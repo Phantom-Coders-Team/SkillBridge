@@ -11,12 +11,12 @@ export default async function ReversePlacementPage() {
   const user = await getCurrentUser();
   if (!user) redirect("/login");
 
-  if (user.role === "FACULTY") {
+  if (user.role === "ACADEMICIAN" || user.role === "FACULTY") {
     return (
       <div className="mx-auto max-w-3xl">
         <EmptyState
           icon={Trophy}
-          title="Faculty view unavailable"
+          title="Academician view unavailable"
           description="Reverse campus placement is available to students, institutions, and industry recruiters."
         />
       </div>
@@ -55,7 +55,7 @@ export default async function ReversePlacementPage() {
           "recruiters can pitch job and internship packages directly to top candidates."
         }
       />
-      <ReversePlacementClient candidates={sorted} viewerRole={effectiveRole as "STUDENT" | "INDUSTRY" | "INSTITUTIONS"} />
+      <ReversePlacementClient candidates={sorted} viewerRole={effectiveRole as any} />
     </div>
   );
 }

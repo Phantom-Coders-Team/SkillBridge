@@ -16,8 +16,8 @@ export default function SignOffControls({
 }) {
   const [state, formAction, pending] = useActionState(signOffProof, null);
 
-  const isFaculty = role === "FACULTY";
-  const isIndustry = role === "INDUSTRY";
+  const isFaculty = role === "ACADEMICIAN" || role === "FACULTY";
+  const isIndustry = role === "INDUSTRIES" || role === "INDUSTRY";
   const canSign = (isFaculty && facultySignOff === "PENDING") || (isIndustry && industrySignOff === "PENDING");
 
   if (!canSign) return null;
@@ -30,7 +30,7 @@ export default function SignOffControls({
         {isFaculty && (
           <>
             <button type="submit" name="action" value="faculty_sign" disabled={pending} className="rounded-md bg-green-600 px-4 py-2 text-xs font-semibold text-white hover:bg-green-700 disabled:opacity-60">
-              {pending ? "Signing..." : "Approve (Faculty)"}
+              {pending ? "Signing..." : "Approve (Academician)"}
             </button>
             <button type="submit" name="action" value="faculty_reject" disabled={pending} className="rounded-md bg-red-100 px-4 py-2 text-xs font-semibold text-red-700 hover:bg-red-200 disabled:opacity-60">
               Reject

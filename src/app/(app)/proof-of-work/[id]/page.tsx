@@ -25,7 +25,11 @@ export default async function ProofDetailPage({ params }: { params: Promise<{ id
 
   if (!proof) notFound();
 
-  const isFacultyOrIndustry = user.role === "FACULTY" || user.role === "INDUSTRY";
+  const isFacultyOrIndustry =
+    user.role === "ACADEMICIAN" ||
+    user.role === "FACULTY" ||
+    user.role === "INDUSTRIES" ||
+    user.role === "INDUSTRY";
 
   const verifyUrl = proof.publicToken
     ? `${process.env.NEXT_PUBLIC_BASE_URL || "http://localhost:3000"}/verify/${proof.publicToken}`
@@ -64,7 +68,7 @@ export default async function ProofDetailPage({ params }: { params: Promise<{ id
 
         <div className="mt-4 grid grid-cols-2 gap-4">
           <div className="rounded-lg bg-gray-50 dark:bg-gray-800 p-3">
-            <p className="text-[10px] font-semibold uppercase tracking-wide text-gray-500 dark:text-gray-400">Faculty Sign-off</p>
+            <p className="text-[10px] font-semibold uppercase tracking-wide text-gray-500 dark:text-gray-400">Academician Sign-off</p>
             <span className={`mt-1 inline-block rounded-full px-2.5 py-0.5 text-xs font-semibold ${SIGN_BADGE[proof.facultySignOff]}`}>
               {proof.facultySignOff}
             </span>

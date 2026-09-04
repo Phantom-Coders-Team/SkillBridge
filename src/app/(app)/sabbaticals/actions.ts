@@ -18,7 +18,7 @@ export async function postSabbaticalListing(input: {
   compensation?: string | null;
 }): Promise<PostSabbaticalResult> {
   const user = await getCurrentUser();
-  if (!user || user.role !== "INDUSTRY") {
+  if (!user || (user.role !== "INDUSTRIES" && user.role !== "INDUSTRY")) {
     return { ok: false, error: "Only industry partners can post sabbatical opportunities." };
   }
 

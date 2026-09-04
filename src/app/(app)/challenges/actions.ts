@@ -10,7 +10,7 @@ export async function postChallenge(
   _prev: { error?: string; success?: boolean } | null,
   formData: FormData,
 ): Promise<{ error?: string; success?: boolean }> {
-  const user = await requireRole(["INDUSTRY"]);
+  const user = await requireRole(["INDUSTRIES", "INDUSTRY"]);
 
   const title = formData.get("title") as string | null;
   const description = formData.get("description") as string | null;

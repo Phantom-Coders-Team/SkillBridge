@@ -19,8 +19,8 @@ type Grading = {
 export default function GradingCard({ grading, role }: { grading: Grading; role: string }) {
   const [state, formAction, pending] = useActionState(submitGrading, null);
 
-  const canGradeFaculty = role === "FACULTY" && !grading.academicMarks;
-  const canGradeIndustry = role === "INDUSTRY" && !grading.jobReadinessScore;
+  const canGradeFaculty = (role === "ACADEMICIAN" || role === "FACULTY") && !grading.academicMarks;
+  const canGradeIndustry = (role === "INDUSTRIES" || role === "INDUSTRY") && !grading.jobReadinessScore;
   const isComplete = grading.academicMarks !== null && grading.jobReadinessScore !== null;
 
   return (
@@ -39,7 +39,7 @@ export default function GradingCard({ grading, role }: { grading: Grading; role:
 
       <div className="mt-4 grid grid-cols-2 gap-4">
         <div className="rounded-lg bg-blue-50 p-3">
-          <p className="text-[10px] font-semibold uppercase tracking-wide text-blue-600">Faculty Academic</p>
+          <p className="text-[10px] font-semibold uppercase tracking-wide text-blue-600">Academician Academic</p>
           <p className="mt-1 text-2xl font-bold text-blue-800">
             {grading.academicMarks !== null ? `${grading.academicMarks}/100` : "—"}
           </p>

@@ -38,7 +38,7 @@ export default async function ChallengesPage() {
         subtitle="Capstones, R&D sprints and micro-consultancy gigs posted by industry partners."
         icon={Sparkles}
         actions={
-          user.role === "INDUSTRY" ? (
+          user.role === "INDUSTRIES" || user.role === "INDUSTRY" ? (
             <details className="group relative">
               <summary className="cursor-pointer list-none [&::-webkit-details-marker]:hidden">
                 <Button size="md" icon={Sparkles}>Post Challenge</Button>

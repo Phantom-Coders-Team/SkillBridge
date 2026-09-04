@@ -20,7 +20,7 @@ export default async function JobPitchesPage() {
     where:
       user.role === "STUDENT"
         ? { studentId: user.id }
-        : user.role === "INDUSTRY"
+        : user.role === "INDUSTRIES" || user.role === "INDUSTRY"
           ? { industryId: user.id }
           : {},
     include: {
@@ -48,7 +48,7 @@ export default async function JobPitchesPage() {
           icon={Briefcase}
           title="No job pitches yet"
           description={
-            user.role === "INDUSTRY"
+            user.role === "INDUSTRIES" || user.role === "INDUSTRY"
               ? "Pitch top students from the reverse-placement leaderboard to start conversations."
               : "When industry partners pitch you a role, it will show up here."
           }

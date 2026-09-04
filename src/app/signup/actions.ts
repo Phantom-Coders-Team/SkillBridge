@@ -2,20 +2,28 @@
 
 import { redirect } from "next/navigation";
 import { prisma } from "@/lib/prisma";
-import { hashPassword, createSession } from "@/lib/auth";
+import { hashPassword, createSession, normalizeRole } from "@/lib/auth";
 import type { Role } from "@/lib/types";
 
 export interface SignupState {
   error?: string;
 }
 
-const ALLOWED_ROLES: Role[] = ["STUDENT", "FACULTY", "INDUSTRY", "INSTITUTIONS"];
+const ALLOWED_ROLES: Role[] = [
+  "STUDENT",
+  "ACADEMICIAN",
+  "INDUSTRIES",
+  "INSTITUTIONS",
+  "FACULTY",
+  "INDUSTRY",
+  "TPO",
+];
 
 export async function signupAction(_prevState: SignupState | null, formData: FormData): Promise<SignupState> {
   const name = String(formData.get("name") || "").trim();
   const email = String(formData.get("email") || "").trim().toLowerCase();
   const password = String(formData.get("password") || "");
-  const role = String(formData.get("role") || "STUDENT").toUpperCase() as Role;
+  const role = normalizeRole(String(formData.get("role") || "STUDENT"));
 
   if (!name || !email || !password) {
     return { error: "Name, email, and password are required." };

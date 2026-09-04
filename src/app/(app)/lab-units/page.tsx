@@ -24,7 +24,7 @@ export default async function LabUnitsPage() {
 
   const [labUnits, challenges, students] = await Promise.all([
     prisma.labUnit.findMany({
-      where: user.role === "FACULTY" ? { facultyId: user.id } : {},
+      where: user.role === "ACADEMICIAN" || user.role === "FACULTY" ? { facultyId: user.id } : {},
       include: {
         faculty: { select: { name: true } },
         challenge: { select: { title: true } },
@@ -50,10 +50,10 @@ export default async function LabUnitsPage() {
       <PageHeader
         icon={FlaskConical}
         title="R&D Lab Units"
-        subtitle="Faculty-led teams for capstone and R&D challenge execution."
+        subtitle="Academician-led teams for capstone and R&D challenge execution."
       />
 
-      {user.role === "FACULTY" && (
+      {(user.role === "ACADEMICIAN" || user.role === "FACULTY") && (
         <div className="mb-6">
           <LabUnitForms challenges={challenges} students={students} />
         </div>
@@ -73,7 +73,7 @@ export default async function LabUnitsPage() {
                 <span className="text-xs text-slate-400 dark:text-slate-500">ID: {lu.id.slice(0, 8)}</span>
               </div>
               <p className="mt-1 text-xs text-slate-500 dark:text-slate-400">
-                Faculty: <span className="font-medium text-slate-600 dark:text-slate-300">{lu.faculty.name}</span>
+                Academician: <span className="font-medium text-slate-600 dark:text-slate-300">{lu.faculty.name}</span>
               </p>
               {lu.challenge && <p className="text-xs text-slate-500 dark:text-slate-400">Challenge: {lu.challenge.title}</p>}
 

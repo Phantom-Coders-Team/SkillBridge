@@ -17,7 +17,7 @@ export default async function PartnersPage() {
   if (!user) redirect("/login");
 
   const partners = await prisma.user.findMany({
-    where: { role: "INDUSTRY" },
+    where: { role: { in: ["INDUSTRIES", "INDUSTRY"] } },
     include: { profile: true },
     orderBy: { name: "asc" },
   });

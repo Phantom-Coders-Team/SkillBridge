@@ -40,8 +40,17 @@ export function verifyToken(token: string): JwtPayload | null {
   }
 }
 
+export function normalizeRole(role: string): Role {
+  const upper = String(role || "").trim().toUpperCase();
+  if (upper === "FACULTY" || upper === "ACADEMICIANS") return "ACADEMICIAN";
+  if (upper === "INDUSTRY") return "INDUSTRIES";
+  if (upper === "TPO" || upper === "INSTITUTION") return "INSTITUTIONS";
+  if (upper === "STUDENTS") return "STUDENT";
+  return upper as Role;
+}
+
 export async function createSession(user: { id: string; name: string; email: string; role: Role }): Promise<void> {
-  const normalizedRole = (user.role === "TPO" ? "INSTITUTIONS" : user.role) as Role;
+  const normalizedRole = normalizeRole(user.role);
   const token = signToken({
     sub: user.id,
     role: normalizedRole,
@@ -78,7 +87,7 @@ export const getCurrentUser = cache(async (): Promise<SessionUser | null> => {
 
   if (!user || !user.isActive) return null;
 
-  const normalizedRole = (user.role === "TPO" ? "INSTITUTIONS" : user.role) as Role;
+  const normalizedRole = normalizeRole(user.role);
 
   return {
     id: user.id,
@@ -91,10 +100,12 @@ export const getCurrentUser = cache(async (): Promise<SessionUser | null> => {
 
 export async function requireRole(allowed: Role[]): Promise<SessionUser> {
   const user = await getCurrentUser();
-  const effectiveAllowed = allowed.flatMap((r) =>
-    r === "INSTITUTIONS" ? ["INSTITUTIONS", "TPO"] : [r]
-  );
-  if (!user || !effectiveAllowed.includes(user.role)) {
+  if (!user) {
+    throw new Error("UNAUTHORIZED");
+  }
+  const normalizedUserRole = normalizeRole(user.role);
+  const normalizedAllowed = allowed.map(normalizeRole);
+  if (!normalizedAllowed.includes(normalizedUserRole)) {
     throw new Error("UNAUTHORIZED");
   }
   return user;

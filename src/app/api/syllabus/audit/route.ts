@@ -10,7 +10,7 @@ export async function POST(req: Request) {
   if (!user) {
     return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
   }
-  if (user.role !== "FACULTY") {
+  if (user.role !== "ACADEMICIAN" && user.role !== "FACULTY") {
     return NextResponse.json({ error: "Forbidden" }, { status: 403 });
   }
 
