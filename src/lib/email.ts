@@ -296,48 +296,92 @@ export async function sendApplicationStatusEmail({
   listingTitle,
   companyName,
   status,
+  interviewDetails,
 }: {
   studentEmail: string;
   studentName: string;
   listingTitle: string;
   companyName: string;
   status: string;
+  interviewDetails?: {
+    date?: string;
+    mode?: string;
+    link?: string;
+    notes?: string;
+  };
 }) {
   const isApproved =
     status.toUpperCase() === "APPROVED" ||
     status.toUpperCase() === "ACCEPTED" ||
     status.toUpperCase() === "OFFERED";
+  const isInterview = status.toUpperCase() === "INTERVIEW";
 
-  const headline = isApproved
-    ? `🎉 Congratulations! Your application for "${listingTitle}" has been approved!`
-    : `Application Status Update: "${listingTitle}" is now ${status}`;
+  let headline = `Application Status Update: "${listingTitle}" is now ${status}`;
+  let description = `${companyName} has updated the status of your application for <strong>${listingTitle}</strong> to <strong>${status}</strong>.`;
+  let badgeText = `Status: ${status}`;
+  let badgeTone: "blue" | "green" | "purple" = "blue";
 
-  const description = isApproved
-    ? `Great news! ${companyName} has reviewed your verified skills and credentials and updated your application status to <strong>${status}</strong>. Please log in to review onboarding materials and connect with the hiring manager.`
-    : `${companyName} has updated the status of your application for <strong>${listingTitle}</strong> to <strong>${status}</strong>.`;
+  const details: { label: string; value: string }[] = [
+    { label: "Company", value: companyName },
+    { label: "Opportunity", value: listingTitle },
+    { label: "Current Status", value: isInterview ? "Interview Scheduled" : status },
+  ];
+
+  if (isApproved) {
+    headline = `🎉 Congratulations! Your application for "${listingTitle}" has been approved!`;
+    description = `Great news! ${companyName} has reviewed your verified skills and credentials and updated your application status to <strong>${status}</strong>. Please log in to review onboarding materials and connect with the hiring manager.`;
+    badgeText = "Offer Approved & Verified";
+    badgeTone = "green";
+  } else if (isInterview) {
+    headline = `📅 Interview Scheduled: "${listingTitle}" with ${companyName}`;
+    description = `${companyName} was impressed with your verified profile and has invited you for an interview for <strong>${listingTitle}</strong>! Please review the meeting schedule and preparation details below.`;
+    badgeText = "Interview Scheduled";
+    badgeTone = "purple";
+
+    if (interviewDetails?.date) {
+      const formattedDate = new Date(interviewDetails.date).toLocaleString("en-IN", {
+        dateStyle: "medium",
+        timeStyle: "short",
+      });
+      details.push({ label: "Interview Date & Time", value: formattedDate });
+    }
+    if (interviewDetails?.mode) {
+      details.push({ label: "Meeting Mode / Platform", value: interviewDetails.mode });
+    }
+    if (interviewDetails?.link) {
+      details.push({ label: "Meeting Link / Location", value: interviewDetails.link });
+    }
+    if (interviewDetails?.notes) {
+      details.push({ label: "Instructions for Candidate", value: interviewDetails.notes });
+    }
+  }
+
+  details.push({
+    label: "Updated At",
+    value: new Date().toLocaleDateString("en-IN", { dateStyle: "long" }),
+  });
 
   const html = renderEmailTemplate({
     title: `Application Update: ${listingTitle}`,
     recipientName: studentName,
-    badgeText: isApproved ? "Offer Approved & Verified" : `Status: ${status}`,
-    badgeTone: isApproved ? "green" : "blue",
+    badgeText,
+    badgeTone,
     headline,
     description,
-    details: [
-      { label: "Company", value: companyName },
-      { label: "Opportunity", value: listingTitle },
-      { label: "New Status", value: status },
-      { label: "Updated At", value: new Date().toLocaleDateString("en-IN", { dateStyle: "long" }) },
-    ],
-    ctaLabel: "View Application Status",
+    details,
+    ctaLabel: isInterview ? "Join Meeting / View Application" : "View Application Status",
     ctaUrl: "/internships",
   });
 
+  const subject = isApproved
+    ? `🎉 Congratulations! ${companyName} approved your application for ${listingTitle}`
+    : isInterview
+    ? `📅 Interview Scheduled: ${listingTitle} at ${companyName}`
+    : `Application Update: ${status} for ${listingTitle} at ${companyName}`;
+
   return sendEmail({
     to: studentEmail,
-    subject: isApproved
-      ? `🎉 Congratulations! ${companyName} approved your application for ${listingTitle}`
-      : `Application Update: ${status} for ${listingTitle} at ${companyName}`,
+    subject,
     html,
   });
 }

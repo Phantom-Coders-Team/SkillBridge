@@ -152,6 +152,12 @@ export async function applyToOpportunity(
   }
 }
 
+import {
+  parseApplicationMessage,
+  encodeApplicationMessage,
+  type InterviewDetails,
+} from "@/lib/interview";
+
 export async function updateApplicationStatus(
   _prev: { error?: string; success?: boolean } | null,
   formData: FormData,
@@ -163,9 +169,38 @@ export async function updateApplicationStatus(
   if (!appId || !status) return { error: "Missing fields." };
 
   try {
+    const currentApp = await prisma.internshipApplication.findUnique({
+      where: { id: appId },
+      select: { message: true },
+    });
+
+    let updatedMessage = currentApp?.message || null;
+    let interviewDetails: InterviewDetails | undefined = undefined;
+
+    if (status === "INTERVIEW") {
+      const interviewDate = formData.get("interviewDate") as string | null;
+      const interviewMode = (formData.get("interviewMode") as string | null) || "Google Meet";
+      const interviewLink = formData.get("interviewLink") as string | null;
+      const interviewNotes = formData.get("interviewNotes") as string | null;
+
+      const existingParsed = parseApplicationMessage(currentApp?.message);
+      interviewDetails = {
+        date: interviewDate || existingParsed.interview?.date || new Date().toISOString(),
+        mode: interviewMode,
+        link: interviewLink || existingParsed.interview?.link || undefined,
+        notes: interviewNotes || existingParsed.interview?.notes || undefined,
+        scheduledAt: new Date().toISOString(),
+      };
+
+      updatedMessage = encodeApplicationMessage(existingParsed.coverLetter, interviewDetails);
+    }
+
     const updatedApp = await prisma.internshipApplication.update({
       where: { id: appId },
-      data: { status },
+      data: {
+        status,
+        ...(status === "INTERVIEW" ? { message: updatedMessage } : {}),
+      },
       include: {
         student: { select: { id: true, email: true, name: true } },
         listing: {
@@ -191,6 +226,7 @@ export async function updateApplicationStatus(
           listingTitle: updatedApp.listing.title,
           companyName,
           status,
+          interviewDetails,
         });
       } catch (err) {
         console.error("Failed to dispatch status email to student:", err);
@@ -200,7 +236,8 @@ export async function updateApplicationStatus(
     revalidatePath("/internships");
     revalidatePath("/dashboard");
     return { success: true };
-  } catch {
+  } catch (err) {
+    console.error("updateApplicationStatus error:", err);
     return { error: "Failed to update status." };
   }
 }

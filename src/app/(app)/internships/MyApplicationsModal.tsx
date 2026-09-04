@@ -13,9 +13,11 @@ import {
   XCircle,
   Award,
   Zap,
+  Video,
 } from "lucide-react";
 import { Badge, Card, EmptyState, type BadgeTone } from "@/components/ui";
 import { calculateSkillMatch } from "@/lib/matchingEngine";
+import { parseApplicationMessage, formatInterviewDateTime } from "@/lib/interview";
 
 export interface SerializedApplication {
   id: string;
@@ -261,6 +263,53 @@ export function MyApplicationsModal({
                           </div>
                         )}
                       </div>
+
+                      {/* Scheduled Interview Details Card */}
+                      {(() => {
+                        const parsed = parseApplicationMessage(app.message);
+                        const interview = parsed.interview;
+                        if (!interview) return null;
+
+                        return (
+                          <div className="my-3 rounded-xl border border-purple-200 bg-purple-50/80 p-3.5 text-xs dark:border-purple-900/60 dark:bg-purple-950/40 space-y-2">
+                            <div className="flex flex-wrap items-center justify-between gap-2 font-bold text-purple-950 dark:text-purple-200">
+                              <span className="flex items-center gap-1.5 text-xs sm:text-sm">
+                                <Calendar className="size-4 text-purple-600 dark:text-purple-400" />
+                                Interview Scheduled: {formatInterviewDateTime(interview.date)}
+                              </span>
+                              <span className="rounded-md bg-purple-200/90 px-2.5 py-0.5 text-[11px] font-bold text-purple-900 dark:bg-purple-900 dark:text-purple-100">
+                                {interview.mode}
+                              </span>
+                            </div>
+
+                            {interview.link && (
+                              <div className="flex items-center gap-1.5 text-xs text-purple-900 dark:text-purple-200">
+                                <Video className="size-3.5 shrink-0 text-purple-600 dark:text-purple-400" />
+                                <span className="font-semibold">Meeting URL / Venue:</span>
+                                {interview.link.startsWith("http") ? (
+                                  <a
+                                    href={interview.link}
+                                    target="_blank"
+                                    rel="noopener noreferrer"
+                                    className="inline-flex items-center gap-1 font-bold text-indigo-600 underline hover:text-indigo-800 dark:text-indigo-400 dark:hover:text-indigo-200"
+                                  >
+                                    <span>Join Interview</span>
+                                    <ExternalLink className="size-3" />
+                                  </a>
+                                ) : (
+                                  <span className="font-medium">{interview.link}</span>
+                                )}
+                              </div>
+                            )}
+
+                            {interview.notes && (
+                              <div className="rounded-lg bg-white/70 dark:bg-slate-900/50 p-2 text-slate-700 dark:text-slate-300">
+                                <span className="font-semibold text-slate-900 dark:text-slate-100">Instructions:</span> {interview.notes}
+                              </div>
+                            )}
+                          </div>
+                        );
+                      })()}
 
                       {/* Required Skills pill row */}
                       {app.listing.skills && (

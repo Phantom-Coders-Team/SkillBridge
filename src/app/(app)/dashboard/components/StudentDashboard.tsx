@@ -4,6 +4,7 @@ import {
   Award,
   BookOpen,
   Briefcase,
+  Calendar,
   CalendarClock,
   CheckCircle2,
   Clock,
@@ -16,6 +17,7 @@ import {
   Zap,
 } from "lucide-react";
 import { Badge, Card, CardHeader, StatCard } from "@/components/ui";
+import { parseApplicationMessage, formatInterviewDateTime } from "@/lib/interview";
 
 export interface StudentDashboardProps {
   name: string;
@@ -57,6 +59,7 @@ export interface StudentDashboardProps {
   recentApplications?: Array<{
     id: string;
     status: string;
+    message?: string | null;
     updatedAt: Date;
     listing: {
       id: string;
@@ -275,6 +278,7 @@ export function StudentDashboard({
                   const isShortlisted = app.status === "SHORTLISTED";
                   const isInterview = app.status === "INTERVIEW";
                   const isRejected = app.status === "REJECTED";
+                  const parsed = parseApplicationMessage(app.message);
 
                   return (
                     <div
@@ -297,6 +301,11 @@ export function StudentDashboard({
                             day: "numeric",
                           })}
                         </p>
+                        {isInterview && parsed?.interview?.date && (
+                          <p className="text-xs font-semibold text-purple-700 dark:text-purple-300">
+                            📅 Interview: {formatInterviewDateTime(parsed.interview.date)} ({parsed.interview.mode})
+                          </p>
+                        )}
                       </div>
 
                       <div className="shrink-0 flex items-center gap-2">
@@ -305,7 +314,7 @@ export function StudentDashboard({
                         ) : isShortlisted ? (
                           <Badge tone="indigo">Shortlisted</Badge>
                         ) : isInterview ? (
-                          <Badge tone="amber">Interview</Badge>
+                          <Badge tone="purple">Interview Scheduled</Badge>
                         ) : isRejected ? (
                           <Badge tone="red">Not Selected</Badge>
                         ) : (

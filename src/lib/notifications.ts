@@ -283,6 +283,7 @@ export async function notifyApplicationStatusChange({
   listingTitle,
   companyName,
   status,
+  interviewDetails,
 }: {
   studentId: string;
   studentEmail: string;
@@ -290,19 +291,33 @@ export async function notifyApplicationStatusChange({
   listingTitle: string;
   companyName: string;
   status: string;
+  interviewDetails?: {
+    date?: string;
+    mode?: string;
+    link?: string;
+    notes?: string;
+  };
 }) {
   const isApproved =
     status.toUpperCase() === "APPROVED" ||
     status.toUpperCase() === "ACCEPTED" ||
     status.toUpperCase() === "OFFERED";
+  const isInterview = status.toUpperCase() === "INTERVIEW";
 
-  const title = isApproved
-    ? `Offer Approved: ${listingTitle}`
-    : `Application Status: ${status} (${listingTitle})`;
+  let title = `Application Status: ${status} (${listingTitle})`;
+  let message = `${companyName} has updated your application status for ${listingTitle} to ${status}.`;
 
-  const message = isApproved
-    ? `Congratulations! ${companyName} has updated and approved your placement application for ${listingTitle}.`
-    : `${companyName} has updated your application status for ${listingTitle} to ${status}.`;
+  if (isApproved) {
+    title = `Offer Approved: ${listingTitle}`;
+    message = `Congratulations! ${companyName} has updated and approved your placement application for ${listingTitle}.`;
+  } else if (isInterview) {
+    title = `Interview Scheduled: ${listingTitle}`;
+    const datePart = interviewDetails?.date
+      ? ` for ${new Date(interviewDetails.date).toLocaleString("en-IN", { dateStyle: "medium", timeStyle: "short" })}`
+      : "";
+    const modePart = interviewDetails?.mode ? ` via ${interviewDetails.mode}` : "";
+    message = `${companyName} scheduled an interview${datePart}${modePart}. Check your applications for meeting link and details.`;
+  }
 
   const notif = await createNotification({
     userId: studentId,
@@ -320,6 +335,7 @@ export async function notifyApplicationStatusChange({
     listingTitle,
     companyName,
     status,
+    interviewDetails,
   });
 
   notif.emailSent = emailResult.success;
