@@ -14,6 +14,7 @@ import {
 } from "lucide-react";
 import { Badge, Card, EmptyState, PageHeader, type BadgeTone } from "@/components/ui";
 import { createMentorSlot } from "./actions";
+import MentorshipClinicModal from "./MentorshipClinicModal";
 
 const SLOT_TONE: Record<string, BadgeTone> = {
   AVAILABLE: "green",
@@ -227,15 +228,22 @@ export function MentorSlotsClient({
                 </div>
 
                 {s.status === "BOOKED" && (
-                  <div className="shrink-0 flex items-center gap-2">
+                  <div className="shrink-0 flex items-center gap-2 flex-wrap">
+                    <MentorshipClinicModal
+                      slotId={s.id}
+                      topic={s.topic}
+                      studentName={s.studentName}
+                      durationMins={s.durationMins}
+                      meetingLink={meetingLink}
+                    />
                     <a
                       href={meetingLink}
                       target="_blank"
                       rel="noopener noreferrer"
-                      className="inline-flex items-center gap-1.5 rounded-xl bg-emerald-600 px-4 py-2 text-xs font-bold text-white shadow-xs hover:bg-emerald-700"
+                      className="inline-flex items-center gap-1.5 rounded-xl border border-emerald-300 bg-emerald-50 px-3 py-2 text-xs font-bold text-emerald-700 hover:bg-emerald-100 dark:border-emerald-800 dark:bg-emerald-950/40 dark:text-emerald-300"
                     >
-                      <Video className="size-4" />
-                      Join Video Meeting
+                      <Video className="size-3.5" />
+                      <span>Direct Video</span>
                       <ExternalLink className="size-3" />
                     </a>
                   </div>

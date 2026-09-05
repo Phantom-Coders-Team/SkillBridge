@@ -192,14 +192,30 @@ export async function updateApplicationStatus(
         scheduledAt: new Date().toISOString(),
       };
 
-      updatedMessage = encodeApplicationMessage(existingParsed.coverLetter, interviewDetails);
+      updatedMessage = encodeApplicationMessage(existingParsed.coverLetter, interviewDetails, existingParsed.feedback);
+    } else if (status === "COMPLETED") {
+      const rating = Number(formData.get("rating")) || 5;
+      const mentorFeedback = (formData.get("mentorFeedback") as string | null) || "Successfully completed internship milestones and industry deliverables.";
+      const grade = (formData.get("grade") as string | null) || "Outstanding (A+)";
+      const certRef = `CERT-INT-${Date.now().toString(36).toUpperCase()}`;
+
+      const existingParsed = parseApplicationMessage(currentApp?.message);
+      const feedback = {
+        rating,
+        mentorFeedback,
+        completionDate: new Date().toISOString(),
+        grade,
+        certificateRef: certRef,
+      };
+
+      updatedMessage = encodeApplicationMessage(existingParsed.coverLetter, existingParsed.interview, feedback);
     }
 
     const updatedApp = await prisma.internshipApplication.update({
       where: { id: appId },
       data: {
         status,
-        ...(status === "INTERVIEW" ? { message: updatedMessage } : {}),
+        ...(status === "INTERVIEW" || status === "COMPLETED" ? { message: updatedMessage } : {}),
       },
       include: {
         student: { select: { id: true, email: true, name: true } },
@@ -210,6 +226,29 @@ export async function updateApplicationStatus(
         },
       },
     });
+
+    // If marked COMPLETED, automatically mint a verified PortfolioItem for the student!
+    if (status === "COMPLETED") {
+      const companyName =
+        updatedApp.listing.company.profile?.companyName ||
+        updatedApp.listing.company.name ||
+        "Industry Partner";
+      const rating = Number(formData.get("rating")) || 5;
+      const mentorFeedback = (formData.get("mentorFeedback") as string | null) || "Successfully completed internship milestones.";
+      const grade = (formData.get("grade") as string | null) || "Outstanding (A+)";
+
+      await prisma.portfolioItem.create({
+        data: {
+          studentId: updatedApp.studentId,
+          type: "INTERNSHIP",
+          title: `Industry Internship: ${updatedApp.listing.title}`,
+          description: `${mentorFeedback} · Grade: ${grade} (${rating}/5 Stars)`,
+          issuer: companyName,
+          year: new Date().getFullYear(),
+          verified: true,
+        },
+      });
+    }
 
     // Send email notification to student
     if (updatedApp.student?.email) {
@@ -234,6 +273,7 @@ export async function updateApplicationStatus(
     }
 
     revalidatePath("/internships");
+    revalidatePath("/portfolio");
     revalidatePath("/dashboard");
     return { success: true };
   } catch (err) {

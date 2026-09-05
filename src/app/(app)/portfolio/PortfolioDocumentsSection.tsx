@@ -12,6 +12,8 @@ import {
   Loader2,
   CheckCircle2,
   FileCheck,
+  ShieldCheck,
+  Filter,
 } from "lucide-react";
 import { Badge, Card, type BadgeTone } from "@/components/ui";
 import { uploadDocumentAction, deleteDocumentAction } from "@/app/(app)/profile/actions";
@@ -35,25 +37,37 @@ export default function PortfolioDocumentsSection({
 }: PortfolioDocumentsSectionProps) {
   const [isUploadOpen, setIsUploadOpen] = useState(false);
   const [isDeletingId, setIsDeletingId] = useState<string | null>(null);
+  const [selectedFilter, setSelectedFilter] = useState<string>("ALL");
 
   const [uploadPending, startUploadTransition] = useTransition();
   const [uploadError, setUploadError] = useState<string | null>(null);
   const [uploadSuccess, setUploadSuccess] = useState(false);
 
   const isResume = (doc: DocumentItem) => {
-    return (
-      doc.type?.toLowerCase().includes("resume") ||
-      doc.name?.toLowerCase().includes("resume") ||
-      doc.type?.toLowerCase().includes("cv")
-    );
+    const t = doc.type?.toLowerCase() || "";
+    const n = doc.name?.toLowerCase() || "";
+    return t.includes("resume") || n.includes("resume") || t.includes("cv") || n.includes("cv");
   };
 
   const getDocBadgeTone = (doc: DocumentItem): BadgeTone => {
+    const t = doc.type?.toLowerCase() || "";
     if (isResume(doc)) return "indigo";
-    if (doc.type?.toLowerCase().includes("cert")) return "emerald";
-    if (doc.type?.toLowerCase().includes("transcript")) return "amber";
+    if (t.includes("cert")) return "emerald";
+    if (t.includes("internship") || t.includes("report")) return "blue";
+    if (t.includes("transcript") || t.includes("academic") || t.includes("marksheet")) return "amber";
     return "gray";
   };
+
+  const filteredDocuments = documents.filter((d) => {
+    if (selectedFilter === "ALL") return true;
+    const t = d.type?.toLowerCase() || "";
+    if (selectedFilter === "RESUME") return isResume(d);
+    if (selectedFilter === "CERTIFICATE") return t.includes("cert");
+    if (selectedFilter === "INTERNSHIP_REPORT") return t.includes("internship") || t.includes("report");
+    if (selectedFilter === "ACADEMIC_RECORD")
+      return t.includes("transcript") || t.includes("academic") || t.includes("marksheet");
+    return true;
+  });
 
   const handleDelete = async (docId: string) => {
     if (!confirm("Are you sure you want to delete this document?")) return;
@@ -125,18 +139,49 @@ export default function PortfolioDocumentsSection({
         )}
       </div>
 
+      {/* Document Type Filter Bar */}
+      {documents.length > 0 && (
+        <div className="flex flex-wrap items-center gap-1.5 border-b border-border-muted/70 bg-slate-50/50 px-5 py-2.5 dark:bg-slate-800/30">
+          <span className="text-[11px] font-bold uppercase tracking-wider text-slate-400 dark:text-slate-500 mr-1 flex items-center gap-1">
+            <Filter className="size-3" /> Filter:
+          </span>
+          {[
+            { id: "ALL", label: `All (${documents.length})` },
+            { id: "RESUME", label: "Resumes / CVs" },
+            { id: "CERTIFICATE", label: "Certifications" },
+            { id: "INTERNSHIP_REPORT", label: "Internship Reports" },
+            { id: "ACADEMIC_RECORD", label: "Academic Records / Transcripts" },
+          ].map((tab) => (
+            <button
+              key={tab.id}
+              type="button"
+              onClick={() => setSelectedFilter(tab.id)}
+              className={`rounded-lg px-2.5 py-1 text-xs font-semibold transition-all cursor-pointer ${
+                selectedFilter === tab.id
+                  ? "bg-indigo-600 text-white shadow-xs"
+                  : "bg-surface text-slate-600 hover:bg-slate-100 dark:text-slate-300 dark:hover:bg-slate-700/60"
+              }`}
+            >
+              {tab.label}
+            </button>
+          ))}
+        </div>
+      )}
+
       {/* Content */}
       <div className="p-5">
-        {documents.length === 0 ? (
+        {filteredDocuments.length === 0 ? (
           <div className="flex flex-col items-center justify-center rounded-xl border border-dashed border-border-muted py-8 text-center">
             <div className="flex size-12 items-center justify-center rounded-full bg-slate-100 dark:bg-slate-800 text-slate-400">
               <FileText className="size-6" />
             </div>
             <p className="mt-3 text-sm font-medium text-slate-700 dark:text-slate-300">
-              No documents uploaded yet
+              {documents.length === 0 ? "No documents uploaded yet" : "No documents in this category"}
             </p>
             <p className="mt-1 max-w-sm text-xs text-slate-400 dark:text-slate-500">
-              Upload your resume and certificates to strengthen your digital portfolio and verified profile.
+              {documents.length === 0
+                ? "Upload your resume, certificates, internship reports, and academic records to strengthen your digital portfolio."
+                : "Try selecting 'All' or uploading a document for this category."}
             </p>
             {canUpload && (
               <button
@@ -144,13 +189,13 @@ export default function PortfolioDocumentsSection({
                 onClick={() => setIsUploadOpen(true)}
                 className="mt-4 inline-flex items-center gap-2 rounded-xl bg-indigo-600 px-4 py-2 text-xs font-semibold text-white transition hover:bg-indigo-700 cursor-pointer"
               >
-                <Upload className="size-3.5" /> Upload Resume / Document
+                <Upload className="size-3.5" /> Upload Document
               </button>
             )}
           </div>
         ) : (
           <div className="space-y-2.5">
-            {documents.map((d) => {
+            {filteredDocuments.map((d) => {
               const resumeFlag = isResume(d);
               return (
                 <div
@@ -195,6 +240,10 @@ export default function PortfolioDocumentsSection({
                         <Badge tone={getDocBadgeTone(d)}>
                           {resumeFlag ? "Resume / CV" : d.type}
                         </Badge>
+                        <span className="inline-flex items-center gap-1 rounded-md bg-emerald-50 px-1.5 py-0.5 text-[10px] font-semibold text-emerald-700 dark:bg-emerald-950/50 dark:text-emerald-300 border border-emerald-200/60 dark:border-emerald-800/60">
+                          <ShieldCheck className="size-3 text-emerald-600" />
+                          Tamper-Verified
+                        </span>
                       </div>
                       <div className="mt-0.5 flex items-center gap-2 text-xs text-slate-400 dark:text-slate-500">
                         <span>
@@ -287,8 +336,9 @@ export default function PortfolioDocumentsSection({
                   className="mt-1 block w-full rounded-xl border border-border-muted bg-surface px-3 py-2 text-sm text-slate-900 dark:text-slate-100 focus:border-indigo-500 focus:outline-none cursor-pointer"
                 >
                   <option value="Resume">Resume / CV</option>
-                  <option value="Certificate">Certificate</option>
-                  <option value="Academic Transcript">Academic Transcript</option>
+                  <option value="Certificate">Certificate (Course / Hackathon / Training)</option>
+                  <option value="Internship Report">Internship Report / Completion Record</option>
+                  <option value="Academic Record">Academic Record / Transcript / Marksheet</option>
                   <option value="Letter of Recommendation">Letter of Recommendation</option>
                   <option value="Other">Other Document</option>
                 </select>

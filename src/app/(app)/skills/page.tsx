@@ -6,6 +6,7 @@ import { prisma } from "@/lib/prisma";
 import { Badge, Card, EmptyState, PageHeader, type BadgeTone } from "@/components/ui";
 import { SkillDecayEngine, type SkillEntry } from "./SkillDecayEngine";
 import SkillQuestionnaire from "./SkillQuestionnaire";
+import SkillMappingHub from "./SkillMappingHub";
 
 const DECAY_TONE: Record<string, BadgeTone> = {
   ACTIVE: "green",
@@ -19,11 +20,26 @@ export default async function SkillsPage() {
   if (!user) redirect("/login");
 
   if (user.role === "STUDENT") {
-    const assessments = await prisma.skillAssessment.findMany({
-      where: { studentId: user.id },
-      orderBy: { skillName: "asc" },
-      take: 50,
-    });
+    const [assessments, learningPrograms] = await Promise.all([
+      prisma.skillAssessment.findMany({
+        where: { studentId: user.id },
+        orderBy: { skillName: "asc" },
+        take: 50,
+      }),
+      prisma.learningProgram.findMany({
+        select: {
+          id: true,
+          title: true,
+          description: true,
+          programType: true,
+          skills: true,
+          duration: true,
+          company: { select: { name: true, profile: { select: { companyName: true } } } },
+        },
+        take: 12,
+        orderBy: { createdAt: "desc" },
+      }),
+    ]);
 
     const skills: SkillEntry[] = assessments.map((a) => ({
       id: a.id,
@@ -36,11 +52,11 @@ export default async function SkillsPage() {
     const selected = assessments.map((a) => a.skillName);
 
     return (
-      <div className="mx-auto max-w-6xl">
+      <div className="mx-auto max-w-6xl space-y-8">
         <PageHeader
           icon={ClipboardCheck}
-          title="Skill Radar & Freshness"
-          subtitle="Track verified proficiency against badge decay and refresh skills with calibrated diagnostic assessments."
+          title="Skill Radar, Mapping & Career Guidance"
+          subtitle="Track verified proficiency against badge decay, map your skill profile to target industries and job roles, and bridge skill gaps."
           actions={
             <Link
               href="/assessments"
@@ -51,17 +67,49 @@ export default async function SkillsPage() {
             </Link>
           }
         />
-        <SkillDecayEngine initialSkills={skills} />
 
-        <Card className="mt-6 p-5">
+        {/* 1. Skill Mapping & Career Guidance Hub */}
+        <SkillMappingHub
+          assessedSkills={assessments.map((a) => ({
+            id: a.id,
+            skillName: a.skillName,
+            score: a.score,
+            decayStatus: a.decayStatus,
+          }))}
+          learningPrograms={learningPrograms.map((lp) => ({
+            id: lp.id,
+            title: lp.title,
+            description: lp.description,
+            programType: lp.programType,
+            companyName: lp.company.profile?.companyName || lp.company.name,
+            skills: lp.skills,
+            duration: lp.duration,
+          }))}
+        />
+
+        {/* 2. Skill Decay Engine & Radar */}
+        <div className="pt-4 border-t border-border-muted">
+          <div className="mb-4">
+            <h3 className="text-base font-bold text-slate-900 dark:text-slate-100">
+              Temporal Skill Freshness & Decay Radar
+            </h3>
+            <p className="text-xs text-slate-500">
+              Technology competencies naturally decay over time. Commit code and retake diagnostic assessments to keep badges ACTIVE.
+            </p>
+          </div>
+          <SkillDecayEngine initialSkills={skills} />
+        </div>
+
+        {/* 3. Skill Questionnaire */}
+        <Card className="p-5">
           <div className="flex items-start gap-3">
             <div className="mt-0.5 flex size-10 shrink-0 items-center justify-center rounded-xl bg-indigo-50 text-indigo-600 dark:bg-indigo-500/15 dark:text-indigo-400">
               <ListChecks className="size-5" />
             </div>
             <div>
-              <h2 className="text-lg font-bold text-slate-900 dark:text-slate-100">Skill Questionnaire</h2>
+              <h2 className="text-lg font-bold text-slate-900 dark:text-slate-100">Self-Assessed Skill Questionnaire</h2>
               <p className="mt-1 text-sm text-slate-500 dark:text-slate-400">
-                Tell us what you know to shape your verified skill profile and recommendations.
+                Update your self-reported skills to shape your profile and personalized recommendations.
               </p>
             </div>
           </div>

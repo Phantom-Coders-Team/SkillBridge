@@ -6,14 +6,23 @@ export interface InterviewDetails {
   scheduledAt?: string;
 }
 
+export interface InternshipFeedback {
+  rating: number;
+  mentorFeedback: string;
+  completionDate: string;
+  grade?: string;
+  certificateRef?: string;
+}
+
 export interface ParsedApplicationMessage {
   coverLetter?: string;
   interview?: InterviewDetails;
+  feedback?: InternshipFeedback;
 }
 
 /**
  * Parses the application message field, which can be either a plain text cover letter
- * or a JSON string containing both coverLetter and interview schedule details.
+ * or a JSON string containing coverLetter, interview schedule, and mentor feedback.
  */
 export function parseApplicationMessage(raw: string | null | undefined): ParsedApplicationMessage {
   if (!raw) return {};
@@ -24,6 +33,7 @@ export function parseApplicationMessage(raw: string | null | undefined): ParsedA
       return {
         coverLetter: parsed.coverLetter || undefined,
         interview: parsed.interview || undefined,
+        feedback: parsed.feedback || undefined,
       };
     }
   } catch {
@@ -33,15 +43,17 @@ export function parseApplicationMessage(raw: string | null | undefined): ParsedA
 }
 
 /**
- * Encodes coverLetter and interview details into a single serialized message string
+ * Encodes coverLetter, interview details, and feedback into a single serialized message string
  */
 export function encodeApplicationMessage(
   coverLetter?: string | null,
-  interview?: InterviewDetails | null
+  interview?: InterviewDetails | null,
+  feedback?: InternshipFeedback | null
 ): string {
   return JSON.stringify({
     coverLetter: coverLetter || null,
     interview: interview || null,
+    feedback: feedback || null,
   });
 }
 

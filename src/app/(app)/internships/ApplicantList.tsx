@@ -72,11 +72,27 @@ export interface Applicant {
 
 function StatusPill({ status }: { status: string }) {
   const s = status.toUpperCase();
+  if (s === "COMPLETED") {
+    return (
+      <span className="inline-flex items-center gap-1 rounded-full bg-indigo-100 px-2 py-0.5 text-[10px] font-bold text-indigo-800 dark:bg-indigo-950/80 dark:text-indigo-300">
+        <Award className="size-3 text-indigo-600 dark:text-indigo-400" />
+        Completed & Verified
+      </span>
+    );
+  }
+  if (s === "IN_PROGRESS") {
+    return (
+      <span className="inline-flex items-center gap-1 rounded-full bg-blue-100 px-2 py-0.5 text-[10px] font-bold text-blue-800 dark:bg-blue-950/80 dark:text-blue-300">
+        <Clock className="size-3 text-blue-600 dark:text-blue-400 animate-spin" />
+        In Progress
+      </span>
+    );
+  }
   if (s === "APPROVED" || s === "ACCEPTED" || s === "OFFERED") {
     return (
       <span className="inline-flex items-center gap-1 rounded-full bg-emerald-100 px-2 py-0.5 text-[10px] font-bold text-emerald-800 dark:bg-emerald-950/80 dark:text-emerald-300">
         <Award className="size-3 text-emerald-600 dark:text-emerald-400" />
-        Approved
+        Approved & Offered
       </span>
     );
   }
@@ -372,6 +388,29 @@ export default function ApplicantList({
                   </div>
                 )}
 
+                {/* 6.5. Completed Internship & Mentor Feedback Card */}
+                {parsed.feedback && (
+                  <div className="mt-3 rounded-xl border border-indigo-200 bg-indigo-50/60 p-3 text-xs dark:border-indigo-900/60 dark:bg-indigo-950/40 space-y-1.5">
+                    <div className="flex flex-wrap items-center justify-between gap-2 font-semibold text-indigo-950 dark:text-indigo-200">
+                      <span className="flex items-center gap-1.5">
+                        <Award className="size-3.5 text-indigo-600 dark:text-indigo-400" />
+                        <span>Internship Completed · {parsed.feedback.grade || "Outstanding"}</span>
+                      </span>
+                      <span className="rounded-md bg-indigo-200/80 px-2 py-0.5 text-[10px] font-bold text-indigo-900 dark:bg-indigo-900 dark:text-indigo-100">
+                        ⭐ {parsed.feedback.rating}/5 Stars
+                      </span>
+                    </div>
+                    <p className="text-[11px] text-slate-700 dark:text-slate-300 italic">
+                      &quot;{parsed.feedback.mentorFeedback}&quot;
+                    </p>
+                    {parsed.feedback.certificateRef && (
+                      <div className="text-[10px] font-mono text-indigo-600 dark:text-indigo-400 pt-1">
+                        Verified Credential ID: {parsed.feedback.certificateRef}
+                      </div>
+                    )}
+                  </div>
+                )}
+
                 {/* 7. Action Buttons (Status transitions & Interview scheduler) */}
                 <div className="mt-3 flex flex-wrap items-center gap-2 border-t border-slate-100 pt-2.5 dark:border-slate-800">
                   <ApplicationActions
@@ -379,6 +418,7 @@ export default function ApplicantList({
                     currentStatus={app.status}
                     studentName={app.student.name}
                     existingInterview={interview}
+                    existingFeedback={parsed.feedback}
                   />
                 </div>
               </div>

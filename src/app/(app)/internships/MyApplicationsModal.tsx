@@ -1,6 +1,7 @@
 "use client";
 
 import { useState } from "react";
+import Link from "next/link";
 import {
   Briefcase,
   Building2,
@@ -14,6 +15,9 @@ import {
   Award,
   Zap,
   Video,
+  PlayCircle,
+  Star,
+  ScrollText,
 } from "lucide-react";
 import { Badge, Card, EmptyState, type BadgeTone } from "@/components/ui";
 import { calculateSkillMatch } from "@/lib/matchingEngine";
@@ -45,6 +49,8 @@ const STAGES = [
   { key: "SHORTLISTED", label: "Shortlisted", icon: CheckCircle2 },
   { key: "INTERVIEW", label: "Interview", icon: Calendar },
   { key: "OFFERED", label: "Offered", icon: Award },
+  { key: "IN_PROGRESS", label: "In Progress", icon: PlayCircle },
+  { key: "COMPLETED", label: "Completed", icon: Award },
 ];
 
 const STATUS_ORDER: Record<string, number> = {
@@ -57,6 +63,8 @@ const STATUS_ORDER: Record<string, number> = {
   ACCEPTED: 3,
   APPROVED: 3,
   SELECTED: 3,
+  IN_PROGRESS: 4,
+  COMPLETED: 5,
 };
 
 export function MyApplicationsModal({
@@ -169,8 +177,18 @@ export function MyApplicationsModal({
 
                         {/* Status & Match Badges */}
                         <div className="shrink-0 flex items-center gap-2 flex-wrap">
-                          {normalizedStatus === "APPROVED" || normalizedStatus === "OFFERED" || normalizedStatus === "ACCEPTED" ? (
-                            <span className="inline-flex items-center gap-1 px-2.5 py-1 rounded-full text-xs font-bold bg-emerald-100 text-emerald-800 dark:bg-emerald-950/80 dark:text-emerald-300 border border-emerald-500/40 animate-pulse">
+                          {normalizedStatus === "COMPLETED" ? (
+                            <span className="inline-flex items-center gap-1 px-2.5 py-1 rounded-full text-xs font-bold bg-indigo-100 text-indigo-800 dark:bg-indigo-950/80 dark:text-indigo-300 border border-indigo-500/40">
+                              <Award className="size-3 text-indigo-600 dark:text-indigo-400" />
+                              Internship Completed
+                            </span>
+                          ) : normalizedStatus === "IN_PROGRESS" ? (
+                            <span className="inline-flex items-center gap-1 px-2.5 py-1 rounded-full text-xs font-bold bg-blue-100 text-blue-800 dark:bg-blue-950/80 dark:text-blue-300 border border-blue-500/40 animate-pulse">
+                              <PlayCircle className="size-3 text-blue-600 dark:text-blue-400" />
+                              Active Work
+                            </span>
+                          ) : normalizedStatus === "APPROVED" || normalizedStatus === "OFFERED" || normalizedStatus === "ACCEPTED" ? (
+                            <span className="inline-flex items-center gap-1 px-2.5 py-1 rounded-full text-xs font-bold bg-emerald-100 text-emerald-800 dark:bg-emerald-950/80 dark:text-emerald-300 border border-emerald-500/40">
                               <Award className="size-3 text-emerald-600 dark:text-emerald-400" />
                               Offer Accepted
                             </span>
@@ -203,7 +221,7 @@ export function MyApplicationsModal({
                         </div>
                       </div>
 
-                      {/* 4-Step Recruitment Status Stepper */}
+                      {/* 6-Step Recruitment & Internship Lifecycle Stepper */}
                       <div className="my-4 pt-2">
                         {isRejected ? (
                           <div className="flex items-center gap-3 p-3 rounded-xl bg-rose-50 dark:bg-rose-950/40 border border-rose-200 dark:border-rose-900 text-rose-700 dark:text-rose-300">
@@ -222,7 +240,7 @@ export function MyApplicationsModal({
                             <div
                               className="absolute top-4 left-6 h-0.5 bg-emerald-500 transition-all duration-500 -z-0"
                               style={{
-                                width: `calc(${(currentIdx / 3) * 100}% - 24px)`,
+                                width: `calc(${(currentIdx / 5) * 100}% - 24px)`,
                               }}
                             />
 
@@ -307,6 +325,58 @@ export function MyApplicationsModal({
                                 <span className="font-semibold text-slate-900 dark:text-slate-100">Instructions:</span> {interview.notes}
                               </div>
                             )}
+                          </div>
+                        );
+                      })()}
+
+                      {/* Mentor Feedback & Verified Completion Record */}
+                      {(() => {
+                        const parsed = parseApplicationMessage(app.message);
+                        const feedback = parsed.feedback;
+                        if (!feedback) return null;
+
+                        return (
+                          <div className="my-3 rounded-xl border border-emerald-200 bg-emerald-50/80 p-3.5 text-xs dark:border-emerald-900/60 dark:bg-emerald-950/40 space-y-2">
+                            <div className="flex flex-wrap items-center justify-between gap-2 font-bold text-emerald-950 dark:text-emerald-200">
+                              <span className="flex items-center gap-1.5 text-xs sm:text-sm">
+                                <Award className="size-4 text-emerald-600 dark:text-emerald-400" />
+                                Internship Record & Mentor Feedback: {feedback.grade || "Outstanding"}
+                              </span>
+                              <div className="flex items-center gap-1">
+                                {[1, 2, 3, 4, 5].map((s) => (
+                                  <Star
+                                    key={s}
+                                    className={`size-3.5 ${
+                                      s <= feedback.rating
+                                        ? "fill-amber-400 text-amber-400"
+                                        : "text-slate-300 dark:text-slate-600"
+                                    }`}
+                                  />
+                                ))}
+                                <span className="ml-1 text-[11px] font-bold text-emerald-900 dark:text-emerald-200">
+                                  {feedback.rating}/5
+                                </span>
+                              </div>
+                            </div>
+
+                            <p className="italic text-slate-700 dark:text-slate-300 text-xs bg-white/70 dark:bg-slate-900/50 p-2.5 rounded-lg border border-emerald-100 dark:border-emerald-900/40">
+                              &quot;{feedback.mentorFeedback}&quot;
+                            </p>
+
+                            <div className="flex flex-wrap items-center justify-between gap-2 pt-1">
+                              {feedback.certificateRef && (
+                                <span className="font-mono text-[10px] text-emerald-700 dark:text-emerald-300">
+                                  Credential ID: {feedback.certificateRef}
+                                </span>
+                              )}
+                              <Link
+                                href="/portfolio"
+                                className="inline-flex items-center gap-1 text-[11px] font-bold text-indigo-700 hover:text-indigo-900 dark:text-indigo-300 dark:hover:text-indigo-100 underline"
+                              >
+                                <ScrollText className="size-3" />
+                                <span>View Verified on My Portfolio</span>
+                              </Link>
+                            </div>
                           </div>
                         );
                       })()}

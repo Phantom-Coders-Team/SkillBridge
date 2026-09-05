@@ -8,6 +8,7 @@ import {
   CheckCircle2,
   Radar,
   ArrowRight,
+  Compass,
 } from "lucide-react";
 import { getCurrentUser } from "@/lib/auth";
 import { prisma } from "@/lib/prisma";
@@ -60,13 +61,13 @@ export default async function AssessmentsPage() {
         title="Student Skill Assessments"
         subtitle="Standardized questionnaire evaluations, skill gap analysis, and industry competency verification."
         actions={
-          <div className="flex items-center gap-3">
+          <div className="flex flex-wrap items-center gap-2.5">
             <Link
               href="/skills"
-              className="inline-flex h-10 items-center gap-2 rounded-xl border border-border-muted bg-surface px-3.5 text-xs font-semibold text-slate-700 dark:text-slate-300 hover:bg-slate-50 dark:hover:bg-slate-800 transition-colors"
+              className="inline-flex h-10 items-center gap-2 rounded-xl border border-indigo-200 bg-indigo-50/70 dark:border-indigo-800 dark:bg-indigo-950/40 px-3.5 text-xs font-semibold text-indigo-700 dark:text-indigo-300 hover:bg-indigo-100 transition-colors"
             >
-              <Radar className="size-4 text-indigo-500" />
-              <span>Skill Radar & Freshness</span>
+              <Compass className="size-4 text-indigo-600 dark:text-indigo-400" />
+              <span>Skill Mapping & Career Guidance</span>
             </Link>
             <SkillQuizModal />
           </div>
@@ -111,6 +112,32 @@ export default async function AssessmentsPage() {
               </p>
             </div>
           </Card>
+        </div>
+      )}
+
+      {/* Direct Career Guidance Callout Banner */}
+      {myAssessments.length > 0 && (
+        <div className="flex flex-col sm:flex-row items-center justify-between gap-3 p-4 rounded-2xl border border-indigo-200 bg-gradient-to-r from-indigo-50/70 via-white to-indigo-50/40 dark:border-indigo-900/60 dark:from-indigo-950/40 dark:via-surface dark:to-indigo-950/20 shadow-xs">
+          <div className="flex items-center gap-3">
+            <div className="flex size-9 shrink-0 items-center justify-center rounded-xl bg-indigo-600 text-white font-bold">
+              <Compass className="size-5" />
+            </div>
+            <div>
+              <p className="text-xs font-bold text-slate-900 dark:text-slate-100">
+                Personalized Career Guidance & Skill Mapping Available
+              </p>
+              <p className="text-[11px] text-slate-500 dark:text-slate-400">
+                Your assessed competencies have been mapped to target industry sectors, high-growth job roles, and specific learning programs.
+              </p>
+            </div>
+          </div>
+          <Link
+            href="/skills"
+            className="inline-flex shrink-0 items-center gap-1.5 rounded-xl bg-indigo-600 px-3.5 py-2 text-xs font-bold text-white hover:bg-indigo-700 shadow-2xs transition"
+          >
+            <span>View Career Guidance Hub</span>
+            <ArrowRight className="size-3.5" />
+          </Link>
         </div>
       )}
 
