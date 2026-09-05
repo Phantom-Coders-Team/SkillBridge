@@ -3,6 +3,7 @@
 import { useState } from "react";
 import { Sparkles, GraduationCap, Building2, BookOpen, ShieldCheck, ChevronUp, ChevronDown, Check } from "lucide-react";
 import type { Role } from "@/lib/types";
+import { ALL_INDUSTRY_PARTNERS } from "@/lib/partnersData";
 
 interface PersonaOption {
   key: "student" | "industry" | "academician" | "institution";
@@ -79,10 +80,32 @@ export function DemoSwitcher({ currentRole }: { currentRole?: Role }) {
     }
   };
 
+  const handleSwitchEmail = async (email: string, keyName: string) => {
+    setSwitching(keyName);
+    try {
+      const res = await fetch("/api/demo-switch", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ email }),
+      });
+
+      if (res.ok) {
+        window.location.href = "/dashboard";
+      } else {
+        console.error("Failed to switch persona");
+      }
+    } catch (err) {
+      console.error("Demo switch error:", err);
+    } finally {
+      setSwitching(null);
+      setIsOpen(false);
+    }
+  };
+
   return (
     <div className="fixed bottom-4 right-4 z-50 flex flex-col items-end gap-2 font-sans select-none">
       {isOpen && (
-        <div className="w-72 rounded-2xl border border-border-muted bg-surface/95 backdrop-blur-md p-3 shadow-2xl transition-all duration-200 animate-in fade-in slide-in-from-bottom-2">
+        <div className="w-80 rounded-2xl border border-border-muted bg-surface/95 backdrop-blur-md p-3.5 shadow-2xl transition-all duration-200 animate-in fade-in slide-in-from-bottom-2">
           <div className="flex items-center justify-between border-b border-border-muted pb-2 mb-2">
             <div className="flex items-center gap-1.5 text-xs font-bold text-indigo-600 dark:text-indigo-400">
               <Sparkles className="size-3.5" />
@@ -135,6 +158,36 @@ export function DemoSwitcher({ currentRole }: { currentRole?: Role }) {
                 </button>
               );
             })}
+          </div>
+
+          {/* Quick Switch to ANY Industry Partner */}
+          <div className="mt-2 pt-2 border-t border-border-muted">
+            <div className="flex items-center justify-between mb-1 px-1">
+              <span className="text-[10px] font-semibold text-slate-600 dark:text-slate-300 flex items-center gap-1">
+                <Building2 className="size-3 text-emerald-500" />
+                Switch to Specific Industry Partner:
+              </span>
+              <span className="text-[9px] font-bold text-emerald-600 dark:text-emerald-400">19 Partners</span>
+            </div>
+            <select
+              disabled={switching !== null}
+              onChange={(e) => {
+                if (e.target.value) {
+                  handleSwitchEmail(e.target.value, "industry");
+                }
+              }}
+              defaultValue=""
+              className="w-full text-xs rounded-lg border border-border-muted bg-surface-subtle p-1.5 text-slate-800 dark:text-slate-200 focus:outline-none focus:ring-1 focus:ring-indigo-500 cursor-pointer"
+            >
+              <option value="" disabled>
+                Select company (e.g. Google, NVIDIA, AWS)...
+              </option>
+              {ALL_INDUSTRY_PARTNERS.map((partner) => (
+                <option key={partner.email} value={partner.email}>
+                  {partner.name} ({partner.email})
+                </option>
+              ))}
+            </select>
           </div>
         </div>
       )}

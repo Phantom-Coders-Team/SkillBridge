@@ -2,11 +2,12 @@
 
 import Link from "next/link";
 import { useActionState, useState } from "react";
-import { ArrowLeft, ArrowRight, Eye, EyeOff, Loader2, Lock, Mail, Sparkles } from "lucide-react";
+import { ArrowLeft, ArrowRight, Building2, ChevronDown, ChevronUp, Eye, EyeOff, Loader2, Lock, Mail, Sparkles } from "lucide-react";
 import { loginAction, plainLoginAction } from "./actions";
 import { cn } from "@/lib/cn";
 import ThemeToggle from "@/components/ThemeToggle";
 import { SkillBridgeLogo, SkillBridgeWordmark } from "@/components/SkillBridgeLogo";
+import { ALL_INDUSTRY_PARTNERS } from "@/lib/partnersData";
 
 const DEMO_ACCOUNTS = [
   {
@@ -42,6 +43,19 @@ export default function LoginPage() {
   const [state, formAction, pending] = useActionState(loginAction, null);
   const [email, setEmail] = useState("");
   const [showPassword, setShowPassword] = useState(false);
+  const [showPartnerLogins, setShowPartnerLogins] = useState(false);
+  const [partnerSearch, setPartnerSearch] = useState("");
+
+  const filteredIndustryPartners = ALL_INDUSTRY_PARTNERS.filter((p) => {
+    if (!partnerSearch.trim()) return true;
+    const q = partnerSearch.toLowerCase();
+    return (
+      p.name.toLowerCase().includes(q) ||
+      p.domain.toLowerCase().includes(q) ||
+      p.location.toLowerCase().includes(q) ||
+      p.email.toLowerCase().includes(q)
+    );
+  });
 
   return (
     <div className="relative flex min-h-screen flex-col justify-between overflow-hidden bg-background text-foreground transition-colors duration-200">
@@ -229,6 +243,75 @@ export default function LoginPage() {
                     </button>
                   </form>
                 ))}
+              </div>
+
+              <div className="mt-3">
+                <button
+                  type="button"
+                  onClick={() => setShowPartnerLogins(!showPartnerLogins)}
+                  className="flex w-full items-center justify-between rounded-xl border border-indigo-200/80 bg-indigo-50/70 px-3.5 py-2.5 text-xs font-semibold text-indigo-700 transition-all hover:bg-indigo-100 dark:border-indigo-800/80 dark:bg-indigo-950/40 dark:text-indigo-300 dark:hover:bg-indigo-950/60 cursor-pointer"
+                >
+                  <span className="flex items-center gap-2">
+                    <Building2 className="size-4 text-indigo-600 dark:text-indigo-400" />
+                    <span>View All 19 Industry Partner Logins</span>
+                  </span>
+                  <span className="flex items-center gap-1 rounded-full bg-indigo-100 dark:bg-indigo-900/60 px-2 py-0.5 text-[10px] font-bold text-indigo-800 dark:text-indigo-200">
+                    {ALL_INDUSTRY_PARTNERS.length} Companies {showPartnerLogins ? <ChevronUp className="size-3" /> : <ChevronDown className="size-3" />}
+                  </span>
+                </button>
+
+                {showPartnerLogins && (
+                  <div className="mt-3 rounded-2xl border border-border-muted bg-surface p-3 shadow-inner max-h-80 overflow-y-auto space-y-2">
+                    <div className="flex items-center justify-between pb-1.5 border-b border-border-muted">
+                      <span className="text-[11px] font-medium text-slate-500 dark:text-slate-400">
+                        Default password for all partners: <code className="font-mono text-indigo-600 dark:text-indigo-400 font-bold">Password@123</code>
+                      </span>
+                    </div>
+
+                    <input
+                      type="text"
+                      value={partnerSearch}
+                      onChange={(e) => setPartnerSearch(e.target.value)}
+                      placeholder="Filter companies (e.g. Google, NVIDIA, AWS)..."
+                      className="w-full rounded-lg border border-border-muted bg-surface-subtle px-2.5 py-1.5 text-xs text-slate-800 dark:text-slate-200 placeholder:text-slate-400 focus:outline-none focus:ring-1 focus:ring-indigo-500"
+                    />
+
+                    <div className="space-y-1.5 pt-1">
+                      {filteredIndustryPartners.map((partner) => (
+                        <div
+                          key={partner.email}
+                          className="flex items-center justify-between rounded-xl border border-border-muted bg-surface-subtle/50 p-2 hover:bg-slate-100/80 dark:hover:bg-slate-800/60 transition-colors"
+                        >
+                          <div className="flex items-center gap-2.5 min-w-0">
+                            <span className="flex size-7 shrink-0 items-center justify-center rounded-lg bg-indigo-600 text-[10px] font-bold text-white">
+                              {partner.initials}
+                            </span>
+                            <div className="min-w-0">
+                              <p className="text-xs font-semibold text-slate-800 dark:text-slate-200 truncate">
+                                {partner.name}
+                              </p>
+                              <p className="text-[10px] text-slate-500 dark:text-slate-400 truncate">
+                                {partner.email}
+                              </p>
+                            </div>
+                          </div>
+
+                          <form action={plainLoginAction} className="shrink-0">
+                            <input type="hidden" name="email" value={partner.email} />
+                            <input type="hidden" name="password" value="Password@123" />
+                            <button
+                              type="submit"
+                              disabled={pending}
+                              className="rounded-lg bg-indigo-600 px-2.5 py-1 text-[11px] font-semibold text-white hover:bg-indigo-700 active:scale-95 transition-all shadow-xs cursor-pointer"
+                            >
+                              Sign In →
+                            </button>
+                          </form>
+                        </div>
+                      ))}
+                    </div>
+                  </div>
+                )}
               </div>
             </div>
           </div>

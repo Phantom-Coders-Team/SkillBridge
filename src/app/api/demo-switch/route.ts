@@ -28,6 +28,34 @@ const DEMO_PERSONAS: Record<string, { email: string; name: string; role: "STUDEN
 export async function POST(req: Request) {
   try {
     const body = await req.json();
+
+    if (body.email) {
+      const user = await prisma.user.findUnique({
+        where: { email: body.email },
+        select: { id: true, name: true, email: true, role: true },
+      });
+
+      if (user) {
+        const normalizedRole = normalizeRole(user.role);
+        await createSession({
+          id: user.id,
+          name: user.name,
+          email: user.email,
+          role: normalizedRole,
+        });
+
+        return NextResponse.json({
+          success: true,
+          user: {
+            id: user.id,
+            name: user.name,
+            email: user.email,
+            role: normalizedRole,
+          },
+        });
+      }
+    }
+
     const personaKey = String(body.persona || "").toLowerCase();
     const target = DEMO_PERSONAS[personaKey];
 
