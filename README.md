@@ -33,32 +33,25 @@ In India's higher education ecosystem, **over 80% of engineering graduates are d
 
 **SkillBridge** directly bridges this divide. Aligned with the **National Education Policy (NEP 2020)**, **AICTE Industry-Academia Collaboration Guidelines**, and **Digital India**, SkillBridge establishes a frictionless, multi-tenant digital bridge connecting **Students**, **Academicians/Faculty**, **Industry Partners**, and **Educational Institutions (TPOs)**.
 
-```
-                    ┌─────────────────────────┐
-                    │      SKILLBRIDGE        │
-                    │   COLLABORATION PORTAL  │
-                    └───────────┬─────────────┘
-          ┌─────────────────────┼─────────────────────┐
-          ▼                     ▼                     ▼
-┌──────────────────┐  ┌──────────────────┐  ┌──────────────────┐
-│     STUDENTS     │  │     FACULTY      │  │ 19+ ENTERPRISES  │
-│ • Proof-of-Work  │  │ • Joint Eval     │  │ • ATS Kanban     │
-│ • Public Portf.  │  │ • Lab Units      │  │ • Custom Tests   │
-│ • Skill Decay    │  │ • AI Audit       │  │ • Reverse Hire   │
-│ • PRI Score      │  │ • Sabbaticals    │  │ • Mentor Clinics │
-│ • Reverse Plcmt. │  │ • Milestones &   │  │ • e-RUPI Vouchers│
-│ • Custom Quizzes │  │   Certificates   │  │ • Scorecards     │
-└─────────┬────────┘  └─────────┬────────┘  └─────────┬────────┘
-          └─────────────────────┼─────────────────────┘
-                                ▼
-                    ┌─────────────────────────┐
-                    │      INSTITUTIONS       │
-                    │ • Yearly Placement Stats│
-                    │ • Bulk Roster Importer  │
-                    │ • NAAC/NIRF Dossier     │
-                    │ • Skill Gap Heatmaps    │
-                    │ • Accreditation Exports │
-                    └─────────────────────────┘
+```mermaid
+flowchart TD
+    classDef core fill:#4f46e5,stroke:#4338ca,stroke-width:2px,color:#fff;
+    classDef student fill:#0284c7,stroke:#0369a1,stroke-width:2px,color:#fff;
+    classDef faculty fill:#7c3aed,stroke:#6d28d9,stroke-width:2px,color:#fff;
+    classDef industry fill:#059669,stroke:#047857,stroke-width:2px,color:#fff;
+    classDef inst fill:#d97706,stroke:#b45309,stroke-width:2px,color:#fff;
+
+    SB["🎓 SkillBridge Collaboration Engine"]:::core
+
+    ST["👨‍🎓 Students<br/>• Verified Proof-of-Work<br/>• PRI Score (0-1000)<br/>• Reverse Placement<br/>• Custom Quizzes"]:::student
+    FAC["👩‍🏫 Faculty<br/>• Joint Evaluation Matrix<br/>• AI Syllabus Obsolescence<br/>• Milestone Certification<br/>• Industry Sabbaticals"]:::faculty
+    IND["🏢 19+ Corporate Partners<br/>• ATS Kanban & Scorecards<br/>• Custom Assessment Builder<br/>• Direct Candidate Outreach<br/>• Live Mentor Clinics"]:::industry
+    INS["🏛️ Institutions / TPO<br/>• AICTE/NAAC/NIRF Dossier<br/>• Bulk Student Roster CSV/XLS<br/>• Yearly Placement Trends<br/>• Skill Gap Heatmaps"]:::inst
+
+    ST <-->|"Code Artifacts & Proposals ⮂ Verified PRI & Job Pitches"| SB
+    FAC <-->|"Curriculum Patches & Review ⮂ Dual Grading & Lab Units"| SB
+    IND <-->|"Engineering Challenges & Quizzes ⮂ Verified Top Talent & Hires"| SB
+    INS <-->|"Cohort Enrollment ⮂ Accreditation Dossiers & Placement Data"| SB
 ```
 
 ---
@@ -74,6 +67,30 @@ A dynamic, tamper-resistant composite score that replaces static CGPA with conti
 - **Mentorship & Office Hours:** Up to 100 pts (Active participation in 1:1 clinics)
 - **Industry Challenge Solves:** Up to 50 pts (Micro-consultancies, capstones & hackathons)
 
+```mermaid
+flowchart LR
+    classDef input fill:#f8fafc,stroke:#cbd5e1,stroke-width:1.5px,color:#0f172a;
+    classDef engine fill:#4f46e5,stroke:#3730a3,stroke-width:2px,color:#fff;
+    classDef gate fill:#0284c7,stroke:#0369a1,stroke-width:2px,color:#fff;
+    classDef unlock fill:#059669,stroke:#047857,stroke-width:2px,color:#fff;
+    classDef upskill fill:#d97706,stroke:#b45309,stroke-width:2px,color:#fff;
+
+    subgraph Inputs ["Multidimensional Competency Signals"]
+        I1["Skill Diagnostics<br/>(Max 300 pts)"]:::input
+        I2["Verified Projects<br/>(Max 250 pts)"]:::input
+        I3["Dual-Signed PoW<br/>(Max 150 pts)"]:::input
+        I4["Joint Evaluation<br/>(Max 150 pts)"]:::input
+        I5["Mentorship Clinics<br/>(Max 100 pts)"]:::input
+        I6["Industry Challenges<br/>(Max 50 pts)"]:::input
+    end
+
+    Inputs --> Engine["🎯 PRI Calculation Engine<br/>Composite Score: 0 – 1000"]:::engine
+    Engine --> Check{"PRI Score ≥ 850?"}:::gate
+
+    Check -- "YES (Top Tier)" --> RP["🚀 Reverse Campus Placement<br/>• Profile Discovered by Recruiters<br/>• Direct Stipend & CTC Job Pitches<br/>• Bypasses Traditional Resume Queues"]:::unlock
+    Check -- "NO (In Progress)" --> US["🎯 Targeted Up-skilling Tracks<br/>• 5 High-Growth Sector Matching<br/>• Pinpointed Competency Gaps<br/>• 1:1 Code Clinics & Office Hours"]:::upskill
+```
+
 ### 2. 🔄 Reverse Campus Placement (Unlock at PRI ≥ 850)
 Flips traditional campus hiring upside down. Students with **PRI ≥ 850** become discoverable in the **Reverse Placement Marketplace**, where verified corporate recruiters send personalized job pitches with stipend, role details, and compensation offers directly to top talent.
 
@@ -81,6 +98,39 @@ Flips traditional campus hiring upside down. Students with **PRI ≥ 850** becom
 - Every completed milestone undergoes a rigorous **Dual Sign-off Workflow** (Academic Advisor + Enterprise Mentor).
 - Validated records are hashed with SHA-256 and committed into a simulated **Consortium Blockchain Ledger** (Block Hash, Merkle Root, Previous Hash, Validator Nodes).
 - Generates **Public QR Badges** that recruiters can scan anywhere to independently verify authentic student output via the public verification endpoint (`/verify/[hash]`).
+
+```mermaid
+flowchart TD
+    classDef artifact fill:#f8fafc,stroke:#94a3b8,stroke-width:1.5px,color:#0f172a;
+    classDef dual fill:#7c3aed,stroke:#6d28d9,stroke-width:2px,color:#fff;
+    classDef chain fill:#4f46e5,stroke:#3730a3,stroke-width:2px,color:#fff;
+    classDef trust fill:#059669,stroke:#047857,stroke-width:2px,color:#fff;
+
+    StudentWork["💻 Student Project Artifacts<br/>(Pull Requests, Code Commits, Architecture Docs)"]:::artifact
+
+    subgraph DualSignOff ["Dual Cryptographic Sign-Off Matrix"]
+        FacultySign["👩‍🏫 Academic Sign-Off<br/>• Algorithmic Rigor<br/>• System Design Fundamentals"]:::dual
+        IndustrySign["🏢 Industry Mentor Sign-Off<br/>• Production Quality Code<br/>• Enterprise Test Coverage"]:::dual
+    end
+
+    subgraph Ledger ["Consortium Blockchain Ledger"]
+        SHA["SHA-256 Block Header Hash"]:::chain
+        Merkle["Merkle Tree Root Calculation"]:::chain
+        Nodes["4-Node Validator Consensus<br/>(Academic + Enterprise Nodes)"]:::chain
+    end
+
+    subgraph PublicTrust ["Public Trust & Verification Gateway"]
+        QR["Public Dynamic QR Code Badge"]:::trust
+        Endpoint["Recruiter Verification URL<br/>/verify/[publicToken]"]:::trust
+    end
+
+    StudentWork --> FacultySign & IndustrySign
+    FacultySign & IndustrySign --> SHA
+    SHA --> Merkle
+    Merkle --> Nodes
+    Nodes --> QR
+    QR --> Endpoint
+```
 
 ### 4. 📂 Public Verifiable Digital Portfolio & Document Vault (`/portfolio/[id]`)
 - **Direct Recruiter Access:** Public, shareable profile link (`/portfolio/[userId]`) allowing recruiters to instantly inspect real pull requests, project architecture, and verified credentials.
@@ -113,6 +163,18 @@ Flips traditional campus hiring upside down. Students with **PRI ≥ 850** becom
 - **Interviewer Scorecard Modal:** Corporate interviewers record structured quantitative scores (1–5 stars) and qualitative evaluation notes directly on the candidate's application record.
 - **Automated Digital Credential Minting:** Marking an internship as completed automatically mints an authenticated, verified credential directly onto the student's **Digital Portfolio** (`/portfolio`), immediately boosting their **Placement Readiness Index (PRI)**.
 
+```mermaid
+stateDiagram-v2
+    [*] --> APPLIED: Student Applies / Matched via Sector Engine
+    APPLIED --> SHORTLISTED: Recruiter Screen via Kanban or Bulk Shortlist Bar
+    SHORTLISTED --> INTERVIEW: Schedule Technical & HR Evaluation
+    INTERVIEW --> OFFERED: Interviewer Scorecard Submitted (1–5★ + Notes)
+    INTERVIEW --> REJECTED: Candidate Below Passing Threshold
+    OFFERED --> IN_PROGRESS: Candidate Accepts & Onboarding Begins
+    IN_PROGRESS --> COMPLETED: Mentor Final Review & Evaluation Submitted
+    COMPLETED --> [*]: Verified Credential Minted to Portfolio & PRI Boosted
+```
+
 ### 7. 🧪 Industry Custom Assessment Builder & Timed Student Quizzes (`/assessments`)
 - **Corporate Assessment Creator:** Enterprise partners can author bespoke online screening quizzes, defining title, category (Technical, Soft Skills, Aptitude), primary skill, duration in minutes, passing threshold, and multiple-choice questions with answer keys and explanations.
 - **Student Interactive Custom Quiz Modal:** Students take company-sponsored assessments with a real-time countdown timer, progress indicators, question skipping, instant scoring, answer explanations, and automated submission persistence.
@@ -123,6 +185,18 @@ Flips traditional campus hiring upside down. Students with **PRI ≥ 850** becom
   `1. Enrolled ➔ 2. Workplan Submitted ➔ 3. Midterm Review ➔ 4. Final Delivery ➔ 5. Certified`.
 - **Dual Deliverable Review:** Students submit workplan and final report links with repository artifacts; faculty evaluate progress with qualitative feedback and star ratings.
 - **Faculty Certificate Modal:** Faculty issue tamper-evident completion certificates with cryptographic SHA-256 integrity hashes, committing official academic endorsements directly to the student's verifiable profile.
+
+```mermaid
+flowchart LR
+    classDef stage fill:#f8fafc,stroke:#64748b,stroke-width:1.5px,color:#0f172a;
+    classDef active fill:#0284c7,stroke:#0369a1,stroke-width:2px,color:#fff;
+    classDef cert fill:#059669,stroke:#047857,stroke-width:2px,color:#fff;
+
+    S1["1. Enrolled<br/>Lab Unit Registration"]:::stage --> S2["2. Workplan<br/>Architecture & Scope"]:::stage
+    S2 --> S3["3. Midterm Review<br/>Code Review & Metrics"]:::active
+    S3 --> S4["4. Final Delivery<br/>Test Suite & Demo Video"]:::stage
+    S4 --> S5["5. Certified<br/>Faculty Certificate Modal<br/>(SHA-256 Cryptographic Stamp)"]:::cert
+```
 
 ### 9. 👥 Institutional Bulk Student Roster Importer (`/analytics`)
 - **CSV / Excel Drag-and-Drop Ingestion:** University TPOs and administrators can bulk onboard entire student cohorts in seconds.
@@ -198,56 +272,84 @@ Flips traditional campus hiring upside down. Students with **PRI ≥ 850** becom
 
 ```mermaid
 flowchart TB
-    subgraph ClientLayer ["Client & Experience Layer (Next.js 16 + React 19)"]
-        UI["Modern Responsive UI (Tailwind CSS v4 + Dark/Light Theme)"]
-        SplitHero["Split Screen Landing Hero (Campus vs Corp)"]
-        Switcher["Floating 1-Click Demo Switcher (All Personas + 19 Partners)"]
-        SkillMapping["Skill Mapping & Career Guidance Hub (/skills)"]
-        AtsBoard["Recruiter ATS Kanban Board & Scorecards (/internships)"]
-        CustomAssess["Custom Assessment Builder & Quiz Modal (/assessments)"]
-        FacultyTracker["Faculty Milestone Tracker & Certification (/faculty-portal)"]
-        RosterImporter["Bulk Student Roster Importer (/analytics)"]
-        AccredDossier["AICTE / NAAC / NIRF Accreditation Dossier (/analytics)"]
-        CollabClinic["Live Mentorship & Code Clinic Workspace (/mentor-slots)"]
-        DocVault["4-Way Tamper-Proof Document Vault (/portfolio)"]
-        RechartsComp["Analytics & Skill Heatmaps (Recharts)"]
-        PublicPortfolio["Public Verifiable Portfolio & Direct Resume Viewer"]
+    classDef client fill:#f1f5f9,stroke:#0284c7,stroke-width:2px,color:#0f172a;
+    classDef sec fill:#e0e7ff,stroke:#4338ca,stroke-width:2px,color:#1e1b4b;
+    classDef core fill:#ede9fe,stroke:#7c3aed,stroke-width:2px,color:#2e1065;
+    classDef ledger fill:#ecfdf5,stroke:#059669,stroke-width:2px,color:#064e3b;
+    classDef data fill:#fef3c7,stroke:#d97706,stroke-width:2px,color:#78350f;
+    classDef ext fill:#fee2e2,stroke:#dc2626,stroke-width:2px,color:#7f1d1d;
+
+    subgraph ClientLayer ["Client & Visual Experience Layer (Next.js 16 + React 19 + Tailwind v4)"]
+        UI["Modern Glassmorphic Shell & Theme Toggle"]:::client
+        SplitHero["Split-Screen Landing Hero (Campus vs Corp)"]:::client
+        DemoSwitch["Floating 1-Click Demo Persona Switcher"]:::client
+        AtsBoard["Recruiter ATS Kanban Board & Scorecard Modal (/internships)"]:::client
+        CustomQuiz["Custom Assessment Builder & Quiz Runner (/assessments)"]:::client
+        FacultyTrack["Faculty Milestone Tracker & Certificate Modal (/faculty-portal)"]:::client
+        RosterImport["Institutional Bulk Student Roster Importer (/analytics)"]:::client
+        AccredDoc["AICTE / NAAC / NIRF Accreditation Dossier (/analytics)"]:::client
+        CollabClinic["Live Mentorship & Code Clinic Workspace (/mentor-slots)"]:::client
+        DocVault["4-Way Cryptographic Document Vault (/portfolio)"]:::client
+        PublicPort["Public Verifiable Portfolio & QR Badges (/portfolio/[userId])"]:::client
     end
 
-    subgraph SecurityLayer ["Identity & Security Gateway"]
-        JWT["HttpOnly Cookie JWT Session"]
-        Bcrypt["Bcrypt Password Hashing & Strength Meter"]
-        TOTP["2FA Two-Factor Authentication (otplib + Backup Codes)"]
-        RBAC["Role-Based Access Control (4 Stakeholders)"]
+    subgraph SecurityGateway ["Identity & Security Gateway"]
+        AuthJWT["HttpOnly Cookie JWT Session Gateway"]:::sec
+        PassSec["Password Policy & Complexity Criteria Meter"]:::sec
+        TwoFA["TOTP Two-Factor Authentication & 8 Backup Codes"]:::sec
+        RBAC["Role-Based Access Control (4 Personas)"]:::sec
     end
 
-    subgraph CoreEngines ["Domain & Logic Engines"]
-        PRI["Placement Readiness Index (PRI Engine 0-1000)"]
-        CareerEngine["Skill Mapping & Industry Sector Recommendation Algorithm"]
-        AtsEngine["ATS Kanban & Candidate Progression Engine"]
-        DecayEngine["Temporal Skill Decay Engine (Active/Stale/Expired)"]
-        JointGrading["Joint Evaluation Matrix (Academic + Industry)"]
-        AuditEngine["AI Syllabus Obsolescence Engine (Gemini 1.5 Flash)"]
-        PlacementEngine["Yearly Placement Tracker & Corporate Matching"]
-        TokenLedger["Skill Token Economy & Office Hours Scheduler"]
+    subgraph DomainEngines ["Core Domain & Intelligence Engines"]
+        PRI["Placement Readiness Index (PRI Engine: 0–1000)"]:::core
+        CareerEngine["Skill Mapping & 5 Industry Sector Matching Algorithm"]:::core
+        AtsEngine["ATS Candidate Progression & Match Scoring Engine"]:::core
+        DecayEngine["Temporal Skill Decay Engine (Active / Stale / Expired)"]:::core
+        JointGrading["Standardized Joint Evaluation Matrix (Dual Grading)"]:::core
+        AuditEngine["AI Syllabus Obsolescence Engine"]:::core
+        PlacementEngine["Yearly Placement Tracker & Corporate Matching Engine"]:::core
+        TokenLedger["Skill Token Economy & e-RUPI Voucher Controller"]:::core
     end
 
-    subgraph VerificationLayer ["Verification & Ledger Layer"]
-        Blockchain["Consortium Blockchain (Merkle Root + SHA-256)"]
-        QRGen["Public QR Proof Verification Badges (/verify/[token])"]
-        Erupi["Purpose-Bound e-RUPI Vouchers"]
+    subgraph TrustLedger ["Verification & Consortium Blockchain Layer"]
+        Consortium["Consortium Blockchain Simulator (Merkle Tree + SHA-256)"]:::ledger
+        QRGen["Public QR Verification Badge Generator (/verify/[token])"]:::ledger
+        ErupiVouchers["Digital India e-RUPI Purpose-Bound Vouchers"]:::ledger
     end
 
-    subgraph DataLayer ["Data & Persistence"]
-        PrismaORM["Prisma ORM 6.x"]
-        PostgresDB[("PostgreSQL / SQLite Database")]
+    subgraph PersistenceLayer ["Data & Persistence Layer"]
+        PrismaORM["Prisma ORM 6.x (Multi-Engine)"]:::data
+        Database[("PostgreSQL / SQLite Database")]:::data
     end
 
-    UI --> SecurityLayer
-    SecurityLayer --> CoreEngines
-    CoreEngines --> VerificationLayer
-    VerificationLayer --> DataLayer
-    AuditEngine -.->|"Google Gemini API"| ExternalLLM["Google Gemini 1.5 Flash"]
+    subgraph ExternalServices ["External Intelligence & Cloud Integrations"]
+        GeminiLLM["Google Gemini 1.5 Flash LLM API"]:::ext
+        SMTP["Nodemailer Enterprise Email Delivery"]:::ext
+    end
+
+    %% Client to Security
+    UI & AtsBoard & CustomQuiz & FacultyTrack & RosterImport & AccredDoc & DocVault --> AuthJWT
+    AuthJWT --> PassSec & TwoFA & RBAC
+
+    %% Security to Domain Engines
+    RBAC --> PRI & CareerEngine & AtsEngine & DecayEngine & JointGrading & AuditEngine & PlacementEngine & TokenLedger
+
+    %% Specific Functional Linkages
+    CustomQuiz & AtsBoard --> AtsEngine
+    FacultyTrack & JointGrading --> JointGrading
+    FacultyTrack --> Consortium
+    AuditEngine -.->|"Curriculum Analysis"| GeminiLLM
+    AuditEngine --> JointGrading
+
+    %% Domain to Ledger
+    JointGrading & PRI --> Consortium
+    Consortium --> QRGen
+    TokenLedger --> ErupiVouchers
+
+    %% Domain & Ledger to Persistence
+    PRI & AtsEngine & JointGrading & PlacementEngine & TokenLedger --> PrismaORM
+    Consortium --> PrismaORM
+    PrismaORM --> Database
 ```
 
 ---
@@ -257,25 +359,37 @@ flowchart TB
 ```mermaid
 sequenceDiagram
     autonumber
-    actor Industry as Industry Partner (19 Corporates)
-    actor Faculty as Academician
-    actor Student as Student
-    actor TPO as Institution (TPO)
+    actor Industry as 🏢 Industry Partner (19 Corporates)
+    actor Faculty as 👩‍🏫 Academician
+    actor Student as 👨‍🎓 Student
+    actor TPO as 🏛️ Institution (TPO)
 
-    Industry->>Faculty: Post Industry Challenge (Capstone / R&D)
-    Faculty->>Student: Form Lab Unit & Assign Milestones
-    Student->>Faculty: Submit Code Artifacts & Milestone Workplans
-    Faculty->>Industry: Initiate Joint Evaluation & Milestone Review
-    Industry->>Student: Grade Corporate Readiness & Sign-Off Proof of Work
-    Note over Student,Industry: SHA-256 Hashed, Block Committed, QR Badge Generated
-    Student->>Student: PRI Engine Computes Verified Score (+Points)
+    Note over TPO,Student: Phase 1: Onboarding & Curriculum Calibration
+    TPO->>TPO: Bulk Import Student Cohorts via CSV/Excel Roster
+    Faculty->>Faculty: Run AI Syllabus Obsolescence Audit (Gemini 1.5 Flash)
+    Faculty->>TPO: Submit Curriculum Modernization Patches
+
+    Note over Industry,Student: Phase 2: Engagement, Capstones & ATS Hiring
+    Industry->>Student: Post Engineering Challenges & Online Custom Quizzes
+    Student->>Industry: Complete Custom Timed Quizzes & Submit Capstone Bids
+    Faculty->>Student: Incubate in Lab Unit & Guide 5-Stage Milestones
+    Student->>Faculty: Submit Workplan & Midterm Deliverables
+    Faculty->>Student: Grade Milestones & Issue Cryptographic Faculty Certificate
+
+    Note over Faculty,Industry: Phase 3: Dual Sign-Off & Blockchain Verification
+    Faculty->>Industry: Initiate Joint Evaluation on Production Code
+    Industry->>Faculty: Grade Corporate Readiness (Dual Scoring Matrix)
+    Note over Student,Industry: SHA-256 Hashed, Block Committed, QR Verification Badge Minted
+
+    Note over Student,TPO: Phase 4: PRI Scoring, Reverse Placement & Accreditation
+    Student->>Student: PRI Engine Computes Verified Score (0–1000)
     alt PRI Score >= 850
-        Student->>Industry: Profile Unlocked in Reverse Placement
-        Industry->>Student: Direct Job Pitch (Role + CTC Offer + Stipend)
-        Student->>Industry: Accept Offer & Commit Output
-        Industry->>TPO: Placement Records & Yearly Analytics Updated Live
-        TPO->>TPO: Generate AICTE / NAAC / NIRF Accreditation Dossier
+        Student->>Industry: Profile Unlocked in Reverse Placement Marketplace
+        Industry->>Student: Direct Job Pitch (Role + Stipend + ₹18 LPA Offer)
+        Student->>Industry: Accept Offer & Advance in ATS Kanban
     end
+    Industry->>TPO: Placement Records Synchronized with Corporate Partner Matches
+    TPO->>TPO: Generate AICTE / NAAC / NIRF Accreditation Dossier
 ```
 
 ---
@@ -438,11 +552,19 @@ SkillBridge/
 
 ## 🌍 National Impact & Future Roadmap
 
-```
-  [Stage 1: SIH Prototype] ➔ [Stage 2: State Pilot] ➔ [Stage 3: National Rollout]
-   • 4 Stakeholders          • 25 Universities        • AICTE/NATS Integration
-   • PRI 0-1000 Engine       • Real e-RUPI Banking    • Decentralized DID Credentials
-   • Simulated Blockchain    • 100+ Enterprise MoUs   • Millions of Empowered Youth
+```mermaid
+flowchart LR
+    classDef s1 fill:#e0e7ff,stroke:#4338ca,stroke-width:2px,color:#1e1b4b;
+    classDef s2 fill:#ede9fe,stroke:#7c3aed,stroke-width:2px,color:#2e1065;
+    classDef s3 fill:#ecfdf5,stroke:#059669,stroke-width:2px,color:#064e3b;
+
+    S1["Stage 1: SIH Prototype<br/>━━━━━━━━━━━━━━━━━━<br/>• 4-Way Multi-Tenant Portal<br/>• PRI (0–1000) Scoring Engine<br/>• Simulated Consortium Chain<br/>• 19 Seeded Corporate MoUs<br/>• ATS Kanban & Custom Tests"]:::s1
+
+    S2["Stage 2: State University Pilot<br/>━━━━━━━━━━━━━━━━━━<br/>• 25 Technical Universities<br/>• Live NPCI e-RUPI Vouchers<br/>• Automated NAAC/NIRF Sync<br/>• 100+ Enterprise Partners<br/>• Sabbatical Exchange Network"]:::s2
+
+    S3["Stage 3: National Rollout<br/>━━━━━━━━━━━━━━━━━━<br/>• AICTE & NATS Direct Integration<br/>• Decentralized W3C DID (Polygon)<br/>• Pan-India Reverse Placement<br/>• Millions of Empowered Graduates<br/>• NEP 2020 Real-World Fulfilment"]:::s3
+
+    S1 ==> S2 ==> S3
 ```
 
 - **NEP 2020 Compliance:** Implements multidisciplinary learning, mandatory internships, continuous credit bank integration, and industry sabbatical exchanges.
