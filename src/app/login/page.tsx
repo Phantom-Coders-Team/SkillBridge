@@ -102,7 +102,7 @@ export default function LoginPage() {
 
           <div className="mt-10 flex items-center gap-8 border-t border-border-muted pt-6 text-slate-500 dark:text-slate-400">
             <div>
-              <p className="text-2xl font-bold text-slate-900 dark:text-white">20+</p>
+              <p className="text-2xl font-bold text-slate-900 dark:text-white">18+</p>
               <p className="text-xs">Active Users</p>
             </div>
             <div>
