@@ -1,7 +1,7 @@
 export interface IndustryPartnerCredential {
   name: string;
   email: string;
-  password: "Password@123";
+  password: "PASSWORD@123";
   domain: string;
   location: string;
   initials: string;
@@ -12,7 +12,7 @@ export const ALL_INDUSTRY_PARTNERS: IndustryPartnerCredential[] = [
   {
     name: "Google India",
     email: "university-india@google.com",
-    password: "Password@123",
+    password: "PASSWORD@123",
     domain: "Google Cloud & Applied AI Labs",
     location: "Bengaluru, Karnataka",
     initials: "GO",
@@ -21,7 +21,7 @@ export const ALL_INDUSTRY_PARTNERS: IndustryPartnerCredential[] = [
   {
     name: "Microsoft India",
     email: "india-recruitment@microsoft.com",
-    password: "Password@123",
+    password: "PASSWORD@123",
     domain: "Azure Systems & Applied Research",
     location: "Hyderabad, Telangana",
     initials: "MS",
@@ -30,7 +30,7 @@ export const ALL_INDUSTRY_PARTNERS: IndustryPartnerCredential[] = [
   {
     name: "Amazon AWS",
     email: "aws-university@amazon.com",
-    password: "Password@123",
+    password: "PASSWORD@123",
     domain: "AWS Cloud Systems Architecture",
     location: "Bengaluru, Karnataka",
     initials: "AW",
@@ -39,7 +39,7 @@ export const ALL_INDUSTRY_PARTNERS: IndustryPartnerCredential[] = [
   {
     name: "NVIDIA India",
     email: "developer-edu@nvidia.com",
-    password: "Password@123",
+    password: "PASSWORD@123",
     domain: "Deep Learning & Accelerated Computing",
     location: "Pune, Maharashtra",
     initials: "NV",
@@ -48,7 +48,7 @@ export const ALL_INDUSTRY_PARTNERS: IndustryPartnerCredential[] = [
   {
     name: "Intel India",
     email: "labs-fellowship@intel.com",
-    password: "Password@123",
+    password: "PASSWORD@123",
     domain: "Intel Labs & Silicon Design",
     location: "Bengaluru, Karnataka",
     initials: "IN",
@@ -57,7 +57,7 @@ export const ALL_INDUSTRY_PARTNERS: IndustryPartnerCredential[] = [
   {
     name: "Cisco Systems",
     email: "networking-academy@cisco.com",
-    password: "Password@123",
+    password: "PASSWORD@123",
     domain: "Enterprise Networking & Zero-Trust",
     location: "Bengaluru, Karnataka",
     initials: "CS",
@@ -66,7 +66,7 @@ export const ALL_INDUSTRY_PARTNERS: IndustryPartnerCredential[] = [
   {
     name: "IBM India Research",
     email: "research-collaborations@ibm.com",
-    password: "Password@123",
+    password: "PASSWORD@123",
     domain: "Hybrid Cloud & Quantum Systems",
     location: "Bengaluru, Karnataka",
     initials: "IB",
@@ -75,7 +75,7 @@ export const ALL_INDUSTRY_PARTNERS: IndustryPartnerCredential[] = [
   {
     name: "Qualcomm India",
     email: "campus-relations@qualcomm.com",
-    password: "Password@123",
+    password: "PASSWORD@123",
     domain: "Wireless Systems & Snapdragon Edge AI",
     location: "Hyderabad, Telangana",
     initials: "QC",
@@ -84,7 +84,7 @@ export const ALL_INDUSTRY_PARTNERS: IndustryPartnerCredential[] = [
   {
     name: "Adobe Systems",
     email: "adobe-labs@adobe.com",
-    password: "Password@123",
+    password: "PASSWORD@123",
     domain: "Digital Media & Experience Platform",
     location: "Noida, Uttar Pradesh",
     initials: "AD",
@@ -93,7 +93,7 @@ export const ALL_INDUSTRY_PARTNERS: IndustryPartnerCredential[] = [
   {
     name: "Infosys",
     email: "recruit@infosys.com",
-    password: "Password@123",
+    password: "PASSWORD@123",
     domain: "Talent Acquisition & Innovation Labs",
     location: "Bengaluru, Karnataka",
     initials: "IF",
@@ -102,7 +102,7 @@ export const ALL_INDUSTRY_PARTNERS: IndustryPartnerCredential[] = [
   {
     name: "TCS",
     email: "campus@tcs.com",
-    password: "Password@123",
+    password: "PASSWORD@123",
     domain: "Cognitive Business Operations",
     location: "Pune, Maharashtra",
     initials: "TC",
@@ -111,7 +111,7 @@ export const ALL_INDUSTRY_PARTNERS: IndustryPartnerCredential[] = [
   {
     name: "Wipro",
     email: "talent@wipro.com",
-    password: "Password@123",
+    password: "PASSWORD@123",
     domain: "Digital Operations & Cyber Resilience",
     location: "Bengaluru, Karnataka",
     initials: "WP",
@@ -120,7 +120,7 @@ export const ALL_INDUSTRY_PARTNERS: IndustryPartnerCredential[] = [
   {
     name: "Zoho",
     email: "campus@zohocorp.com",
-    password: "Password@123",
+    password: "PASSWORD@123",
     domain: "Platform Engineering & SaaS",
     location: "Chennai, Tamil Nadu",
     initials: "ZH",
@@ -129,7 +129,7 @@ export const ALL_INDUSTRY_PARTNERS: IndustryPartnerCredential[] = [
   {
     name: "HCLTech",
     email: "careers@hcltech.com",
-    password: "Password@123",
+    password: "PASSWORD@123",
     domain: "Engineering and R&D Services",
     location: "Noida, Uttar Pradesh",
     initials: "HC",
@@ -138,7 +138,7 @@ export const ALL_INDUSTRY_PARTNERS: IndustryPartnerCredential[] = [
   {
     name: "L&T Technology Services",
     email: "careers@ltts.com",
-    password: "Password@123",
+    password: "PASSWORD@123",
     domain: "Smart Manufacturing & Industry 4.0",
     location: "Vadodara, Gujarat",
     initials: "LT",
@@ -147,7 +147,7 @@ export const ALL_INDUSTRY_PARTNERS: IndustryPartnerCredential[] = [
   {
     name: "Samsung R&D Institute",
     email: "sri.collaborate@samsung.com",
-    password: "Password@123",
+    password: "PASSWORD@123",
     domain: "Advanced Technology & Mobile Solutions",
     location: "Bengaluru, Karnataka",
     initials: "SS",
@@ -156,7 +156,7 @@ export const ALL_INDUSTRY_PARTNERS: IndustryPartnerCredential[] = [
   {
     name: "Tata Motors",
     email: "ev-innovation@tatamotors.com",
-    password: "Password@123",
+    password: "PASSWORD@123",
     domain: "Electric Mobility & Connected Vehicles",
     location: "Pune, Maharashtra",
     initials: "TM",
@@ -165,7 +165,7 @@ export const ALL_INDUSTRY_PARTNERS: IndustryPartnerCredential[] = [
   {
     name: "Reliance Jio Platforms",
     email: "jio-innovations@ril.com",
-    password: "Password@123",
+    password: "PASSWORD@123",
     domain: "5G Telecom & Indigenous AI Platforms",
     location: "Navi Mumbai, Maharashtra",
     initials: "RJ",
@@ -174,7 +174,7 @@ export const ALL_INDUSTRY_PARTNERS: IndustryPartnerCredential[] = [
   {
     name: "All India Institute of Ayurveda (AIIA)",
     email: "research@aiia.gov.in",
-    password: "Password@123",
+    password: "PASSWORD@123",
     domain: "Ayush Bio-Informatics & Quality Screening",
     location: "New Delhi",
     initials: "AI",

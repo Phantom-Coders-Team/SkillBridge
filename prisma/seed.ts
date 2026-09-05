@@ -59,7 +59,7 @@ async function main() {
   console.log("Existing records cleared.");
 
   console.log("Hashing default credentials...");
-  const passwordHash = await bcrypt.hash("Password@123", 10);
+  const passwordHash = await bcrypt.hash("PASSWORD@123", 10);
 
   // ----- STUDENTS -----
   const students: Array<[string, string, string, { year: number; rollNumber: string; department: string; skills: string }]> = [

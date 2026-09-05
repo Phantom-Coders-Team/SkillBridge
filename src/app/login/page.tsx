@@ -223,14 +223,14 @@ export default function LoginPage() {
               <p className="mb-3 text-xs font-semibold uppercase tracking-wider text-slate-500 dark:text-slate-400">
                 Quick Demo Sign In — Password:{" "}
                 <code className="rounded bg-surface-subtle px-1.5 py-0.5 text-[11px] font-mono text-slate-700 dark:text-slate-300 border border-border-muted">
-                  Password@123
+                  PASSWORD@123
                 </code>
               </p>
               <div className="grid grid-cols-2 gap-2">
                 {DEMO_ACCOUNTS.map((account) => (
                   <form key={account.email} action={plainLoginAction}>
                     <input type="hidden" name="email" value={account.email} />
-                    <input type="hidden" name="password" value="Password@123" />
+                    <input type="hidden" name="password" value="PASSWORD@123" />
                     <button
                       type="submit"
                       disabled={pending}
@@ -264,7 +264,7 @@ export default function LoginPage() {
                   <div className="mt-3 rounded-2xl border border-border-muted bg-surface p-3 shadow-inner max-h-80 overflow-y-auto space-y-2">
                     <div className="flex items-center justify-between pb-1.5 border-b border-border-muted">
                       <span className="text-[11px] font-medium text-slate-500 dark:text-slate-400">
-                        Default password for all partners: <code className="font-mono text-indigo-600 dark:text-indigo-400 font-bold">Password@123</code>
+                        Default password for all partners: <code className="font-mono text-indigo-600 dark:text-indigo-400 font-bold">PASSWORD@123</code>
                       </span>
                     </div>
 
@@ -298,7 +298,7 @@ export default function LoginPage() {
 
                           <form action={plainLoginAction} className="shrink-0">
                             <input type="hidden" name="email" value={partner.email} />
-                            <input type="hidden" name="password" value="Password@123" />
+                            <input type="hidden" name="password" value="PASSWORD@123" />
                             <button
                               type="submit"
                               disabled={pending}

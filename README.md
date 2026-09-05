@@ -227,7 +227,7 @@ SkillBridge features an integrated **Floating Demo Persona Switcher** at the **b
 - **Industry Partners** (Quick switch across **Infosys** and **18 other top enterprises**!)
 
 ### 2. Pre-Seeded Test Credentials
-All demo accounts are pre-configured with the default password: `Password@123`
+All demo accounts are pre-configured with the default password: `PASSWORD@123`
 
 | Persona | Role | Seeded Email | Key Areas to Evaluate |
 |:---|:---|:---|:---|
