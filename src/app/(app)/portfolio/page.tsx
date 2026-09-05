@@ -7,6 +7,7 @@ import AddPortfolioForm from "./AddPortfolioForm";
 import RemovePortfolioItem from "./RemovePortfolioItem";
 import AIResumeParseButton from "./AIResumeParseButton";
 import PortfolioDocumentsSection from "./PortfolioDocumentsSection";
+import SharePortfolioButton from "./SharePortfolioButton";
 
 const TYPE_TONE: Record<string, BadgeTone> = {
   CERTIFICATION: "purple",
@@ -47,7 +48,8 @@ export default async function PortfolioPage() {
         icon={ScrollText}
         actions={
           user.role === "STUDENT" ? (
-            <div className="flex items-center gap-3">
+            <div className="flex flex-wrap items-center gap-3">
+              <SharePortfolioButton userId={user.id} />
               <AIResumeParseButton />
               <details className="group relative">
                 <summary className="cursor-pointer list-none [&::-webkit-details-marker]:hidden">

@@ -1,4 +1,5 @@
 import { redirect, notFound } from "next/navigation";
+import Link from "next/link";
 import {
   User,
   Mail,
@@ -16,11 +17,27 @@ import {
   Briefcase,
   School,
   ExternalLink,
+  FileText,
+  Download,
+  ScrollText,
+  BadgeCheck,
+  ShieldCheck,
+  FolderOpen,
+  CheckCircle2,
 } from "lucide-react";
 import { getCurrentUser } from "@/lib/auth";
 import { prisma } from "@/lib/prisma";
 import { ROLE_LABELS, ROLE_COLORS, type Role } from "@/lib/types";
-import { Avatar, Badge, Card, PageHeader } from "@/components/ui";
+import { Avatar, Badge, Card, PageHeader, type BadgeTone } from "@/components/ui";
+
+const PORTFOLIO_TYPE_TONE: Record<string, BadgeTone> = {
+  CERTIFICATION: "purple",
+  PROJECT: "blue",
+  INTERNSHIP: "emerald",
+  ACHIEVEMENT: "amber",
+  PUBLICATION: "violet",
+  VOLUNTEERING: "cyan",
+};
 
 export default async function PublicProfilePage({ params }: { params: Promise<{ userId: string }> }) {
   const viewer = await getCurrentUser();
@@ -45,6 +62,39 @@ export default async function PublicProfilePage({ params }: { params: Promise<{ 
   const p = user.profile;
   const normalizedRole = user.role.toUpperCase();
   const isStudent = normalizedRole === "STUDENT" || normalizedRole === "STUDENTS";
+
+  const [documents, assessments, portfolioItems, proofsOfWork, projects] = isStudent
+    ? await Promise.all([
+        prisma.userDocument.findMany({
+          where: { userId },
+          orderBy: { createdAt: "desc" },
+        }),
+        prisma.skillAssessment.findMany({
+          where: { studentId: userId },
+          orderBy: { score: "desc" },
+        }),
+        prisma.portfolioItem.findMany({
+          where: { studentId: userId },
+          orderBy: { createdAt: "desc" },
+        }),
+        prisma.proofOfWork.findMany({
+          where: { studentId: userId },
+          include: { project: { select: { title: true } } },
+          orderBy: { createdAt: "desc" },
+        }),
+        prisma.project.findMany({
+          where: { ownerId: userId },
+          orderBy: { createdAt: "desc" },
+        }),
+      ])
+    : [[], [], [], [], []];
+
+  const resumeDoc = documents.find(
+    (d) =>
+      d.type?.toLowerCase().includes("resume") ||
+      d.name?.toLowerCase().includes("resume") ||
+      d.type?.toLowerCase().includes("cv")
+  ) || documents[0] || null;
   const isAcademician =
     normalizedRole === "ACADEMICIAN" ||
     normalizedRole === "FACULTY" ||
@@ -102,6 +152,31 @@ export default async function PublicProfilePage({ params }: { params: Promise<{ 
         title="Profile"
         subtitle={`Viewing ${user.name}'s public profile.`}
         icon={User}
+        actions={
+          isStudent ? (
+            <div className="flex flex-wrap items-center gap-2">
+              {resumeDoc && (
+                <a
+                  href={`/api/documents/${resumeDoc.id}`}
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className="inline-flex h-9 items-center gap-1.5 rounded-xl bg-indigo-600 px-3.5 text-xs font-semibold text-white shadow-2xs hover:bg-indigo-700 transition"
+                >
+                  <FileText className="size-3.5" />
+                  <span>View Resume</span>
+                  <ExternalLink className="size-2.5 opacity-70" />
+                </a>
+              )}
+              <Link
+                href={`/portfolio/${user.id}`}
+                className="inline-flex h-9 items-center gap-1.5 rounded-xl border border-purple-200 bg-purple-50 px-3.5 text-xs font-semibold text-purple-700 hover:bg-purple-100 dark:border-purple-800 dark:bg-purple-950/50 dark:text-purple-300 dark:hover:bg-purple-900/60 transition"
+              >
+                <ScrollText className="size-3.5 text-purple-600 dark:text-purple-400" />
+                <span>Digital Portfolio</span>
+              </Link>
+            </div>
+          ) : undefined
+        }
       />
 
       <Card className="overflow-hidden">
@@ -202,6 +277,189 @@ export default async function PublicProfilePage({ params }: { params: Promise<{ 
           <div className="flex flex-wrap gap-2">
             {p.skills.split(",").map((s: string, i: number) => (
               <Badge key={i} tone="indigo">{s.trim()}</Badge>
+            ))}
+          </div>
+        </Card>
+      )}
+
+      {/* Student: Verified Assessments */}
+      {isStudent && assessments.length > 0 && (
+        <Card className="mt-6 p-5">
+          <div className="flex items-center justify-between gap-2 mb-3">
+            <h3 className="flex items-center gap-2 text-sm font-semibold text-slate-900 dark:text-slate-100">
+              <BadgeCheck className="size-4 text-emerald-600" />
+              Verified Skill Assessments
+            </h3>
+            <span className="text-xs text-slate-400">
+              {assessments.length} Assessment{assessments.length !== 1 ? "s" : ""}
+            </span>
+          </div>
+          <div className="grid grid-cols-1 sm:grid-cols-2 gap-2.5">
+            {assessments.map((a) => (
+              <div
+                key={a.id}
+                className="flex items-center justify-between rounded-xl border border-border-muted p-3 bg-surface-muted/30"
+              >
+                <div className="flex items-center gap-2">
+                  <BadgeCheck className="size-4 text-emerald-600 dark:text-emerald-400" />
+                  <span className="text-sm font-semibold text-slate-900 dark:text-slate-100">
+                    {a.skillName}
+                  </span>
+                </div>
+                <span className="rounded-full bg-emerald-50 px-2.5 py-0.5 text-xs font-bold text-emerald-700 dark:bg-emerald-950/60 dark:text-emerald-300">
+                  {a.score}%
+                </span>
+              </div>
+            ))}
+          </div>
+        </Card>
+      )}
+
+      {/* Student: Resume & Documents */}
+      {isStudent && documents.length > 0 && (
+        <Card className="mt-6 p-5">
+          <div className="flex items-center justify-between gap-2 mb-3">
+            <h3 className="flex items-center gap-2 text-sm font-semibold text-slate-900 dark:text-slate-100">
+              <FileText className="size-4 text-indigo-600" />
+              Resume & Verified Documents
+            </h3>
+            <span className="text-xs text-slate-400">
+              {documents.length} File{documents.length !== 1 ? "s" : ""}
+            </span>
+          </div>
+          <div className="space-y-2">
+            {documents.map((doc) => {
+              const isDocResume =
+                doc.type?.toLowerCase().includes("resume") ||
+                doc.name?.toLowerCase().includes("resume") ||
+                doc.type?.toLowerCase().includes("cv");
+
+              return (
+                <div
+                  key={doc.id}
+                  className={`flex flex-wrap items-center justify-between gap-3 rounded-xl border p-3 ${
+                    isDocResume
+                      ? "border-indigo-200 bg-indigo-50/40 dark:border-indigo-900/60 dark:bg-indigo-950/20"
+                      : "border-border-muted bg-surface"
+                  }`}
+                >
+                  <div className="flex items-center gap-2.5 min-w-0">
+                    <div className="flex size-8 shrink-0 items-center justify-center rounded-lg bg-indigo-100 text-indigo-700 dark:bg-indigo-900/60 dark:text-indigo-300">
+                      <FileText className="size-4" />
+                    </div>
+                    <div className="min-w-0">
+                      <p className="truncate text-sm font-semibold text-slate-900 dark:text-slate-100">
+                        {doc.name}
+                      </p>
+                      <p className="text-xs text-slate-400">
+                        {doc.type} · Uploaded{" "}
+                        {new Date(doc.createdAt).toLocaleDateString("en-IN", {
+                          month: "short",
+                          day: "numeric",
+                          year: "numeric",
+                        })}
+                      </p>
+                    </div>
+                  </div>
+
+                  <div className="flex items-center gap-2">
+                    <a
+                      href={`/api/documents/${doc.id}`}
+                      target="_blank"
+                      rel="noopener noreferrer"
+                      className="inline-flex items-center gap-1 rounded-lg bg-indigo-600 px-3 py-1.5 text-xs font-semibold text-white shadow-2xs hover:bg-indigo-700 transition"
+                    >
+                      <span>View</span>
+                      <ExternalLink className="size-2.5" />
+                    </a>
+                    <a
+                      href={`/api/documents/${doc.id}?download=1`}
+                      download
+                      className="inline-flex items-center gap-1 rounded-lg border border-border-muted bg-surface px-2.5 py-1.5 text-xs font-semibold text-slate-700 hover:bg-slate-50 dark:text-slate-200 dark:hover:bg-slate-800 transition"
+                    >
+                      <Download className="size-3" />
+                      <span>Download</span>
+                    </a>
+                  </div>
+                </div>
+              );
+            })}
+          </div>
+        </Card>
+      )}
+
+      {/* Student: Digital Portfolio Items */}
+      {isStudent && portfolioItems.length > 0 && (
+        <Card className="mt-6 p-5">
+          <div className="flex items-center justify-between gap-2 mb-3">
+            <h3 className="flex items-center gap-2 text-sm font-semibold text-slate-900 dark:text-slate-100">
+              <Award className="size-4 text-purple-600" />
+              Digital Portfolio & Certifications
+            </h3>
+            <Link
+              href={`/portfolio/${user.id}`}
+              className="text-xs font-semibold text-indigo-600 hover:underline dark:text-indigo-400 inline-flex items-center gap-1"
+            >
+              <span>View Full Showcase</span>
+              <ExternalLink className="size-2.5" />
+            </Link>
+          </div>
+          <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
+            {portfolioItems.map((it) => (
+              <div
+                key={it.id}
+                className="rounded-xl border border-border-muted p-3.5 space-y-1.5 bg-surface"
+              >
+                <div className="flex items-center justify-between gap-2">
+                  <Badge tone={PORTFOLIO_TYPE_TONE[it.type] ?? "gray"}>{it.type}</Badge>
+                  {it.year && <span className="text-[11px] text-slate-400">{it.year}</span>}
+                </div>
+                <p className="text-sm font-bold text-slate-900 dark:text-slate-100">{it.title}</p>
+                {it.issuer && (
+                  <p className="text-xs text-slate-500 dark:text-slate-400">{it.issuer}</p>
+                )}
+                {it.description && (
+                  <p className="line-clamp-2 text-xs text-slate-500 dark:text-slate-400">
+                    {it.description}
+                  </p>
+                )}
+              </div>
+            ))}
+          </div>
+        </Card>
+      )}
+
+      {/* Student: Proof of Work */}
+      {isStudent && (proofsOfWork.length > 0 || projects.length > 0) && (
+        <Card className="mt-6 p-5">
+          <h3 className="flex items-center gap-2 text-sm font-semibold text-slate-900 dark:text-slate-100 mb-3">
+            <FolderOpen className="size-4 text-indigo-500" />
+            Proof of Work & Project Artifacts
+          </h3>
+          <div className="divide-y divide-border-muted">
+            {proofsOfWork.map((po) => (
+              <div key={po.id} className="py-2.5 flex items-center justify-between gap-2">
+                <span className="text-sm font-medium text-slate-800 dark:text-slate-200">
+                  {po.project.title}
+                </span>
+                <Badge tone="green">
+                  <span className="inline-flex items-center gap-1">
+                    <ShieldCheck className="size-3" />
+                    Verified Proof
+                  </span>
+                </Badge>
+              </div>
+            ))}
+            {projects.map((pr) => (
+              <div key={pr.id} className="py-2.5 flex items-center justify-between gap-2">
+                <div>
+                  <p className="text-sm font-medium text-slate-800 dark:text-slate-200">{pr.title}</p>
+                  {pr.techStack && (
+                    <p className="text-xs text-slate-400">Stack: {pr.techStack}</p>
+                  )}
+                </div>
+                <Badge tone="gray">{pr.status}</Badge>
+              </div>
             ))}
           </div>
         </Card>

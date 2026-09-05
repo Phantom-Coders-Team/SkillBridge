@@ -28,15 +28,64 @@ export default async function InternshipsPage() {
 
   const isIndustry = user.role === "INDUSTRIES" || user.role === "INDUSTRY";
 
-  const [listings, studentProfile, myApplications] = await Promise.all([
+  const [listings, studentProfile, myApplications, studentDocuments] = await Promise.all([
     prisma.learningProgram.findMany({
       where: isIndustry ? { companyId: user.id } : undefined,
       include: {
         company: { select: { name: true, profile: { select: { companyName: true } } } },
         applications: {
           include: {
-            student: { select: { id: true, name: true, profile: { select: { department: true, rollNumber: true, skills: true } } } },
+            student: {
+              select: {
+                id: true,
+                name: true,
+                email: true,
+                profile: {
+                  select: {
+                    department: true,
+                    rollNumber: true,
+                    skills: true,
+                    collegeName: true,
+                    year: true,
+                    phone: true,
+                    bio: true,
+                  },
+                },
+                documents: {
+                  select: {
+                    id: true,
+                    name: true,
+                    type: true,
+                    createdAt: true,
+                  },
+                  orderBy: { createdAt: "desc" },
+                },
+                assessments: {
+                  select: {
+                    id: true,
+                    skillName: true,
+                    score: true,
+                  },
+                  orderBy: { score: "desc" },
+                },
+                portfolioItems: {
+                  select: {
+                    id: true,
+                    title: true,
+                    type: true,
+                    verified: true,
+                  },
+                },
+                proofsOfWork: {
+                  select: {
+                    id: true,
+                    project: { select: { title: true } },
+                  },
+                },
+              },
+            },
           },
+          orderBy: { createdAt: "desc" },
         },
       },
       orderBy: { createdAt: "desc" },
@@ -62,7 +111,20 @@ export default async function InternshipsPage() {
           orderBy: { createdAt: "desc" },
         })
       : [],
+    user.role === "STUDENT"
+      ? prisma.userDocument.findMany({
+          where: { userId: user.id },
+          orderBy: { createdAt: "desc" },
+        })
+      : [],
   ]);
+
+  const studentResume = studentDocuments.find(
+    (d) =>
+      d.type?.toLowerCase().includes("resume") ||
+      d.name?.toLowerCase().includes("resume") ||
+      d.type?.toLowerCase().includes("cv")
+  ) || studentDocuments[0] || null;
 
   const mySkills = user.role === "STUDENT"
     ? (studentProfile?.skills ?? "").toLowerCase().split(/[,\s]+/).filter(Boolean)
@@ -190,7 +252,10 @@ export default async function InternshipsPage() {
                         Applications Closed (Deadline Passed)
                       </div>
                     ) : (
-                      <ApplyButton listingId={l.id} />
+                      <ApplyButton
+                        listingId={l.id}
+                        studentResume={studentResume ? { id: studentResume.id, name: studentResume.name } : null}
+                      />
                     ))}
                   {(user.role === "INDUSTRIES" || user.role === "INDUSTRY") && (
                     <div className="space-y-2">

@@ -59,9 +59,26 @@ export default async function ChallengesPage() {
                       include: {
                         student: {
                           select: {
+                            id: true,
                             name: true,
                             email: true,
-                            profile: { select: { department: true } },
+                            profile: {
+                              select: {
+                                department: true,
+                                skills: true,
+                                collegeName: true,
+                                year: true,
+                              },
+                            },
+                            documents: {
+                              select: {
+                                id: true,
+                                name: true,
+                                type: true,
+                                createdAt: true,
+                              },
+                              orderBy: { createdAt: "desc" },
+                            },
                           },
                         },
                       },

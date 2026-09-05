@@ -1,6 +1,7 @@
 "use client";
 
 import { useState, useTransition } from "react";
+import Link from "next/link";
 import {
   Sparkles,
   X,
@@ -16,6 +17,8 @@ import {
   FileText,
   Loader2,
   Plus,
+  ScrollText,
+  ExternalLink,
 } from "lucide-react";
 import { Badge, EmptyState, type BadgeTone } from "@/components/ui";
 import { updateChallengeStatus, updateChallengeApplicationStatus } from "./actions";
@@ -44,9 +47,21 @@ export interface SerializedChallenge {
       faculty?: { name: string; email: string } | null;
       members: Array<{
         student: {
+          id?: string;
           name: string;
           email: string;
-          profile?: { department?: string | null } | null;
+          profile?: {
+            department?: string | null;
+            skills?: string | null;
+            collegeName?: string | null;
+            year?: number | null;
+          } | null;
+          documents?: Array<{
+            id: string;
+            name: string;
+            type: string;
+            createdAt?: Date | string;
+          }>;
         };
       }>;
     };
@@ -420,19 +435,99 @@ export default function MyChallengesModal({
                                 </div>
                               </div>
 
-                              {/* Student Members */}
+                              {/* Student Members & Direct Credentials */}
                               {app.labUnit?.members && app.labUnit.members.length > 0 && (
-                                <div className="text-xs text-slate-500 dark:text-slate-400">
-                                  <span className="font-semibold text-slate-700 dark:text-slate-300">
-                                    Student Researchers:{" "}
+                                <div className="space-y-1.5 pt-1">
+                                  <span className="text-[11px] font-bold uppercase tracking-wider text-slate-500 dark:text-slate-400">
+                                    Team Researchers & Credentials:
                                   </span>
-                                  {app.labUnit.members.map((m, idx) => (
-                                    <span key={idx}>
-                                      {m.student.name}
-                                      {m.student.profile?.department ? ` (${m.student.profile.department})` : ""}
-                                      {idx < app.labUnit.members.length - 1 ? ", " : ""}
-                                    </span>
-                                  ))}
+                                  <div className="grid grid-cols-1 sm:grid-cols-2 gap-2">
+                                    {app.labUnit.members.map((m, idx) => {
+                                      const resumeDoc =
+                                        m.student.documents?.find(
+                                          (d) =>
+                                            d.type?.toLowerCase().includes("resume") ||
+                                            d.name?.toLowerCase().includes("resume") ||
+                                            d.type?.toLowerCase().includes("cv")
+                                        ) || m.student.documents?.[0];
+
+                                      return (
+                                        <div
+                                          key={idx}
+                                          className="flex flex-col justify-between gap-1.5 rounded-lg border border-border-muted bg-surface-muted/30 p-2 text-xs"
+                                        >
+                                          <div className="flex items-start justify-between gap-1">
+                                            <div className="min-w-0">
+                                              {m.student.id ? (
+                                                <Link
+                                                  href={`/profile/${m.student.id}`}
+                                                  className="font-bold text-slate-900 dark:text-slate-100 hover:text-indigo-600 dark:hover:text-indigo-400 truncate block"
+                                                >
+                                                  {m.student.name}
+                                                </Link>
+                                              ) : (
+                                                <span className="font-bold text-slate-900 dark:text-slate-100">
+                                                  {m.student.name}
+                                                </span>
+                                              )}
+                                              <p className="text-[11px] text-slate-500 dark:text-slate-400 truncate">
+                                                {m.student.profile?.department || "Student Researcher"}
+                                                {m.student.profile?.year ? ` · Yr ${m.student.profile.year}` : ""}
+                                              </p>
+                                            </div>
+                                          </div>
+
+                                          {/* Skills snippet if available */}
+                                          {m.student.profile?.skills && (
+                                            <div className="flex flex-wrap gap-1">
+                                              {m.student.profile.skills
+                                                .split(",")
+                                                .slice(0, 3)
+                                                .map((s, si) => (
+                                                  <span
+                                                    key={si}
+                                                    className="rounded bg-indigo-50 dark:bg-indigo-950/50 px-1.5 py-0.2 text-[10px] font-medium text-indigo-700 dark:text-indigo-300"
+                                                  >
+                                                    {s.trim()}
+                                                  </span>
+                                                ))}
+                                            </div>
+                                          )}
+
+                                          {/* Direct Access Buttons */}
+                                          <div className="flex items-center gap-1.5 pt-1 border-t border-border-muted">
+                                            {resumeDoc ? (
+                                              <a
+                                                href={`/api/documents/${resumeDoc.id}`}
+                                                target="_blank"
+                                                rel="noopener noreferrer"
+                                                className="inline-flex items-center gap-1 rounded bg-indigo-50 dark:bg-indigo-950/60 border border-indigo-200 dark:border-indigo-800 px-2 py-0.5 text-[10px] font-semibold text-indigo-700 dark:text-indigo-300 hover:bg-indigo-100"
+                                                title="View Resume"
+                                              >
+                                                <FileText className="size-3 text-indigo-600" />
+                                                <span>Resume</span>
+                                                <ExternalLink className="size-2 opacity-60" />
+                                              </a>
+                                            ) : (
+                                              <span className="text-[10px] text-slate-400">
+                                                No resume
+                                              </span>
+                                            )}
+
+                                            {m.student.id && (
+                                              <Link
+                                                href={`/portfolio/${m.student.id}`}
+                                                className="inline-flex items-center gap-1 rounded bg-purple-50 dark:bg-purple-950/60 border border-purple-200 dark:border-purple-800 px-2 py-0.5 text-[10px] font-semibold text-purple-700 dark:text-purple-300 hover:bg-purple-100"
+                                              >
+                                                <ScrollText className="size-3 text-purple-600" />
+                                                <span>Portfolio</span>
+                                              </Link>
+                                            )}
+                                          </div>
+                                        </div>
+                                      );
+                                    })}
+                                  </div>
                                 </div>
                               )}
 
