@@ -6,6 +6,7 @@ import { Avatar, Badge, Card, EmptyState, PageHeader, type BadgeTone } from "@/c
 import AddPortfolioForm from "./AddPortfolioForm";
 import RemovePortfolioItem from "./RemovePortfolioItem";
 import AIResumeParseButton from "./AIResumeParseButton";
+import PortfolioDocumentsSection from "./PortfolioDocumentsSection";
 
 const TYPE_TONE: Record<string, BadgeTone> = {
   CERTIFICATION: "purple",
@@ -147,30 +148,11 @@ export default async function PortfolioPage() {
             </div>
           </Card>
 
-          {/* Documents */}
-          <Card>
-            <div className="border-b border-border-muted px-5 py-4">
-              <h3 className="flex items-center gap-2 text-sm font-semibold text-slate-900 dark:text-slate-100">
-                <FileText className="size-4 text-indigo-500" /> Documents
-              </h3>
-            </div>
-            <div className="p-5">
-              {documents.length === 0 ? (
-                <p className="text-sm text-slate-400 dark:text-slate-500">No documents uploaded yet. Upload your resume and certificates from your profile.</p>
-              ) : (
-                <ul className="space-y-2">
-                  {documents.map((d) => (
-                    <li key={d.id} className="flex items-center justify-between rounded-xl border border-border-muted px-3 py-2 text-sm">
-                      <span className="inline-flex items-center gap-2 text-slate-700 dark:text-slate-300">
-                        <FileText className="size-4 text-slate-400" /> {d.name}
-                      </span>
-                      <span className="text-xs text-slate-400">{d.type}</span>
-                    </li>
-                  ))}
-                </ul>
-              )}
-            </div>
-          </Card>
+          {/* Documents & Resume */}
+          <PortfolioDocumentsSection
+            documents={documents}
+            canUpload={user.role === "STUDENT"}
+          />
         </div>
       </div>
     </div>

@@ -1,7 +1,7 @@
 "use client";
 
 import { useRef, useState, useTransition } from "react";
-import { Camera, CheckCircle, FileText, Loader2, Trash2, Upload, User, X, GraduationCap, BookOpen, Briefcase, School, Globe, Building2 } from "lucide-react";
+import { Camera, CheckCircle, FileText, Loader2, Trash2, Upload, User, X, GraduationCap, BookOpen, Briefcase, School, Globe, Building2, ExternalLink, Download } from "lucide-react";
 import { updateProfileAction, uploadDocumentAction, deleteDocumentAction, type ProfileState } from "./actions";
 import { Avatar, Card, CardHeader } from "@/components/ui";
 import { cn } from "@/lib/cn";
@@ -1191,13 +1191,36 @@ export default function ProfileClient({ profile }: { profile: ProfileData }) {
               {profile.documents.length > 0 && (
                 <ul className="mt-4 space-y-2">
                   {profile.documents.map((d) => (
-                    <li key={d.id} className="flex items-center justify-between rounded-xl border border-border-muted px-3 py-2">
-                      <a href={d.dataUrl} download={d.name} className="inline-flex min-w-0 items-center gap-2 text-sm font-medium text-slate-700 hover:text-indigo-600 dark:text-slate-300 dark:hover:text-indigo-400">
+                    <li key={d.id} className="flex items-center justify-between gap-3 rounded-xl border border-border-muted px-3 py-2">
+                      <a
+                        href={`/api/documents/${d.id}`}
+                        target="_blank"
+                        rel="noopener noreferrer"
+                        className="inline-flex min-w-0 items-center gap-2 text-sm font-medium text-slate-700 hover:text-indigo-600 dark:text-slate-300 dark:hover:text-indigo-400"
+                        title="Click to open document in new tab"
+                      >
                         <FileText className="size-4 shrink-0 text-slate-400" />
                         <span className="truncate">{d.name}</span>
                       </a>
-                      <div className="flex shrink-0 items-center gap-2">
+                      <div className="flex shrink-0 items-center gap-1.5">
                         <span className="text-xs text-slate-400">{d.type}</span>
+                        <a
+                          href={`/api/documents/${d.id}`}
+                          target="_blank"
+                          rel="noopener noreferrer"
+                          className="flex size-7 items-center justify-center rounded-lg text-slate-400 transition-colors hover:bg-slate-100 hover:text-indigo-600 dark:hover:bg-slate-800 dark:hover:text-indigo-400"
+                          title="Open in new tab"
+                        >
+                          <ExternalLink className="size-3.5" />
+                        </a>
+                        <a
+                          href={`/api/documents/${d.id}?download=1`}
+                          download={d.name}
+                          className="flex size-7 items-center justify-center rounded-lg text-slate-400 transition-colors hover:bg-slate-100 hover:text-indigo-600 dark:hover:bg-slate-800 dark:hover:text-indigo-400"
+                          title="Download document"
+                        >
+                          <Download className="size-3.5" />
+                        </a>
                         <button
                           onClick={() => handleDeleteDoc(d.id)}
                           disabled={deletePending === d.id}
