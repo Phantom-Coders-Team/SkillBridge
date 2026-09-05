@@ -129,12 +129,12 @@ export default function MyChallengesModal({
       <button
         type="button"
         onClick={() => setIsOpen(true)}
-        className="relative inline-flex h-10 items-center gap-2 rounded-xl border border-indigo-200 dark:border-indigo-800 bg-indigo-50/80 dark:bg-indigo-950/40 px-4 text-sm font-semibold text-indigo-700 dark:text-indigo-300 hover:bg-indigo-100 dark:hover:bg-indigo-900/60 shadow-xs transition-all cursor-pointer"
+        className="relative inline-flex h-9 sm:h-10 items-center gap-2 rounded-xl border border-indigo-200 dark:border-indigo-800 bg-indigo-50/80 dark:bg-indigo-950/40 px-3 sm:px-4 text-xs sm:text-sm font-semibold text-indigo-700 dark:text-indigo-300 hover:bg-indigo-100 dark:hover:bg-indigo-900/60 shadow-xs transition-all cursor-pointer whitespace-nowrap shrink-0"
       >
-        <FolderKanban className="size-4" />
+        <FolderKanban className="size-4 shrink-0" />
         <span>My Challenges</span>
         {challenges.length > 0 && (
-          <span className="flex size-5 items-center justify-center rounded-full bg-indigo-600 text-[10px] font-bold text-white">
+          <span className="flex size-5 items-center justify-center rounded-full bg-indigo-600 text-[10px] font-bold text-white shrink-0">
             {challenges.length}
           </span>
         )}

@@ -38,9 +38,9 @@ export default function PostChallengeModal() {
           setStatusMessage(null);
           setIsOpen(true);
         }}
-        className="inline-flex h-10 items-center gap-2 rounded-xl bg-indigo-600 px-4 text-sm font-semibold text-white shadow-sm hover:bg-indigo-700 active:scale-98 transition-all cursor-pointer"
+        className="inline-flex h-9 sm:h-10 items-center gap-2 rounded-xl bg-indigo-600 px-3 sm:px-4 text-xs sm:text-sm font-semibold text-white shadow-sm hover:bg-indigo-700 active:scale-98 transition-all cursor-pointer whitespace-nowrap shrink-0"
       >
-        <Plus className="size-4 stroke-[2.5]" />
+        <Plus className="size-4 stroke-[2.5] shrink-0" />
         <span>Post Challenge</span>
       </button>
 

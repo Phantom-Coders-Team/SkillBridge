@@ -296,65 +296,70 @@ export default function ChallengeMarketplaceClient({
   return (
     <div className="space-y-6">
       {/* Role-Specific Metric Overview Cards */}
-      <div className="grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-4">
+      <div className={`grid grid-cols-1 gap-4 ${isIndustry ? "sm:grid-cols-3 lg:grid-cols-5" : "sm:grid-cols-2 lg:grid-cols-4"}`}>
         {/* Industry Perspective */}
         {isIndustry && (
           <>
-            <div className="rounded-2xl border border-border-muted bg-surface p-5 shadow-xs">
-              <div className="flex items-center justify-between">
-                <span className="text-xs font-semibold text-slate-500 dark:text-slate-400">
+            <div className="rounded-2xl border border-border-muted bg-surface p-4 shadow-xs">
+              <div className="flex items-center justify-between gap-1.5">
+                <span className="text-xs font-semibold text-slate-500 dark:text-slate-400 truncate" title="My Posted Challenges">
                   My Posted Challenges
                 </span>
-                <div className="rounded-xl bg-indigo-50 dark:bg-indigo-950/60 p-2 text-indigo-600 dark:text-indigo-400">
+                <div className="rounded-xl bg-indigo-50 dark:bg-indigo-950/60 p-1.5 text-indigo-600 dark:text-indigo-400 shrink-0">
                   <Sparkles className="size-4" />
                 </div>
               </div>
-              <p className="mt-3 text-2xl font-bold text-slate-900 dark:text-slate-100">
+              <p className="mt-2 text-2xl font-bold text-slate-900 dark:text-slate-100">
                 {myChallengesRaw.length}
               </p>
-              <p className="mt-1 text-xs text-slate-400">Active industry problem statements</p>
+              <p className="mt-0.5 text-xs text-slate-400 leading-snug">Active industry problem statements</p>
             </div>
 
-            <div className="rounded-2xl border border-border-muted bg-surface p-5 shadow-xs">
-              <div className="flex items-center justify-between">
-                <span className="text-xs font-semibold text-slate-500 dark:text-slate-400">
+            <div className="rounded-2xl border border-border-muted bg-surface p-4 shadow-xs">
+              <div className="flex items-center justify-between gap-1.5">
+                <span className="text-xs font-semibold text-slate-500 dark:text-slate-400 truncate" title="Proposals Received">
                   Proposals Received
                 </span>
-                <div className="rounded-xl bg-emerald-50 dark:bg-emerald-950/60 p-2 text-emerald-600 dark:text-emerald-400">
+                <div className="rounded-xl bg-emerald-50 dark:bg-emerald-950/60 p-1.5 text-emerald-600 dark:text-emerald-400 shrink-0">
                   <Users2 className="size-4" />
                 </div>
               </div>
-              <p className="mt-3 text-2xl font-bold text-slate-900 dark:text-slate-100">
+              <p className="mt-2 text-2xl font-bold text-slate-900 dark:text-slate-100">
                 {myChallengesRaw.reduce((acc, c) => acc + (c.applications?.length || 0), 0)}
               </p>
-              <p className="mt-1 text-xs text-slate-400">Academic & student team proposals</p>
+              <p className="mt-0.5 text-xs text-slate-400 leading-snug">Academic & student proposals</p>
             </div>
 
-            <div className="rounded-2xl border border-border-muted bg-surface p-5 shadow-xs">
-              <div className="flex items-center justify-between">
-                <span className="text-xs font-semibold text-slate-500 dark:text-slate-400">
+            <div className="rounded-2xl border border-border-muted bg-surface p-4 shadow-xs">
+              <div className="flex items-center justify-between gap-1.5">
+                <span className="text-xs font-semibold text-slate-500 dark:text-slate-400 truncate" title="Marketplace Live">
                   Marketplace Live
                 </span>
-                <div className="rounded-xl bg-purple-50 dark:bg-purple-950/60 p-2 text-purple-600 dark:text-purple-400">
+                <div className="rounded-xl bg-purple-50 dark:bg-purple-950/60 p-1.5 text-purple-600 dark:text-purple-400 shrink-0">
                   <Layers className="size-4" />
                 </div>
               </div>
-              <p className="mt-3 text-2xl font-bold text-slate-900 dark:text-slate-100">
+              <p className="mt-2 text-2xl font-bold text-slate-900 dark:text-slate-100">
                 {challenges.length}
               </p>
-              <p className="mt-1 text-xs text-slate-400">Total challenges across all partners</p>
+              <p className="mt-0.5 text-xs text-slate-400 leading-snug">Total challenges across all partners</p>
             </div>
 
-            <div className="rounded-2xl border border-indigo-200 dark:border-indigo-900 bg-indigo-50/60 dark:bg-indigo-950/30 p-5 shadow-xs flex flex-col justify-between">
+            <div className="rounded-2xl border border-indigo-200 dark:border-indigo-900 bg-indigo-50/60 dark:bg-indigo-950/30 p-4 sm:p-5 shadow-xs flex flex-col justify-between sm:col-span-3 lg:col-span-2">
               <div>
-                <span className="text-xs font-semibold text-indigo-700 dark:text-indigo-300">
-                  Quick Actions
-                </span>
-                <p className="text-xs text-slate-500 dark:text-slate-400 mt-1">
+                <div className="flex items-center justify-between gap-2">
+                  <span className="text-xs font-bold uppercase tracking-wider text-indigo-700 dark:text-indigo-300">
+                    Quick Actions
+                  </span>
+                  <span className="inline-flex items-center rounded-full bg-indigo-100 dark:bg-indigo-900/60 px-2 py-0.5 text-[10px] font-semibold text-indigo-700 dark:text-indigo-300">
+                    Industry Hub
+                  </span>
+                </div>
+                <p className="text-xs text-slate-500 dark:text-slate-400 mt-1 leading-relaxed">
                   Manage applications and score teams in Joint Evaluation.
                 </p>
               </div>
-              <div className="mt-3 flex items-center gap-2">
+              <div className="mt-3 flex flex-wrap items-center gap-2.5">
                 <MyChallengesModal challenges={myChallengesRaw} />
                 <PostChallengeModal />
               </div>
