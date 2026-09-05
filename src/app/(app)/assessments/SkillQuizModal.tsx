@@ -273,7 +273,6 @@ export function SkillQuizModal() {
                   <button
                     type="button"
                     onClick={handleNext}
-                    disabled={answers[currentQuestionIndex] === undefined}
                     className="inline-flex items-center gap-1.5 rounded-xl bg-indigo-600 px-4 py-2 text-xs font-semibold text-white hover:bg-indigo-700 disabled:opacity-40 disabled:pointer-events-none shadow-sm cursor-pointer"
                   >
                     {currentQuestionIndex === currentQuestions.length - 1 ? (

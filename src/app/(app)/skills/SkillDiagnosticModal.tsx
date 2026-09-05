@@ -423,7 +423,7 @@ export function SkillDiagnosticModal({
                   <button
                     type="button"
                     onClick={handleSubmit}
-                    disabled={submitting || !allAnswered}
+                    disabled={submitting}
                     className="inline-flex items-center gap-1.5 rounded-xl bg-emerald-600 px-5 py-2 text-xs font-bold text-white shadow-sm hover:bg-emerald-700 disabled:opacity-50 active:scale-[0.98]"
                   >
                     {submitting ? (
