@@ -90,6 +90,94 @@ interface PlacementTrackerClientProps {
   corporatePartners?: CorporatePartnerItem[];
 }
 
+interface CustomTooltipProps {
+  active?: boolean;
+  payload?: Array<{ payload: YearlyPlacementData }>;
+  label?: string;
+}
+
+function CustomTooltip({ active, payload, label }: CustomTooltipProps) {
+  if (active && payload && payload.length) {
+    const item = payload[0]?.payload;
+    if (!item) return null;
+
+    return (
+      <div className="rounded-2xl border border-border-muted/80 bg-surface/95 p-4 shadow-2xl backdrop-blur-xl text-xs min-w-[270px] animate-in fade-in-50 zoom-in-95">
+        <div className="flex items-center justify-between border-b border-border-muted pb-2.5 mb-2.5">
+          <div className="flex items-center gap-2">
+            <span className="flex size-7 items-center justify-center rounded-xl bg-indigo-600 font-bold text-xs text-white shadow-xs">
+              {item.year ? item.year.slice(0, 4) : label}
+            </span>
+            <div>
+              <p className="font-bold text-slate-900 dark:text-slate-100 text-sm">
+                Batch {item.year || label}
+              </p>
+              <p className="text-[10px] text-slate-400">Academic Placement Cohort</p>
+            </div>
+          </div>
+          <span className="rounded-full bg-emerald-500/10 px-2.5 py-1 text-[11px] font-bold text-emerald-600 dark:text-emerald-400 border border-emerald-500/20">
+            {item.placementRate}% Placed
+          </span>
+        </div>
+
+        <div className="space-y-2 text-slate-600 dark:text-slate-300">
+          <div className="flex items-center justify-between gap-4">
+            <span className="flex items-center gap-2 font-medium text-indigo-600 dark:text-indigo-400">
+              <span className="size-2 rounded-full bg-indigo-500 shadow-xs" />
+              Students Placed:
+            </span>
+            <span className="font-bold text-slate-900 dark:text-slate-100">
+              {item.placedStudents}{" "}
+              <span className="font-normal text-slate-400">/ {item.eligibleStudents} pool</span>
+            </span>
+          </div>
+
+          <div className="flex items-center justify-between gap-4">
+            <span className="flex items-center gap-2 font-medium text-emerald-600 dark:text-emerald-400">
+              <span className="size-2 rounded-full bg-emerald-500 shadow-xs" />
+              Placement Rate:
+            </span>
+            <span className="font-bold text-emerald-600 dark:text-emerald-400">
+              {item.placementRate}%
+            </span>
+          </div>
+
+          <div className="flex items-center justify-between gap-4">
+            <span className="flex items-center gap-2 font-medium text-purple-600 dark:text-purple-400">
+              <span className="size-2 rounded-full bg-purple-500 shadow-xs" />
+              Average CTC:
+            </span>
+            <span className="font-bold text-slate-900 dark:text-slate-100">
+              ₹{item.avgCtcLpa} LPA
+            </span>
+          </div>
+
+          <div className="flex items-center justify-between gap-4">
+            <span className="flex items-center gap-2 font-medium text-amber-600 dark:text-amber-400">
+              <span className="size-2 rounded-full bg-amber-500 shadow-xs" />
+              Highest CTC:
+            </span>
+            <span className="font-bold text-amber-600 dark:text-amber-400">
+              ₹{item.highestCtcLpa} LPA
+            </span>
+          </div>
+
+          <div className="flex items-center justify-between gap-4 border-t border-border-muted pt-2 mt-2 text-[11px] text-slate-400">
+            <span className="flex items-center gap-1.5">
+              <Building2 className="size-3.5 text-slate-400" />
+              Recruiters Visited:
+            </span>
+            <span className="font-semibold text-slate-700 dark:text-slate-300">
+              {item.companiesVisited} Corporate Partners
+            </span>
+          </div>
+        </div>
+      </div>
+    );
+  }
+  return null;
+}
+
 export function PlacementTrackerClient({
   livePitches,
   corporatePartners = [],
@@ -100,7 +188,15 @@ export function PlacementTrackerClient({
 
   const [selectedYear, setSelectedYear] = useState<string>("2025-26");
   const [chartView, setChartView] = useState<"combined" | "count" | "percentage" | "salary">("combined");
-  const [searchQuery, setSearchQuery] = useState("");
+  const [searchQuery, setSearchQuery] = useState(() => {
+    if (typeof window !== "undefined") {
+      try {
+        const params = new URLSearchParams(window.location.search);
+        return params.get("search") || "";
+      } catch {}
+    }
+    return "";
+  });
   const [categoryFilter, setCategoryFilter] = useState<string>("All");
   const [notification, setNotification] = useState<string | null>(null);
 
@@ -118,17 +214,6 @@ export function PlacementTrackerClient({
     }
     return null;
   };
-
-  // Sync search param from URL if navigated from /partners
-  useEffect(() => {
-    if (typeof window !== "undefined") {
-      try {
-        const params = new URLSearchParams(window.location.search);
-        const searchVal = params.get("search");
-        if (searchVal) setSearchQuery(searchVal);
-      } catch {}
-    }
-  }, []);
 
   // Modal State for Post & Edit
   const [isModalOpen, setIsModalOpen] = useState(false);
@@ -157,11 +242,11 @@ export function PlacementTrackerClient({
       if (saved) {
         const parsed = JSON.parse(saved);
         if (Array.isArray(parsed) && parsed.length > 0) {
-          setYearlyData(parsed);
+          setTimeout(() => setYearlyData(parsed), 0);
         }
       }
     } catch {}
-    setIsLoaded(true);
+    setTimeout(() => setIsLoaded(true), 0);
   }, []);
 
   // Persist to localStorage on data change only after initial client mount
@@ -317,7 +402,7 @@ export function PlacementTrackerClient({
     };
 
     setYearlyData((prevData) => {
-      let nextData = prevData.map((yd) => ({
+      const nextData = prevData.map((yd) => ({
         ...yd,
         companies: [...yd.companies],
       }));
@@ -441,88 +526,7 @@ export function PlacementTrackerClient({
     }
   }
 
-  // High-Fidelity Custom Chart Tooltip
-  const CustomTooltip = ({ active, payload, label }: any) => {
-    if (active && payload && payload.length) {
-      const item = chartData.find((d) => d.year === label);
-      if (!item) return null;
 
-      return (
-        <div className="rounded-2xl border border-border-muted/80 bg-surface/95 p-4 shadow-2xl backdrop-blur-xl text-xs min-w-[270px] animate-in fade-in-50 zoom-in-95">
-          <div className="flex items-center justify-between border-b border-border-muted pb-2.5 mb-2.5">
-            <div className="flex items-center gap-2">
-              <span className="flex size-7 items-center justify-center rounded-xl bg-indigo-600 font-bold text-xs text-white shadow-xs">
-                {item.year.slice(0, 4)}
-              </span>
-              <div>
-                <p className="font-bold text-slate-900 dark:text-slate-100 text-sm">
-                  Batch {item.year}
-                </p>
-                <p className="text-[10px] text-slate-400">Academic Placement Cohort</p>
-              </div>
-            </div>
-            <span className="rounded-full bg-emerald-500/10 px-2.5 py-1 text-[11px] font-bold text-emerald-600 dark:text-emerald-400 border border-emerald-500/20">
-              {item.placementRate}% Placed
-            </span>
-          </div>
-
-          <div className="space-y-2 text-slate-600 dark:text-slate-300">
-            <div className="flex items-center justify-between gap-4">
-              <span className="flex items-center gap-2 font-medium text-indigo-600 dark:text-indigo-400">
-                <span className="size-2 rounded-full bg-indigo-500 shadow-xs" />
-                Students Placed:
-              </span>
-              <span className="font-bold text-slate-900 dark:text-slate-100">
-                {item.placedStudents}{" "}
-                <span className="font-normal text-slate-400">/ {item.eligibleStudents} pool</span>
-              </span>
-            </div>
-
-            <div className="flex items-center justify-between gap-4">
-              <span className="flex items-center gap-2 font-medium text-emerald-600 dark:text-emerald-400">
-                <span className="size-2 rounded-full bg-emerald-500 shadow-xs" />
-                Placement Rate:
-              </span>
-              <span className="font-bold text-emerald-600 dark:text-emerald-400">
-                {item.placementRate}%
-              </span>
-            </div>
-
-            <div className="flex items-center justify-between gap-4">
-              <span className="flex items-center gap-2 font-medium text-purple-600 dark:text-purple-400">
-                <span className="size-2 rounded-full bg-purple-500 shadow-xs" />
-                Average CTC:
-              </span>
-              <span className="font-bold text-slate-900 dark:text-slate-100">
-                ₹{item.avgCtcLpa} LPA
-              </span>
-            </div>
-
-            <div className="flex items-center justify-between gap-4">
-              <span className="flex items-center gap-2 font-medium text-amber-600 dark:text-amber-400">
-                <span className="size-2 rounded-full bg-amber-500 shadow-xs" />
-                Highest CTC:
-              </span>
-              <span className="font-bold text-amber-600 dark:text-amber-400">
-                ₹{item.highestCtcLpa} LPA
-              </span>
-            </div>
-
-            <div className="flex items-center justify-between gap-4 border-t border-border-muted pt-2 mt-2 text-[11px] text-slate-400">
-              <span className="flex items-center gap-1.5">
-                <Building2 className="size-3.5 text-slate-400" />
-                Recruiters Visited:
-              </span>
-              <span className="font-semibold text-slate-700 dark:text-slate-300">
-                {item.companiesVisited} Corporate Partners
-              </span>
-            </div>
-          </div>
-        </div>
-      );
-    }
-    return null;
-  };
 
   return (
     <div className="space-y-8">
@@ -1493,7 +1497,7 @@ export function PlacementTrackerClient({
                   </label>
                   <select
                     value={formCategory}
-                    onChange={(e) => setFormCategory(e.target.value as any)}
+                    onChange={(e) => setFormCategory(e.target.value as CompanyPlacementRecord["category"])}
                     className="h-10 w-full rounded-xl border border-border-muted bg-surface-subtle px-3 text-xs text-slate-900 focus:border-indigo-500 focus:outline-none dark:text-slate-100"
                   >
                     <option value="Super Dream">Super Dream (≥ ₹20 LPA)</option>

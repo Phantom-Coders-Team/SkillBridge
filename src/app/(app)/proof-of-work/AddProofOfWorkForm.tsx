@@ -29,7 +29,7 @@ export default function AddProofOfWorkForm({
   if (projects.length === 0) {
     return (
       <div className="text-center py-4 text-sm text-slate-500">
-        You don't have any projects yet. Create a project in your portfolio first to submit a Proof of Work.
+        You don&apos;t have any projects yet. Create a project in your portfolio first to submit a Proof of Work.
       </div>
     );
   }

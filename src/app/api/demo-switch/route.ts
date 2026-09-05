@@ -122,8 +122,9 @@ export async function POST(req: Request) {
         role: normalizedRole,
       },
     });
-  } catch (err: any) {
+  } catch (err: unknown) {
     console.error("Demo switch error:", err);
-    return NextResponse.json({ error: err.message || "Failed to switch persona" }, { status: 500 });
+    const message = err instanceof Error ? err.message : "Failed to switch persona";
+    return NextResponse.json({ error: message }, { status: 500 });
   }
 }

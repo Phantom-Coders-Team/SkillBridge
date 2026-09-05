@@ -50,9 +50,14 @@ export function NotificationCenter({ userEmail }: { userEmail: string }) {
   };
 
   useEffect(() => {
-    fetchNotifications();
+    const initialTimer = setTimeout(() => {
+      fetchNotifications();
+    }, 0);
     const interval = setInterval(fetchNotifications, 15000);
-    return () => clearInterval(interval);
+    return () => {
+      clearTimeout(initialTimer);
+      clearInterval(interval);
+    };
   }, []);
 
   // Close on outside click

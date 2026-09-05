@@ -299,7 +299,7 @@ export default function ApplicantList({
                 {/* 5. Cover letter note (if candidate provided one) */}
                 {parsed.coverLetter && (
                   <p className="mt-2 text-[11px] text-slate-600 dark:text-slate-300 italic bg-slate-50 dark:bg-slate-800/40 rounded-lg p-2.5 border border-slate-100 dark:border-slate-800">
-                    "{parsed.coverLetter}"
+                    &quot;{parsed.coverLetter}&quot;
                   </p>
                 )}
 

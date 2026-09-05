@@ -134,13 +134,13 @@ export default async function PortfolioPage() {
                       <span className="flex items-center gap-1.5"><ShieldCheck className="size-3" /> Blockchain Verified</span>
                     </Badge>
                   ) : "facultySignOff" in po ? (
-                    <Badge tone={(po as any).facultySignOff === "APPROVED" && (po as any).industrySignOff === "APPROVED" ? "green" : "amber"}>
-                      {(po as any).facultySignOff === "APPROVED" && (po as any).industrySignOff === "APPROVED" ? (
+                    <Badge tone={po.facultySignOff === "APPROVED" && po.industrySignOff === "APPROVED" ? "green" : "amber"}>
+                      {po.facultySignOff === "APPROVED" && po.industrySignOff === "APPROVED" ? (
                         <span className="flex items-center gap-1.5"><ShieldCheck className="size-3" /> Dual sign-off (Verified)</span>
                       ) : "Pending sign-off"}
                     </Badge>
                   ) : (
-                    <Badge tone="gray">{(po as any).status ?? ""}</Badge>
+                    <Badge tone="gray">{"status" in po ? String(po.status ?? "") : ""}</Badge>
                   )}
                 </div>
               ))}

@@ -219,7 +219,7 @@ export default async function PublicProfilePage({ params }: { params: Promise<{ 
         </div>
 
         <dl className="grid grid-cols-1 gap-px border-t border-border-muted bg-border-muted sm:grid-cols-2">
-          {infoItems.map(({ icon: Icon, label, value, isLink }: any) =>
+          {infoItems.map(({ icon: Icon, label, value, isLink }) =>
             value ? (
               <div key={label} className="flex items-start gap-3 bg-surface p-4">
                 <Icon aria-hidden className="mt-0.5 size-4 shrink-0 text-slate-400" />

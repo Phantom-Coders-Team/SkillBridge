@@ -58,9 +58,10 @@ export function SyncClient({
         text: `Successfully synced ${data.syncedCount} programming skills from GitHub into your profile!`,
         type: "success",
       });
-    } catch (err: any) {
+    } catch (err: unknown) {
+      const message = err instanceof Error ? err.message : "Could not sync GitHub profile.";
       setGhMsg({
-        text: err.message || "Could not sync GitHub profile.",
+        text: message,
         type: "error",
       });
     } finally {

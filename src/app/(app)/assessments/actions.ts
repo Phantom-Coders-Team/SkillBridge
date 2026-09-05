@@ -86,8 +86,9 @@ export async function submitAssessmentAction(data: {
     revalidatePath("/reverse-placement");
 
     return { success: true };
-  } catch (err: any) {
+  } catch (err: unknown) {
     console.error("Submit assessment error:", err);
-    return { success: false, error: err.message || "Failed to record assessment" };
+    const message = err instanceof Error ? err.message : "Failed to record assessment";
+    return { success: false, error: message };
   }
 }

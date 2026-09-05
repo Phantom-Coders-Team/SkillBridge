@@ -418,8 +418,9 @@ export function SettingsClient({
                           const data = await initTwoFactorSetupAction();
                           setSetupData(data);
                           setSetupStep("scanning");
-                        } catch (err: any) {
-                          setError2fa(err.message || "Failed to initialize 2FA setup");
+                        } catch (err: unknown) {
+                          const msg = err instanceof Error ? err.message : "Failed to initialize 2FA setup";
+                          setError2fa(msg);
                         } finally {
                           setLoading2fa(false);
                         }
@@ -526,8 +527,9 @@ export function SettingsClient({
                               } else {
                                 setError2fa(res.error || "Invalid 2FA verification code.");
                               }
-                            } catch (err: any) {
-                              setError2fa(err.message || "Failed to confirm 2FA");
+                            } catch (err: unknown) {
+                              const msg = err instanceof Error ? err.message : "Failed to confirm 2FA";
+                              setError2fa(msg);
                             } finally {
                               setLoading2fa(false);
                             }
@@ -631,8 +633,9 @@ export function SettingsClient({
                             } else {
                               setError2fa(res.error || "Invalid 2FA token.");
                             }
-                          } catch (err: any) {
-                            setError2fa(err.message || "Failed to disable 2FA");
+                          } catch (err: unknown) {
+                            const msg = err instanceof Error ? err.message : "Failed to disable 2FA";
+                            setError2fa(msg);
                           } finally {
                             setLoading2fa(false);
                           }

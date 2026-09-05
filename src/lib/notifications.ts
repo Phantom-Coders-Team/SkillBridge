@@ -2,7 +2,6 @@ import fs from "fs";
 import path from "path";
 import { prisma } from "./prisma";
 import {
-  sendEmail,
   sendApplicationStatusEmail,
   sendRecruiterPitchEmail,
   sendNewApplicationAlertEmail,
@@ -13,24 +12,39 @@ import {
 export interface AppNotification {
   id: string;
   userId: string;
-  userEmail: string;
-  userName: string;
+  userEmail?: string;
+  userName?: string;
   title: string;
   message: string;
   type: "APPLICATION" | "PITCH" | "MENTOR_SLOT" | "BADGE" | "TEST" | "SYSTEM";
   link?: string;
   read: boolean;
-  emailSent: boolean;
+  emailSent?: boolean;
   emailSimulated?: boolean;
   createdAt: string;
 }
 
-const STORAGE_FILE = path.join(process.cwd(), ".notifications.json");
+interface DbNotificationRow {
+  id: string;
+  user_id: string;
+  user_email?: string;
+  user_name?: string;
+  title: string;
+  message: string;
+  type: string;
+  link?: string | null;
+  read?: boolean | number | null;
+  email_sent?: boolean | number | null;
+  email_simulated?: boolean | number | null;
+  created_at?: string | Date | null;
+}
 
-// In-memory cache fallback
+const STORAGE_FILE = path.join(process.cwd(), "notifications.json");
+
 let notificationsMemory: AppNotification[] = [];
 
 function loadNotifications(): AppNotification[] {
+  if (notificationsMemory.length > 0) return notificationsMemory;
   try {
     if (fs.existsSync(STORAGE_FILE)) {
       const data = fs.readFileSync(STORAGE_FILE, "utf-8");
@@ -52,7 +66,7 @@ function saveNotifications(notifications: AppNotification[]) {
   }
 }
 
-function mapDbRow(row: any): AppNotification {
+function mapDbRow(row: DbNotificationRow): AppNotification {
   return {
     id: row.id,
     userId: row.user_id,
@@ -170,7 +184,7 @@ export async function updateNotificationEmailStatus(
  */
 export async function getUserNotifications(userId: string): Promise<AppNotification[]> {
   try {
-    const rows = await prisma.$queryRawUnsafe<any[]>(
+    const rows = await prisma.$queryRawUnsafe<DbNotificationRow[]>(
       `
       SELECT * FROM notifications
       WHERE user_id = $1

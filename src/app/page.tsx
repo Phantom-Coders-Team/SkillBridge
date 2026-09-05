@@ -236,7 +236,7 @@ export default async function Home() {
               </div>
 
               <span className="font-mono text-xs sm:text-sm font-semibold tracking-widest text-indigo-600 dark:text-indigo-400 uppercase">
-                // ACADEMIA
+                {"// ACADEMIA"}
               </span>
 
               <h1 className="mt-4 text-3xl font-extrabold tracking-tight text-slate-900 dark:text-white sm:text-5xl sm:leading-[1.12]">
@@ -275,7 +275,7 @@ export default async function Home() {
               </div>
 
               <span className="font-mono text-xs sm:text-sm font-semibold tracking-widest text-amber-600 dark:text-amber-400 uppercase">
-                INDUSTRY //
+                {"INDUSTRY //"}
               </span>
 
               <h1 className="mt-4 text-3xl font-extrabold tracking-tight text-slate-900 dark:text-white sm:text-5xl sm:leading-[1.12]">

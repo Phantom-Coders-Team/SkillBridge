@@ -59,14 +59,16 @@ export function SkillDiagnosticModal({
     if (!isOpen || skillsToTest.length === 0) return;
 
     let isMounted = true;
-    setLoading(true);
-    setErrorMessage(null);
-    setResult(null);
-    setAnswers({});
-    setSkippedIds([]);
-    setCurrentIndex(0);
 
     async function load() {
+      if (!isMounted) return;
+      setLoading(true);
+      setErrorMessage(null);
+      setResult(null);
+      setAnswers({});
+      setSkippedIds([]);
+      setCurrentIndex(0);
+
       const res = await getDiagnosticTestQuestions(skillsToTest);
       if (!isMounted) return;
       if (!res.ok || res.questions.length === 0) {
@@ -78,10 +80,13 @@ export function SkillDiagnosticModal({
       setLoading(false);
     }
 
-    load();
+    const timer = setTimeout(() => {
+      load();
+    }, 0);
 
     return () => {
       isMounted = false;
+      clearTimeout(timer);
     };
   }, [isOpen, skillsToTest]);
 

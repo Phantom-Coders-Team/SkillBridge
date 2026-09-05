@@ -135,8 +135,11 @@ export default function PostOpportunityForm() {
   // Reset selected skills upon successful posting
   useEffect(() => {
     if (state?.success) {
-      setSelectedSkills([]);
-      setSearchQuery("");
+      const timer = setTimeout(() => {
+        setSelectedSkills([]);
+        setSearchQuery("");
+      }, 0);
+      return () => clearTimeout(timer);
     }
   }, [state?.success]);
 
@@ -408,7 +411,7 @@ export default function PostOpportunityForm() {
                 onClick={addCustomSkill}
                 className="font-bold text-indigo-600 underline hover:text-indigo-700 dark:text-indigo-400 cursor-pointer"
               >
-                Add "{searchQuery}" as custom skill
+                Add &quot;{searchQuery}&quot; as custom skill
               </button>
             </div>
           )}

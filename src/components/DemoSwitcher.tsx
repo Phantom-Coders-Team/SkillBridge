@@ -68,7 +68,7 @@ export function DemoSwitcher({ currentRole }: { currentRole?: Role }) {
       });
 
       if (res.ok) {
-        window.location.href = "/dashboard";
+        window.location.assign("/dashboard");
       } else {
         console.error("Failed to switch persona");
       }
@@ -90,7 +90,7 @@ export function DemoSwitcher({ currentRole }: { currentRole?: Role }) {
       });
 
       if (res.ok) {
-        window.location.href = "/dashboard";
+        window.location.assign("/dashboard");
       } else {
         console.error("Failed to switch persona");
       }

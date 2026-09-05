@@ -22,6 +22,11 @@ const TYPE_TONE: Record<string, BadgeTone> = {
   MENTORSHIP: "pink",
 };
 
+function isDeadlineExpired(deadlineDateStr: string | null): boolean {
+  if (!deadlineDateStr) return false;
+  return new Date(`${deadlineDateStr}T23:59:59`).getTime() < Date.now();
+}
+
 export default async function InternshipsPage() {
   const user = await getCurrentUser();
   if (!user) redirect("/login");
@@ -188,9 +193,8 @@ export default async function InternshipsPage() {
 
             const deadlineMatch = l.duration?.match(/Deadline:\s*([0-9]{4}-[0-9]{2}-[0-9]{2})/);
             const deadlineDateStr = deadlineMatch ? deadlineMatch[1] : null;
-            const isExpired = deadlineDateStr
-              ? new Date(`${deadlineDateStr}T23:59:59`).getTime() < Date.now()
-              : false;
+            const isExpired = isDeadlineExpired(deadlineDateStr);
+
 
             return (
               <Card key={l.id} hover className="flex flex-col p-5">

@@ -519,7 +519,7 @@ export function ReversePlacementClient({
               {/* Status filter */}
               <select
                 value={statusFilter}
-                onChange={(e) => setStatusFilter(e.target.value as any)}
+                onChange={(e) => setStatusFilter(e.target.value as "ALL" | "UNLOCKED" | "LOCKED")}
                 className="rounded-xl border border-border-muted bg-surface px-2.5 py-1.5 text-xs text-slate-800 dark:text-slate-200 focus:border-indigo-500 focus:outline-none cursor-pointer"
               >
                 <option value="ALL">All Scores</option>

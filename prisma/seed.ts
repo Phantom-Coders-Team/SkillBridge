@@ -9,10 +9,11 @@ async function retry<T>(fn: () => Promise<T>, retries = 5, delayMs = 1500): Prom
   while (attempt <= retries) {
     try {
       return await fn();
-    } catch (err: any) {
+    } catch (err: unknown) {
       attempt++;
       if (attempt <= retries) {
-        console.warn(`[Seed Retry] attempt ${attempt}/${retries} after error: ${err?.message || err}`);
+        const message = err instanceof Error ? err.message : String(err);
+        console.warn(`[Seed Retry] attempt ${attempt}/${retries} after error: ${message}`);
         await new Promise((res) => setTimeout(res, delayMs * attempt));
       } else {
         throw err;

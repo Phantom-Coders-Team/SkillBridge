@@ -43,6 +43,7 @@ export function MentorSlotsClient({
   const [isAdding, setIsAdding] = useState(false);
   const [submitting, setSubmitting] = useState(false);
   const [error, setError] = useState<string | null>(null);
+  const [defaultDate] = useState(() => new Date(Date.now() + 86400000).toISOString().split("T")[0]);
 
   async function handleSubmit(e: React.FormEvent<HTMLFormElement>) {
     e.preventDefault();
@@ -101,7 +102,7 @@ export function MentorSlotsClient({
                 type="date"
                 name="date"
                 required
-                defaultValue={new Date(Date.now() + 86400000).toISOString().split("T")[0]}
+                defaultValue={defaultDate}
                 className="mt-1 w-full rounded-xl border border-border-muted bg-surface px-3 py-2 text-xs text-slate-900 dark:text-slate-100"
               />
             </div>

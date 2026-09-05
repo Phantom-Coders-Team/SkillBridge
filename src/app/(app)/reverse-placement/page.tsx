@@ -127,7 +127,7 @@ export default async function ReversePlacementPage() {
       />
       <ReversePlacementClient
         candidates={sorted}
-        viewerRole={effectiveRole as any}
+        viewerRole={effectiveRole as React.ComponentProps<typeof ReversePlacementClient>["viewerRole"]}
         currentUserId={user.id}
         incomingPitches={serializedIncomingPitches}
         sentPitches={serializedSentPitches}

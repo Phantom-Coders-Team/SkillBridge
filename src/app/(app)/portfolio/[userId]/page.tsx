@@ -359,14 +359,14 @@ export default async function StudentPortfolioViewPage({
                   ) : "facultySignOff" in po ? (
                     <Badge
                       tone={
-                        (po as any).facultySignOff === "APPROVED" &&
-                        (po as any).industrySignOff === "APPROVED"
+                        po.facultySignOff === "APPROVED" &&
+                        po.industrySignOff === "APPROVED"
                           ? "green"
                           : "amber"
                       }
                     >
-                      {(po as any).facultySignOff === "APPROVED" &&
-                      (po as any).industrySignOff === "APPROVED" ? (
+                      {po.facultySignOff === "APPROVED" &&
+                      po.industrySignOff === "APPROVED" ? (
                         <span className="flex items-center gap-1.5">
                           <ShieldCheck className="size-3" /> Dual sign-off (Verified)
                         </span>
@@ -375,7 +375,7 @@ export default async function StudentPortfolioViewPage({
                       )}
                     </Badge>
                   ) : (
-                    <Badge tone="gray">{(po as any).status ?? ""}</Badge>
+                    <Badge tone="gray">{"status" in po ? String(po.status ?? "") : ""}</Badge>
                   )}
                 </div>
               ))}

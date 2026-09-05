@@ -115,8 +115,9 @@ export async function createGradingRecord(
     revalidatePath("/dashboard");
     revalidatePath("/reverse-placement");
     return { success: true };
-  } catch (e: any) {
-    return { error: e?.message || "Failed to create joint evaluation record." };
+  } catch (e: unknown) {
+    const message = e instanceof Error ? e.message : "Failed to create joint evaluation record.";
+    return { error: message };
   }
 }
 
@@ -159,8 +160,9 @@ export async function updateGradingSession(
     revalidatePath("/dashboard");
     revalidatePath("/reverse-placement");
     return { success: true };
-  } catch (e: any) {
-    return { error: e?.message || "Failed to update joint evaluation session." };
+  } catch (e: unknown) {
+    const message = e instanceof Error ? e.message : "Failed to update joint evaluation session.";
+    return { error: message };
   }
 }
 
@@ -186,7 +188,8 @@ export async function deleteGradingRecord(
     revalidatePath("/dashboard");
     revalidatePath("/reverse-placement");
     return { success: true };
-  } catch (e: any) {
-    return { error: e?.message || "Failed to delete joint evaluation record." };
+  } catch (e: unknown) {
+    const message = e instanceof Error ? e.message : "Failed to delete joint evaluation record.";
+    return { error: message };
   }
 }
