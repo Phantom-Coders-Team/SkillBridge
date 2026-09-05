@@ -14,7 +14,6 @@ import {
   Sparkles,
   Target,
   TrendingUp,
-  Video,
   type LucideIcon,
 } from "lucide-react";
 import type { Role } from "@/lib/types";
@@ -33,7 +32,6 @@ const STUDENT_NAV: NavItem[] = [
   { label: "Proof of Work & Badges", href: "/proof-of-work", icon: Award },
   { label: "Reverse Placement", href: "/reverse-placement", icon: TrendingUp },
   { label: "Mentor Office Hours", href: "/office-hours", icon: CalendarClock },
-  { label: "AI Mock Interviews", href: "/mock-interview", icon: Video },
   { label: "Digital Portfolio", href: "/portfolio", icon: ScrollText },
 ];
 

@@ -261,7 +261,7 @@ async function main() {
   const day = 86400000;
   const mentorSlotDefs = [
     [industryUserIds[0], studentUserIds[0], 2, "Career guidance & placement prep"],
-    [industryUserIds[1], studentUserIds[4], 5, "Resume review & mock interview"],
+    [industryUserIds[1], studentUserIds[4], 5, "Resume review & portfolio guidance"],
     [industryUserIds[2], studentUserIds[1], 8, "Tech stack roadmap discussion"],
     [industryUserIds[3], null, 4, "Open office hours - building systems"],
     [industryUserIds[4], studentUserIds[7], 10, "Microservices architecture deep-dive"],
