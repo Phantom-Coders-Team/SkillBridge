@@ -281,3 +281,95 @@ export async function updateApplicationStatus(
     return { error: "Failed to update status." };
   }
 }
+
+export async function bulkUpdateApplicationStatusAction(
+  appIds: string[],
+  status: string
+): Promise<{ success: boolean; count?: number; error?: string }> {
+  const user = await requireRole(["INDUSTRIES", "INDUSTRY"]);
+  if (!appIds || appIds.length === 0) {
+    return { success: false, error: "No applicants selected." };
+  }
+
+  try {
+    // Verify these applications belong to this company's listings
+    const apps = await prisma.internshipApplication.findMany({
+      where: {
+        id: { in: appIds },
+        listing: { companyId: user.id },
+      },
+      include: {
+        student: { select: { id: true, email: true, name: true } },
+        listing: { select: { title: true } },
+      },
+    });
+
+    const validIds = apps.map((a) => a.id);
+    if (validIds.length === 0) {
+      return { success: false, error: "No matching applications found for your company." };
+    }
+
+    await prisma.internshipApplication.updateMany({
+      where: { id: { in: validIds } },
+      data: { status },
+    });
+
+    // Notify each student
+    for (const app of apps) {
+      if (app.student?.email) {
+        try {
+          await notifyApplicationStatusChange({
+            studentId: app.student.id,
+            studentEmail: app.student.email,
+            studentName: app.student.name,
+            listingTitle: app.listing.title,
+            companyName: user.name,
+            status,
+          });
+        } catch {
+          // ignore notification error in bulk
+        }
+      }
+    }
+
+    revalidatePath("/internships");
+    return { success: true, count: validIds.length };
+  } catch (err) {
+    console.error("bulkUpdateApplicationStatus error:", err);
+    return { success: false, error: "Failed to bulk update applications." };
+  }
+}
+
+export async function saveInterviewerScorecardAction(
+  appId: string,
+  rating: number,
+  notes: string
+): Promise<{ success: boolean; error?: string }> {
+  const user = await requireRole(["INDUSTRIES", "INDUSTRY"]);
+
+  try {
+    const app = await prisma.internshipApplication.findUnique({
+      where: { id: appId },
+      include: { listing: { select: { companyId: true } } },
+    });
+
+    if (!app || app.listing.companyId !== user.id) {
+      return { success: false, error: "Application not found or unauthorized." };
+    }
+
+    await prisma.internshipApplication.update({
+      where: { id: appId },
+      data: {
+        interviewerRating: rating,
+        interviewerNotes: notes,
+      },
+    });
+
+    revalidatePath("/internships");
+    return { success: true };
+  } catch (err) {
+    console.error("saveInterviewerScorecard error:", err);
+    return { success: false, error: "Failed to record scorecard." };
+  }
+}
+

@@ -45,7 +45,6 @@ const ACADEMICIAN_NAV: NavItem[] = [
   { label: "Joint Evaluation", href: "/dual-grading", icon: Scale },
   { label: "Academician Development", href: "/faculty-portal", icon: Building2 },
   { label: "Proof of Work Review", href: "/proof-of-work", icon: Award },
-  { label: "Candidate Talent Radar", href: "/reverse-placement", icon: TrendingUp },
 ];
 
 const INDUSTRIES_NAV: NavItem[] = [
@@ -65,7 +64,7 @@ const INSTITUTIONS_NAV: NavItem[] = [
   { label: "Placement Records", href: "/placements", icon: Target },
   { label: "Joint Evaluation", href: "/dual-grading", icon: Scale },
   { label: "Corporate Partners", href: "/partners", icon: Building2 },
-  { label: "Reverse Placement Radar", href: "/reverse-placement", icon: TrendingUp },
+  { label: "Reverse Placement", href: "/reverse-placement", icon: TrendingUp },
   { label: "Cohort Analytics", href: "/analytics", icon: ClipboardCheck },
 ];
 

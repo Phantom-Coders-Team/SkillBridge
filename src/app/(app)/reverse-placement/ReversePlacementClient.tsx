@@ -418,7 +418,7 @@ export function ReversePlacementClient({
                 : "text-slate-600 hover:bg-slate-100 dark:text-slate-400 dark:hover:bg-slate-800"
             }`}
           >
-            Candidate Radar & Leaderboard ({candidates.length})
+            Candidate Leaderboard & Pitches ({candidates.length})
           </button>
           <button
             type="button"
@@ -646,7 +646,7 @@ export function ReversePlacementClient({
                             onClick={() => setBreakdownCandidate(c)}
                             className="text-indigo-600 dark:text-indigo-400 hover:underline inline-flex items-center gap-1 font-medium cursor-pointer"
                           >
-                            <span>Inspect radar</span>
+                            <span>Inspect Scorecard</span>
                             <ChevronRight className="size-3" />
                           </button>
                         </td>
@@ -694,7 +694,7 @@ export function ReversePlacementClient({
         </section>
       )}
 
-      {/* INSPECT RADAR / BREAKDOWN MODAL */}
+      {/* INSPECT SCORECARD / BREAKDOWN MODAL */}
       {breakdownCandidate && (
         <div
           className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/60 backdrop-blur-sm animate-in fade-in"
@@ -747,7 +747,7 @@ export function ReversePlacementClient({
               </div>
             </div>
 
-            {/* 6 Dimension Radar Breakdown */}
+            {/* 6 Dimension PRI Breakdown */}
             <div className="space-y-2.5">
               <p className="text-xs font-bold uppercase tracking-wider text-slate-400">
                 Evaluation Metric Breakdown

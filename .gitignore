@@ -47,6 +47,7 @@ __pycache__/
 next-env.d.ts
 
 /src/generated/prisma
+/src/generated/client
 /prisma/migrations_sqlite_backup
 
 .vercel

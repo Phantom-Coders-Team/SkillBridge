@@ -22,16 +22,25 @@ import {
   Phone,
   Building2,
   User,
+  LayoutGrid, 
+  ListFilter, 
+  CheckSquare, 
+  Square,
 } from "lucide-react";
 import ExportButton from "./ExportButton";
 import ApplicationActions from "./ApplicationActions";
 import MatchBadge from "./MatchBadge";
+import { KanbanAtsBoard } from "./KanbanAtsBoard";
+import { BulkShortlistBar } from "./BulkShortlistBar";
+import { InterviewerScorecardModal } from "./InterviewerScorecardModal";
 import { parseApplicationMessage, formatInterviewDateTime } from "@/lib/interview";
 
 export interface Applicant {
   id: string;
   status: string;
   message?: string | null;
+  interviewerRating?: number | null;
+  interviewerNotes?: string | null;
   createdAt?: string | Date;
   student: {
     id: string;
@@ -98,31 +107,31 @@ function StatusPill({ status }: { status: string }) {
   }
   if (s === "INTERVIEW") {
     return (
-      <span className="inline-flex items-center gap-1 rounded-full bg-purple-100 px-2 py-0.5 text-[10px] font-bold text-purple-800 dark:bg-purple-950/80 dark:text-purple-300 animate-pulse">
-        <Calendar className="size-3 text-purple-600 dark:text-purple-400" />
-        Interview
+      <span className="inline-flex items-center gap-1 rounded-full bg-amber-100 px-2 py-0.5 text-[10px] font-bold text-amber-800 dark:bg-amber-950/80 dark:text-amber-300">
+        <Calendar className="size-3 text-amber-600 dark:text-amber-400" />
+        Interview Scheduled
       </span>
     );
   }
   if (s === "SHORTLISTED") {
     return (
-      <span className="inline-flex items-center gap-1 rounded-full bg-indigo-100 px-2 py-0.5 text-[10px] font-bold text-indigo-800 dark:bg-indigo-950/80 dark:text-indigo-300">
-        <CheckCircle2 className="size-3 text-indigo-600 dark:text-indigo-400" />
+      <span className="inline-flex items-center gap-1 rounded-full bg-purple-100 px-2 py-0.5 text-[10px] font-bold text-purple-800 dark:bg-purple-950/80 dark:text-purple-300">
+        <CheckCircle2 className="size-3 text-purple-600 dark:text-purple-400" />
         Shortlisted
       </span>
     );
   }
   if (s === "REJECTED") {
     return (
-      <span className="inline-flex items-center gap-1 rounded-full bg-rose-100 px-2 py-0.5 text-[10px] font-bold text-rose-800 dark:bg-rose-950/80 dark:text-rose-300">
-        <XCircle className="size-3 text-rose-600 dark:text-rose-400" />
+      <span className="inline-flex items-center gap-1 rounded-full bg-slate-100 px-2 py-0.5 text-[10px] font-bold text-slate-600 dark:bg-slate-800 dark:text-slate-400">
+        <XCircle className="size-3 text-slate-400" />
         Rejected
       </span>
     );
   }
   return (
     <span className="inline-flex items-center gap-1 rounded-full bg-slate-100 px-2 py-0.5 text-[10px] font-bold text-slate-700 dark:bg-slate-800 dark:text-slate-300">
-      <Clock className="size-3 text-slate-500" />
+      <Clock className="size-3 text-slate-400" />
       Applied
     </span>
   );
@@ -140,10 +149,26 @@ export default function ApplicantList({
   autoExpand?: boolean;
 }) {
   const [expanded, setExpanded] = useState<boolean>(autoExpand);
+  const [viewMode, setViewMode] = useState<"table" | "kanban">("table");
+  const [selectedIds, setSelectedIds] = useState<string[]>([]);
+
+  const handleToggleSelectAll = () => {
+    if (selectedIds.length === applicants.length) {
+      setSelectedIds([]);
+    } else {
+      setSelectedIds(applicants.map((a) => a.id));
+    }
+  };
+
+  const handleToggleSelectOne = (id: string) => {
+    setSelectedIds((prev) =>
+      prev.includes(id) ? prev.filter((item) => item !== id) : [...prev, id]
+    );
+  };
 
   return (
-    <div className="space-y-2.5">
-      <div className="flex items-center justify-between gap-2">
+    <div className="space-y-3">
+      <div className="flex flex-wrap items-center justify-between gap-2">
         <button
           type="button"
           onClick={() => setExpanded((v) => !v)}
@@ -155,20 +180,60 @@ export default function ApplicantList({
           </span>
           {expanded ? <ChevronUp className="size-3.5" /> : <ChevronDown className="size-3.5" />}
         </button>
-        <ExportButton
-          href={`/api/exports/applications?listingId=${listingId}`}
-          label="Export"
-          variant="ghost"
-          small
-        />
+
+        {expanded && applicants.length > 0 && (
+          <div className="flex items-center gap-2">
+            <div className="inline-flex rounded-lg border border-slate-200 bg-slate-50 p-0.5 dark:border-slate-800 dark:bg-slate-800">
+              <button
+                type="button"
+                onClick={() => setViewMode("table")}
+                className={`inline-flex items-center gap-1 rounded-md px-2.5 py-1 text-[11px] font-bold transition-all ${
+                  viewMode === "table"
+                    ? "bg-white text-purple-700 shadow-2xs dark:bg-slate-700 dark:text-purple-300"
+                    : "text-slate-500 hover:text-slate-900 dark:text-slate-400"
+                }`}
+              >
+                <ListFilter className="size-3" />
+                <span>List View</span>
+              </button>
+              <button
+                type="button"
+                onClick={() => setViewMode("kanban")}
+                className={`inline-flex items-center gap-1 rounded-md px-2.5 py-1 text-[11px] font-bold transition-all ${
+                  viewMode === "kanban"
+                    ? "bg-white text-purple-700 shadow-2xs dark:bg-slate-700 dark:text-purple-300"
+                    : "text-slate-500 hover:text-slate-900 dark:text-slate-400"
+                }`}
+              >
+                <LayoutGrid className="size-3" />
+                <span>ATS Kanban</span>
+              </button>
+            </div>
+
+            <ExportButton
+              href={`/api/exports/applications?listingId=${listingId}`}
+              label="Export CSV"
+              variant="ghost"
+              small
+            />
+          </div>
+        )}
       </div>
 
       {!expanded ? (
         <p className="text-[11px] text-slate-400 dark:text-slate-500">
           Click to view candidates, resumes, portfolios, and interview schedules.
         </p>
+      ) : viewMode === "kanban" ? (
+        <KanbanAtsBoard applicants={applicants} listingSkills={listingSkills} />
       ) : (
         <div className="space-y-3 pt-1">
+          <BulkShortlistBar
+            applicants={applicants}
+            selectedIds={selectedIds}
+            onToggleSelectAll={handleToggleSelectAll}
+            onClearSelection={() => setSelectedIds([])}
+          />
           {applicants.map((app) => {
             const parsed = parseApplicationMessage(app.message);
             const interview = parsed.interview;
@@ -187,9 +252,20 @@ export default function ApplicantList({
                 key={app.id}
                 className="rounded-2xl border border-slate-200/90 bg-white p-4 shadow-xs transition-all dark:border-slate-800 dark:bg-slate-900/80"
               >
-                {/* 1. Header: Full Student Name, Match Badge, Status Pill */}
+                {/* 1. Header: Selection Checkbox, Full Student Name, Match Badge, Scorecard, Status Pill */}
                 <div className="flex flex-wrap items-center justify-between gap-2">
-                  <div className="flex flex-wrap items-center gap-2">
+                  <div className="flex flex-wrap items-center gap-2.5">
+                    <button
+                      type="button"
+                      onClick={() => handleToggleSelectOne(app.id)}
+                      className="text-slate-400 hover:text-purple-600 dark:hover:text-purple-400 transition-colors cursor-pointer"
+                    >
+                      {selectedIds.includes(app.id) ? (
+                        <CheckSquare className="size-4 text-purple-600 dark:text-purple-400" />
+                      ) : (
+                        <Square className="size-4" />
+                      )}
+                    </button>
                     <Link
                       href={`/profile/${app.student.id}`}
                       className="text-sm font-bold text-slate-900 hover:text-indigo-600 dark:text-slate-100 dark:hover:text-indigo-400 transition-colors"
@@ -200,7 +276,15 @@ export default function ApplicantList({
                       <MatchBadge skills={listingSkills} mySkills={app.student.profile.skills} />
                     )}
                   </div>
-                  <StatusPill status={app.status} />
+                  <div className="flex items-center gap-2">
+                    <InterviewerScorecardModal
+                      applicationId={app.id}
+                      studentName={app.student.name}
+                      initialRating={app.interviewerRating}
+                      initialNotes={app.interviewerNotes}
+                    />
+                    <StatusPill status={app.status} />
+                  </div>
                 </div>
 
                 {/* 2. Subtitle: College, Department, Year, Roll Number, Applied Date */}

@@ -378,7 +378,7 @@ export function IndustryDashboard({
                 <p className="mt-0.5 text-purple-100">Directly pitch pre-vetted candidates with locked-in stipend offers without waiting for campus drive dates.</p>
               </div>
               <div className="rounded-xl bg-white/10 p-3 text-xs">
-                <p className="font-semibold text-white">Verified Skill Radar</p>
+                <p className="font-semibold text-white">Verified Skill Profile</p>
                 <p className="mt-0.5 text-purple-100">See real code-clinic benchmarks and live GitHub repositories.</p>
               </div>
             </div>

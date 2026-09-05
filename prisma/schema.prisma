@@ -1,5 +1,6 @@
 generator client {
   provider      = "prisma-client-js"
+  output        = "../src/generated/client"
   binaryTargets = ["native", "rhel-openssl-3.0.x"]
 }
 
@@ -44,6 +45,8 @@ model User {
   documents                  UserDocument[]
   vouchersIssued             ErupiVoucher[]              @relation("VoucherIssuer")
   vouchersReceived           ErupiVoucher[]              @relation("VoucherBeneficiary")
+  customAssessments          CustomAssessment[]          @relation("CompanyCustomAssessments")
+  assessmentSubmissions      AssessmentSubmission[]      @relation("StudentSubmissions")
 
   @@map("users")
 }
@@ -402,9 +405,15 @@ model FacultyProgramApplication {
   facultyId String
   faculty   User                  @relation(fields: [facultyId], references: [id], onDelete: Cascade)
   message   String?
-  status    String                @default("APPLIED")
-  createdAt DateTime              @default(now())
-  updatedAt DateTime              @updatedAt
+  status                    String                @default("APPLIED")
+  milestoneStage            String                @default("ENROLLED")
+  workplanUrl               String?
+  finalReportUrl            String?
+  mentorRating              Int?
+  mentorFeedback            String?
+  completionCertificateHash String?
+  createdAt                 DateTime              @default(now())
+  updatedAt                 DateTime              @updatedAt
 
   @@unique([listingId, facultyId])
   @@map("faculty_program_applications")
@@ -446,9 +455,11 @@ model InternshipApplication {
   studentId String
   student   User            @relation(fields: [studentId], references: [id], onDelete: Cascade)
   message   String?
-  status    String          @default("APPLIED")
-  createdAt DateTime        @default(now())
-  updatedAt DateTime        @updatedAt
+  status            String          @default("APPLIED")
+  interviewerRating Int?
+  interviewerNotes  String?
+  createdAt         DateTime        @default(now())
+  updatedAt         DateTime        @updatedAt
 
   @@unique([listingId, studentId])
   @@map("internship_applications")
@@ -489,4 +500,57 @@ model ErupiVoucher {
   @@index([industryId])
   @@index([studentId])
   @@map("erupi_vouchers")
+}
+
+model CustomAssessment {
+  id              String                 @id @default(cuid())
+  companyId       String
+  company         User                   @relation("CompanyCustomAssessments", fields: [companyId], references: [id], onDelete: Cascade)
+  title           String
+  description     String
+  category        String                 @default("Technical")
+  primarySkill    String
+  durationMinutes Int                    @default(10)
+  passingScore    Int                    @default(70)
+  questionsJson   String
+  status          String                 @default("ACTIVE")
+  createdAt       DateTime               @default(now())
+  updatedAt       DateTime               @updatedAt
+  submissions     AssessmentSubmission[]
+
+  @@index([companyId])
+  @@map("custom_assessments")
+}
+
+model AssessmentSubmission {
+  id           String           @id @default(cuid())
+  assessmentId String
+  assessment   CustomAssessment @relation(fields: [assessmentId], references: [id], onDelete: Cascade)
+  studentId    String
+  student      User             @relation("StudentSubmissions", fields: [studentId], references: [id], onDelete: Cascade)
+  score        Int
+  passed       Boolean
+  answersJson  String
+  completedAt  DateTime         @default(now())
+
+  @@index([assessmentId])
+  @@index([studentId])
+  @@map("assessment_submissions")
+}
+
+model Notification {
+  id             String   @id
+  userId         String   @map("user_id")
+  userEmail      String?  @map("user_email")
+  userName       String?  @map("user_name")
+  title          String
+  message        String
+  type           String
+  link           String?
+  read           Boolean  @default(false)
+  emailSent      Boolean  @default(false) @map("email_sent")
+  emailSimulated Boolean  @default(false) @map("email_simulated")
+  createdAt      DateTime @default(now()) @map("created_at")
+
+  @@map("notifications")
 }

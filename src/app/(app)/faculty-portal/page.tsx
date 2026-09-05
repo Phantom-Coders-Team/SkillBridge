@@ -1,10 +1,11 @@
 import { redirect } from "next/navigation";
-import { BookOpen, Building2, FlaskConical, Users2 } from "lucide-react";
+import { BookOpen, Building2, FlaskConical, Users2, Award, Sparkles, CheckCircle2 } from "lucide-react";
 import { getCurrentUser } from "@/lib/auth";
 import { prisma } from "@/lib/prisma";
 import { Badge, Card, PageHeader, type BadgeTone } from "@/components/ui";
 import ApplyToProgramButton from "./ApplyToProgramButton";
 import PostFacultyForm from "./PostFacultyForm";
+import { FacultyMilestoneTracker } from "./FacultyMilestoneTracker";
 
 const TYPE_TONE: Record<string, BadgeTone> = {
   FACULTY_INTERNSHIP: "blue",
@@ -21,7 +22,7 @@ export default async function FacultyPortalPage() {
   const isAcademician = user.role === "ACADEMICIAN" || user.role === "FACULTY";
   const isIndustry = user.role === "INDUSTRIES" || user.role === "INDUSTRY";
 
-  const [listings, myApps] = await Promise.all([
+  const [listings, myApps, companyFacultyApps] = await Promise.all([
     prisma.facultyProgramListing.findMany({
       where: isIndustry ? { companyId: user.id } : undefined,
       include: {
@@ -33,14 +34,35 @@ export default async function FacultyPortalPage() {
     isAcademician
       ? prisma.facultyProgramApplication.findMany({
           where: { facultyId: user.id },
-          include: { listing: true },
+          include: {
+            faculty: { select: { id: true, name: true, email: true } },
+            listing: {
+              include: {
+                company: { select: { name: true, profile: { select: { companyName: true } } } },
+              },
+            },
+          },
+          orderBy: { createdAt: "desc" },
+        })
+      : [],
+    isIndustry
+      ? prisma.facultyProgramApplication.findMany({
+          where: { listing: { companyId: user.id } },
+          include: {
+            faculty: { select: { id: true, name: true, email: true } },
+            listing: {
+              include: {
+                company: { select: { name: true, profile: { select: { companyName: true } } } },
+              },
+            },
+          },
           orderBy: { createdAt: "desc" },
         })
       : [],
   ]);
 
   return (
-    <div className="mx-auto max-w-6xl">
+    <div className="mx-auto max-w-6xl space-y-6">
       <PageHeader
         title="Academician Development Portal"
         subtitle="Academician immersions, industrial training, FDPs, consultancy, and collaborative research."
@@ -61,22 +83,35 @@ export default async function FacultyPortalPage() {
         }
       />
 
-      {/* Academician: My applications */}
+      {/* Academician: Active Industrial Training & Milestone Tracking */}
       {isAcademician && myApps.length > 0 && (
-        <section className="mb-8">
-          <h2 className="mb-3 text-sm font-semibold uppercase tracking-wide text-slate-400 dark:text-slate-500">
-            My Applications
-          </h2>
-          <div className="grid grid-cols-1 gap-3 sm:grid-cols-2 lg:grid-cols-3">
+        <section className="space-y-3">
+          <div className="flex items-center gap-2">
+            <Award className="size-4 text-purple-600 dark:text-purple-400" />
+            <h2 className="text-xs font-bold uppercase tracking-wider text-slate-700 dark:text-slate-300">
+              My Industrial Training Milestones & Credentials ({myApps.length})
+            </h2>
+          </div>
+          <div className="space-y-4">
             {myApps.map((a) => (
-              <Card key={a.id} className="p-4">
-                <div className="flex items-center justify-between gap-2">
-                  <h3 className="text-sm font-semibold text-slate-900 dark:text-slate-100">{a.listing.title}</h3>
-                  <Badge tone={a.status === "APPLIED" ? "blue" : a.status === "SELECTED" ? "green" : a.status === "REJECTED" ? "red" : "amber"}>
-                    {a.status}
-                  </Badge>
-                </div>
-              </Card>
+              <FacultyMilestoneTracker key={a.id} application={a} isIndustryViewer={false} />
+            ))}
+          </div>
+        </section>
+      )}
+
+      {/* Industry: Enrolled Faculty Cohort & Evaluations */}
+      {isIndustry && companyFacultyApps.length > 0 && (
+        <section className="space-y-3">
+          <div className="flex items-center gap-2">
+            <Users2 className="size-4 text-emerald-600 dark:text-emerald-400" />
+            <h2 className="text-xs font-bold uppercase tracking-wider text-slate-700 dark:text-slate-300">
+              Enrolled Faculty Cohort & Milestone Evaluations ({companyFacultyApps.length})
+            </h2>
+          </div>
+          <div className="space-y-4">
+            {companyFacultyApps.map((a) => (
+              <FacultyMilestoneTracker key={a.id} application={a} isIndustryViewer={true} />
             ))}
           </div>
         </section>
