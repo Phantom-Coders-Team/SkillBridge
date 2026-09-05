@@ -11,6 +11,7 @@ import {
   ChevronUp,
   HelpCircle,
   Loader2,
+  SkipForward,
   Sparkles,
   X,
   XCircle,
@@ -49,6 +50,7 @@ export function SkillDiagnosticModal({
   const [questions, setQuestions] = useState<ClientDiagnosticQuestion[]>([]);
   const [currentIndex, setCurrentIndex] = useState(0);
   const [answers, setAnswers] = useState<Record<string, number>>({});
+  const [skippedIds, setSkippedIds] = useState<string[]>([]);
   const [result, setResult] = useState<DiagnosticSubmissionResult | null>(null);
   const [errorMessage, setErrorMessage] = useState<string | null>(null);
   const [showExplanations, setShowExplanations] = useState(false);
@@ -61,6 +63,7 @@ export function SkillDiagnosticModal({
     setErrorMessage(null);
     setResult(null);
     setAnswers({});
+    setSkippedIds([]);
     setCurrentIndex(0);
 
     async function load() {
@@ -95,6 +98,23 @@ export function SkillDiagnosticModal({
       ...prev,
       [currentQ.id]: optionIndex,
     }));
+    setSkippedIds((prev) => prev.filter((id) => id !== currentQ.id));
+  }
+
+  function handleSkip() {
+    if (!currentQ) return;
+    setSkippedIds((prev) => (prev.includes(currentQ.id) ? prev : [...prev, currentQ.id]));
+    setAnswers((prev) => {
+      const copy = { ...prev };
+      delete copy[currentQ.id];
+      return copy;
+    });
+
+    if (currentIndex < questions.length - 1) {
+      setCurrentIndex((prev) => prev + 1);
+    } else {
+      handleSubmit();
+    }
   }
 
   async function handleSubmit() {
@@ -277,7 +297,11 @@ export function SkillDiagnosticModal({
                             </span>
                             {item.question}
                           </p>
-                          {item.isCorrect ? (
+                          {item.userSelected < 0 ? (
+                            <span className="inline-flex shrink-0 items-center gap-1 rounded-md bg-amber-50 px-2 py-0.5 text-[11px] font-bold text-amber-600 dark:bg-amber-950/40 dark:text-amber-400">
+                              <HelpCircle className="size-3.5" /> Skipped
+                            </span>
+                          ) : item.isCorrect ? (
                             <span className="inline-flex shrink-0 items-center gap-1 rounded-md bg-emerald-50 px-2 py-0.5 text-[11px] font-bold text-emerald-600 dark:bg-emerald-950/40 dark:text-emerald-400">
                               <CheckCircle2 className="size-3.5" /> Correct
                             </span>
@@ -293,12 +317,16 @@ export function SkillDiagnosticModal({
                             Your answer:{" "}
                             <span
                               className={
-                                item.isCorrect ? "font-semibold text-emerald-600" : "font-semibold text-rose-600"
+                                item.userSelected < 0
+                                  ? "font-medium italic text-amber-600 dark:text-amber-400"
+                                  : item.isCorrect
+                                  ? "font-semibold text-emerald-600"
+                                  : "font-semibold text-rose-600"
                               }
                             >
                               {item.userSelected >= 0
                                 ? item.options[item.userSelected]
-                                : "No answer selected"}
+                                : "Skipped (No answer submitted)"}
                             </span>
                           </p>
                           {!item.isCorrect && (
@@ -331,6 +359,11 @@ export function SkillDiagnosticModal({
                   </span>
                   <span>
                     Question {currentIndex + 1} of {questions.length}
+                    {currentQ && skippedIds.includes(currentQ.id) && (
+                      <span className="ml-2 rounded-md bg-amber-100 px-1.5 py-0.5 text-[10px] font-bold text-amber-700 dark:bg-amber-950/60 dark:text-amber-300">
+                        Skipped
+                      </span>
+                    )}
                   </span>
                 </div>
                 <div className="mt-2 h-2 w-full overflow-hidden rounded-full bg-slate-100 dark:bg-slate-800">
@@ -409,6 +442,16 @@ export function SkillDiagnosticModal({
                 <span className="text-xs text-slate-500 dark:text-slate-400">
                   {answeredCount}/{questions.length} answered
                 </span>
+
+                <button
+                  type="button"
+                  onClick={handleSkip}
+                  disabled={loading || submitting}
+                  className="inline-flex items-center gap-1.5 rounded-xl border border-slate-200 bg-white px-3.5 py-2 text-xs font-semibold text-slate-600 hover:bg-slate-50 hover:text-slate-900 dark:border-slate-700 dark:bg-slate-800 dark:text-slate-300 dark:hover:bg-slate-700 dark:hover:text-white transition-all cursor-pointer shadow-2xs"
+                >
+                  <SkipForward className="size-3.5 text-amber-500" />
+                  <span>Skip Question</span>
+                </button>
 
                 {currentIndex < questions.length - 1 ? (
                   <button

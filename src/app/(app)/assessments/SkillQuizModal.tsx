@@ -17,6 +17,8 @@ import {
   ChevronUp,
   XCircle,
   BookOpen,
+  SkipForward,
+  HelpCircle,
 } from "lucide-react";
 import Link from "next/link";
 import { ASSESSMENT_TRACKS, type AssessmentTrack } from "./assessmentData";
@@ -28,6 +30,7 @@ export function SkillQuizModal() {
   const [selectedTrack, setSelectedTrack] = useState<AssessmentTrack | null>(null);
   const [currentQuestionIndex, setCurrentQuestionIndex] = useState(0);
   const [answers, setAnswers] = useState<Record<number, number>>({});
+  const [skippedQuestions, setSkippedQuestions] = useState<number[]>([]);
   const [showResult, setShowResult] = useState(false);
   const [savedSuccess, setSavedSuccess] = useState(false);
   const [showReview, setShowReview] = useState(false);
@@ -37,6 +40,7 @@ export function SkillQuizModal() {
     setSelectedTrack(track);
     setCurrentQuestionIndex(0);
     setAnswers({});
+    setSkippedQuestions([]);
     setShowResult(false);
     setSavedSuccess(false);
     setShowReview(false);
@@ -47,6 +51,25 @@ export function SkillQuizModal() {
       ...prev,
       [currentQuestionIndex]: optionIndex,
     }));
+    setSkippedQuestions((prev) => prev.filter((idx) => idx !== currentQuestionIndex));
+  };
+
+  const handleSkip = () => {
+    if (!selectedTrack) return;
+    setSkippedQuestions((prev) =>
+      prev.includes(currentQuestionIndex) ? prev : [...prev, currentQuestionIndex]
+    );
+
+    const updatedAnswers = { ...answers };
+    delete updatedAnswers[currentQuestionIndex];
+    setAnswers(updatedAnswers);
+
+    if (currentQuestionIndex < selectedTrack.questions.length - 1) {
+      setCurrentQuestionIndex((prev) => prev + 1);
+    } else {
+      setShowResult(true);
+      calculateAndSave(updatedAnswers);
+    }
   };
 
   const handleNext = () => {
@@ -66,11 +89,11 @@ export function SkillQuizModal() {
     }
   };
 
-  const calculateAndSave = () => {
+  const calculateAndSave = (currentAnswers = answers) => {
     if (!selectedTrack) return;
     let correctCount = 0;
     selectedTrack.questions.forEach((q, idx) => {
-      if (answers[idx] === q.correctIndex) {
+      if (currentAnswers[idx] === q.correctIndex) {
         correctCount += 1;
       }
     });
@@ -94,6 +117,7 @@ export function SkillQuizModal() {
     setSelectedTrack(null);
     setCurrentQuestionIndex(0);
     setAnswers({});
+    setSkippedQuestions([]);
     setShowResult(false);
     setSavedSuccess(false);
     setShowReview(false);
@@ -109,6 +133,9 @@ export function SkillQuizModal() {
   const currentQuestions = selectedTrack?.questions ?? [];
   const correctCount = selectedTrack
     ? currentQuestions.filter((q, idx) => answers[idx] === q.correctIndex).length
+    : 0;
+  const skippedCount = selectedTrack
+    ? currentQuestions.filter((_, idx) => answers[idx] === undefined || skippedQuestions.includes(idx)).length
     : 0;
   const score = selectedTrack ? Math.round((correctCount / currentQuestions.length) * 100) : 0;
 
@@ -205,8 +232,15 @@ export function SkillQuizModal() {
                 {/* Progress bar */}
                 <div>
                   <div className="flex items-center justify-between text-xs font-medium text-slate-500 mb-1.5">
-                    <span>
-                      Question {currentQuestionIndex + 1} of {currentQuestions.length}
+                    <span className="flex items-center gap-2">
+                      <span>
+                        Question {currentQuestionIndex + 1} of {currentQuestions.length}
+                      </span>
+                      {skippedQuestions.includes(currentQuestionIndex) && (
+                        <span className="rounded-md bg-amber-100 dark:bg-amber-950/60 px-1.5 py-0.5 text-[10px] font-bold text-amber-700 dark:text-amber-300">
+                          Skipped
+                        </span>
+                      )}
                     </span>
                     <span className="text-indigo-600 dark:text-indigo-400 font-semibold">
                       Skill Tested: {currentQuestions[currentQuestionIndex]?.skillTested}
@@ -259,32 +293,43 @@ export function SkillQuizModal() {
                   })}
                 </div>
 
-                {/* Navigation Buttons */}
-                <div className="flex items-center justify-between pt-3 border-t border-border-muted">
+                {/* Navigation & Skip Buttons */}
+                <div className="flex items-center justify-between pt-3 border-t border-border-muted gap-2">
                   <button
                     type="button"
                     onClick={handlePrev}
                     disabled={currentQuestionIndex === 0}
-                    className="inline-flex items-center gap-1.5 text-xs font-semibold text-slate-500 hover:text-slate-800 disabled:opacity-40 disabled:pointer-events-none cursor-pointer"
+                    className="inline-flex items-center gap-1.5 text-xs font-semibold text-slate-500 hover:text-slate-800 dark:hover:text-slate-200 disabled:opacity-40 disabled:pointer-events-none cursor-pointer"
                   >
                     <ArrowLeft className="size-3.5" /> Previous
                   </button>
 
-                  <button
-                    type="button"
-                    onClick={handleNext}
-                    className="inline-flex items-center gap-1.5 rounded-xl bg-indigo-600 px-4 py-2 text-xs font-semibold text-white hover:bg-indigo-700 disabled:opacity-40 disabled:pointer-events-none shadow-sm cursor-pointer"
-                  >
-                    {currentQuestionIndex === currentQuestions.length - 1 ? (
-                      <>
-                        <Sparkles className="size-3.5" /> Finish & View Gaps
-                      </>
-                    ) : (
-                      <>
-                        Next <ArrowRight className="size-3.5" />
-                      </>
-                    )}
-                  </button>
+                  <div className="flex items-center gap-2">
+                    <button
+                      type="button"
+                      onClick={handleSkip}
+                      className="inline-flex items-center gap-1.5 rounded-xl border border-slate-200 bg-surface px-3 py-2 text-xs font-semibold text-slate-600 hover:bg-slate-100 hover:text-slate-900 dark:border-slate-700 dark:text-slate-300 dark:hover:bg-slate-800 dark:hover:text-white transition-all cursor-pointer shadow-2xs"
+                    >
+                      <SkipForward className="size-3.5 text-amber-500" />
+                      <span>Skip Question</span>
+                    </button>
+
+                    <button
+                      type="button"
+                      onClick={handleNext}
+                      className="inline-flex items-center gap-1.5 rounded-xl bg-indigo-600 px-4 py-2 text-xs font-semibold text-white hover:bg-indigo-700 disabled:opacity-40 disabled:pointer-events-none shadow-sm cursor-pointer"
+                    >
+                      {currentQuestionIndex === currentQuestions.length - 1 ? (
+                        <>
+                          <Sparkles className="size-3.5" /> Finish &amp; View Gaps
+                        </>
+                      ) : (
+                        <>
+                          Next <ArrowRight className="size-3.5" />
+                        </>
+                      )}
+                    </button>
+                  </div>
                 </div>
               </div>
             )}
@@ -318,7 +363,8 @@ export function SkillQuizModal() {
                         )}
                       </div>
                       <p className="text-xs text-slate-500 dark:text-slate-400 mt-0.5">
-                        Answered {correctCount} of {currentQuestions.length} questions correctly in {selectedTrack.primarySkill}.
+                        Answered {correctCount} of {currentQuestions.length} questions correctly
+                        {skippedCount > 0 ? ` (${skippedCount} skipped)` : ""} in {selectedTrack.primarySkill}.
                         {savedSuccess ? " Synced to your verified profile!" : isPending ? " Saving to profile..." : ""}
                       </p>
                     </div>
@@ -398,27 +444,42 @@ export function SkillQuizModal() {
                     <div className="divide-y divide-border-muted p-4 space-y-4">
                       {currentQuestions.map((q, idx) => {
                         const userAns = answers[idx];
-                        const isCorrect = userAns === q.correctIndex;
+                        const isSkipped = userAns === undefined || skippedQuestions.includes(idx);
+                        const isCorrect = !isSkipped && userAns === q.correctIndex;
                         return (
                           <div key={q.id} className="pt-3 first:pt-0 space-y-2">
                             <div className="flex items-start gap-2">
                               {isCorrect ? (
                                 <CheckCircle2 className="size-4 text-emerald-500 shrink-0 mt-0.5" />
+                              ) : isSkipped ? (
+                                <HelpCircle className="size-4 text-amber-500 shrink-0 mt-0.5" />
                               ) : (
                                 <XCircle className="size-4 text-rose-500 shrink-0 mt-0.5" />
                               )}
-                              <div>
-                                <span className="text-xs font-semibold text-slate-900 dark:text-slate-100">
-                                  {idx + 1}. {q.text}
-                                </span>
-                                <span className="ml-2 text-[10px] font-medium text-slate-400">
-                                  ({q.skillTested})
-                                </span>
+                              <div className="flex-1">
+                                <div className="flex items-center gap-2 flex-wrap">
+                                  <span className="text-xs font-semibold text-slate-900 dark:text-slate-100">
+                                    {idx + 1}. {q.text}
+                                  </span>
+                                  <span className="text-[10px] font-medium text-slate-400">
+                                    ({q.skillTested})
+                                  </span>
+                                  {isSkipped && (
+                                    <span className="rounded-md bg-amber-100 dark:bg-amber-950/60 px-1.5 py-0.5 text-[10px] font-bold text-amber-700 dark:text-amber-300">
+                                      Skipped
+                                    </span>
+                                  )}
+                                </div>
                               </div>
                             </div>
 
                             {/* Options with state */}
                             <div className="ml-6 space-y-1.5">
+                              {isSkipped && (
+                                <div className="rounded-lg border border-amber-200/80 bg-amber-50/50 dark:border-amber-900/40 dark:bg-amber-950/20 px-3 py-1.5 text-xs text-amber-800 dark:text-amber-300">
+                                  Question was skipped without selecting an option.
+                                </div>
+                              )}
                               {q.options.map((opt, optIdx) => {
                                 const isSelected = userAns === optIdx;
                                 const isRightAnswer = optIdx === q.correctIndex;
