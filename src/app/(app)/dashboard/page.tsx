@@ -375,7 +375,8 @@ export default async function DashboardPage() {
             },
             challenges: { select: { id: true } },
           },
-          take: 5,
+          orderBy: { name: "asc" },
+          take: 6,
         }),
         prisma.hiringBenchmark.findMany({
           select: {

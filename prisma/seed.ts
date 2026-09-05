@@ -4,71 +4,101 @@ import bcrypt from "bcryptjs";
 
 const prisma = new PrismaClient();
 
+async function retry<T>(fn: () => Promise<T>, retries = 5, delayMs = 1500): Promise<T> {
+  let attempt = 0;
+  while (attempt <= retries) {
+    try {
+      return await fn();
+    } catch (err: any) {
+      attempt++;
+      if (attempt <= retries) {
+        console.warn(`[Seed Retry] attempt ${attempt}/${retries} after error: ${err?.message || err}`);
+        await new Promise((res) => setTimeout(res, delayMs * attempt));
+      } else {
+        throw err;
+      }
+    }
+  }
+  throw new Error("Failed after retries");
+}
+
 async function main() {
   console.log("Seeding Academia-Industry Collaboration Portal...");
 
-  await prisma.blockchainTransaction.deleteMany();
-  await prisma.erupiVoucher.deleteMany();
-  await prisma.jobPitch.deleteMany();
-  await prisma.dualGrading.deleteMany();
-  await prisma.challengeApplication.deleteMany();
-  await prisma.labUnitMember.deleteMany();
-  await prisma.labUnit.deleteMany();
-  await prisma.industryChallenge.deleteMany();
-  await prisma.mentorSlot.deleteMany();
-  await prisma.tokenTransaction.deleteMany();
-  await prisma.tokenLedger.deleteMany();
-  await prisma.skillAssessment.deleteMany();
-  await prisma.proofOfWork.deleteMany();
-  await prisma.project.deleteMany();
-  await prisma.syllabus.deleteMany();
-  await prisma.profile.deleteMany();
-  await prisma.user.deleteMany();
-  await prisma.hiringBenchmark.deleteMany();
-  await prisma.sabbaticalListing.deleteMany();
-  await prisma.userDocument.deleteMany();
-  await prisma.portfolioItem.deleteMany();
-  await prisma.facultyProgramApplication.deleteMany();
-  await prisma.facultyProgramListing.deleteMany();
-  await prisma.internshipApplication.deleteMany();
-  await prisma.learningProgram.deleteMany();
+  const tables = [
+    () => prisma.blockchainTransaction.deleteMany(),
+    () => prisma.erupiVoucher.deleteMany(),
+    () => prisma.jobPitch.deleteMany(),
+    () => prisma.dualGrading.deleteMany(),
+    () => prisma.challengeApplication.deleteMany(),
+    () => prisma.labUnitMember.deleteMany(),
+    () => prisma.labUnit.deleteMany(),
+    () => prisma.industryChallenge.deleteMany(),
+    () => prisma.mentorSlot.deleteMany(),
+    () => prisma.tokenTransaction.deleteMany(),
+    () => prisma.tokenLedger.deleteMany(),
+    () => prisma.skillAssessment.deleteMany(),
+    () => prisma.proofOfWork.deleteMany(),
+    () => prisma.project.deleteMany(),
+    () => prisma.syllabus.deleteMany(),
+    () => prisma.profile.deleteMany(),
+    () => prisma.user.deleteMany(),
+    () => prisma.hiringBenchmark.deleteMany(),
+    () => prisma.sabbaticalListing.deleteMany(),
+    () => prisma.userDocument.deleteMany(),
+    () => prisma.portfolioItem.deleteMany(),
+    () => prisma.facultyProgramApplication.deleteMany(),
+    () => prisma.facultyProgramListing.deleteMany(),
+    () => prisma.internshipApplication.deleteMany(),
+    () => prisma.learningProgram.deleteMany(),
+  ];
 
+  for (const del of tables) {
+    await retry(del);
+  }
+  console.log("Existing records cleared.");
+
+  console.log("Hashing default credentials...");
   const passwordHash = await bcrypt.hash("Password@123", 10);
 
   // ----- STUDENTS -----
   const students: Array<[string, string, string, { year: number; rollNumber: string; department: string; skills: string }]> = [
-    ["Aarav Sharma", "aarav.sharma@student.edu", "STU001", { year: 4, rollNumber: "CS21B001", department: "Computer Science", skills: "React,Node.js,Python,Machine Learning" }],
-    ["Priya Patel", "priya.patel@student.edu", "STU002", { year: 3, rollNumber: "CS22B014", department: "Computer Science", skills: "Java,Spring,SQL,Docker" }],
-    ["Rohan Verma", "rohan.verma@student.edu", "STU003", { year: 4, rollNumber: "EE21B007", department: "Electrical Engineering", skills: "MATLAB,Circuit Design,Embedded C" }],
-    ["Sneha Iyer", "sneha.iyer@student.edu", "STU004", { year: 3, rollNumber: "ME22B019", department: "Mechanical Engineering", skills: "CAD,Simulation,GD&T" }],
-    ["Vikram Singh", "vikram.singh@student.edu", "STU005", { year: 4, rollNumber: "CS21B023", department: "Computer Science", skills: "Flutter,Firebase,UI/UX" }],
-    ["Ananya Rao", "ananya.rao@student.edu", "STU006", { year: 2, rollNumber: "IT23B005", department: "Information Technology", skills: "Python,Data Analysis,SQL" }],
-    ["Karthik Nair", "karthik.nair@student.edu", "STU007", { year: 3, rollNumber: "EC22B011", department: "Electronics & Communication", skills: "VLSI,Verilog,Signal Processing" }],
-    ["Meera Krishnan", "meera.krishnan@student.edu", "STU008", { year: 4, rollNumber: "CS21B031", department: "Computer Science", skills: "Go,Microservices,Kubernetes" }],
+    ["Aarav Sharma", "aarav.sharma@student.edu", "CS21B001", { year: 4, rollNumber: "CS21B001", department: "Computer Science", skills: "React,Node.js,Python,Machine Learning" }],
+    ["Priya Patel", "priya.patel@student.edu", "CS22B014", { year: 3, rollNumber: "CS22B014", department: "Computer Science", skills: "Java,Spring,SQL,Docker" }],
+    ["Rohan Verma", "rohan.verma@student.edu", "EE21B007", { year: 4, rollNumber: "EE21B007", department: "Electrical Engineering", skills: "MATLAB,Circuit Design,Embedded C" }],
+    ["Sneha Iyer", "sneha.iyer@student.edu", "ME22B019", { year: 3, rollNumber: "ME22B019", department: "Mechanical Engineering", skills: "CAD,Simulation,GD&T" }],
+    ["Vikram Singh", "vikram.singh@student.edu", "CS21B023", { year: 4, rollNumber: "CS21B023", department: "Computer Science", skills: "Flutter,Firebase,UI/UX" }],
+    ["Ananya Rao", "ananya.rao@student.edu", "IT23B005", { year: 2, rollNumber: "IT23B005", department: "Information Technology", skills: "Python,Data Analysis,SQL" }],
+    ["Karthik Nair", "karthik.nair@student.edu", "EC22B011", { year: 3, rollNumber: "EC22B011", department: "Electronics & Communication", skills: "VLSI,Verilog,Signal Processing" }],
+    ["Meera Krishnan", "meera.krishnan@student.edu", "CS21B031", { year: 4, rollNumber: "CS21B031", department: "Computer Science", skills: "Go,Microservices,Kubernetes" }],
   ];
 
+  console.log("Seeding student accounts...");
   const studentUserIds: string[] = [];
   for (const [name, email, roll, details] of students) {
-    const user = await prisma.user.create({
-      data: {
-        name,
-        email,
-        passwordHash,
-        role: "STUDENT",
-        profile: {
-          create: {
-            department: details.department,
-            year: details.year,
-            rollNumber: roll,
-            skills: details.skills,
-            bio: `${name} is a ${details.year}th year ${details.department} student passionate about building real-world solutions.`,
-            location: "Bengaluru, India",
+    const user = await retry(() =>
+      prisma.user.create({
+        data: {
+          name,
+          email,
+          passwordHash,
+          role: "STUDENT",
+          profile: {
+            create: {
+              department: details.department,
+              year: details.year,
+              rollNumber: roll,
+              skills: details.skills,
+              bio: `${name} is a ${details.year}th year ${details.department} student passionate about building real-world solutions.`,
+              location: "Bengaluru, India",
+            },
           },
         },
-      },
-    });
+      })
+    );
     studentUserIds.push(user.id);
   }
+  console.log(`Created ${studentUserIds.length} student accounts.`);
 
   // ----- ACADEMICIANS -----
   const faculty: Array<[string, string, string, string]> = [
@@ -78,58 +108,261 @@ async function main() {
     ["Dr. Kavitha Menon", "kavitha.menon@faculty.edu", "Professor", "Information Technology"],
   ];
 
+  console.log("Seeding faculty accounts...");
   const facultyIds: string[] = [];
   for (const [name, email, designation, dept] of faculty) {
-    const user = await prisma.user.create({
-      data: {
-        name,
-        email,
-        passwordHash,
-        role: "ACADEMICIAN",
-        profile: {
-          create: {
-            department: dept,
-            designation,
-            bio: `${designation} in the Department of ${dept}. Mentor for capstone and micro-consultancy projects.`,
-            location: "VIT Chennai Campus",
+    const user = await retry(() =>
+      prisma.user.create({
+        data: {
+          name,
+          email,
+          passwordHash,
+          role: "ACADEMICIAN",
+          profile: {
+            create: {
+              department: dept,
+              designation,
+              bio: `${designation} in the Department of ${dept}. Mentor for capstone and micro-consultancy projects.`,
+              location: "VIT Chennai Campus",
+            },
           },
         },
-      },
-    });
+      })
+    );
     facultyIds.push(user.id);
   }
+  console.log(`Created ${facultyIds.length} faculty accounts.`);
 
-  // ----- INDUSTRIES -----
-  const industry: Array<[string, string, string, string, string]> = [
-    ["Infosys", "recruit@infosys.com", "Senior Hiring Manager", "Talent Acquisition", "Infosys Limited, Bengaluru"],
-    ["TCS", "campus@tcs.com", "Campus Recruitment Lead", "Campus Hiring", "Tata Consultancy Services, Pune"],
-    ["Wipro", "talent@wipro.com", "Technical Recruiter", "Talent Acquisition", "Wipro Limited, Bengaluru"],
-    ["Zoho", "campus@zohocorp.com", "Engineering Manager", "Platform Engineering", "Zoho Corporation, Chennai"],
-    ["HCLTech", "careers@hcltech.com", "Program Manager", "Innovation Labs", "HCL Technologies, Noida"],
-    ["All India Institute of Ayurveda (AIIA)", "research@aiia.gov.in", "Head of Digital Health & Innovation", "Ayush Bio-Informatics", "All India Institute of Ayurveda, New Delhi"],
+  // ----- INDUSTRIES (19 Corporate & Enterprise Partners) -----
+  const industry: Array<{
+    company: string;
+    email: string;
+    designation: string;
+    dept: string;
+    loc: string;
+    skills: string;
+    websiteUrl: string;
+    bio: string;
+  }> = [
+    {
+      company: "Infosys",
+      email: "recruit@infosys.com",
+      designation: "Senior Hiring Manager",
+      dept: "Talent Acquisition & Innovation Labs",
+      loc: "Infosys Limited, Bengaluru",
+      skills: "Enterprise IT, Cloud Transformation, GenAI, Full-Stack",
+      websiteUrl: "https://www.infosys.com",
+      bio: "Global leader in next-generation digital services, enterprise cloud consulting, and student innovation labs.",
+    },
+    {
+      company: "TCS",
+      email: "campus@tcs.com",
+      designation: "Campus Recruitment Lead",
+      dept: "Cognitive Business Operations",
+      loc: "Tata Consultancy Services, Pune",
+      skills: "BFSI, Cloud Architecture, Automation, Data Analytics",
+      websiteUrl: "https://www.tcs.com",
+      bio: "Pioneering IT services and business consulting giant driving global industrial digital transformation.",
+    },
+    {
+      company: "Wipro",
+      email: "talent@wipro.com",
+      designation: "Technical Recruiter",
+      dept: "Digital Operations & Cyber Resilience",
+      loc: "Wipro Limited, Bengaluru",
+      skills: "Cybersecurity, DevOps, Cloud Infrastructure, IoT",
+      websiteUrl: "https://www.wipro.com",
+      bio: "Leading technology services and consulting company focused on building innovative solutions across cybersecurity and cloud.",
+    },
+    {
+      company: "Zoho",
+      email: "campus@zohocorp.com",
+      designation: "Engineering Manager",
+      dept: "Platform Engineering",
+      loc: "Zoho Corporation, Chennai",
+      skills: "SaaS Infrastructure, Low-Code, Microservices, Full-Stack",
+      websiteUrl: "https://www.zoho.com",
+      bio: "Unique bootstrapped SaaS ecosystem powering over 100M users with high-performance web applications.",
+    },
+    {
+      company: "HCLTech",
+      email: "careers@hcltech.com",
+      designation: "Program Manager",
+      dept: "Engineering and R&D Services",
+      loc: "HCL Technologies, Noida",
+      skills: "Product Engineering, Embedded Systems, IoT, Edge AI",
+      websiteUrl: "https://www.hcltech.com",
+      bio: "Global technology company supercharging digital enterprise and engineering R&D across semiconductors and smart devices.",
+    },
+    {
+      company: "All India Institute of Ayurveda (AIIA)",
+      email: "research@aiia.gov.in",
+      designation: "Head of Digital Health & Innovation",
+      dept: "Ayush Bio-Informatics",
+      loc: "All India Institute of Ayurveda, New Delhi",
+      skills: "Ayush Informatics, Botanical Vision AI, Medical Analytics",
+      websiteUrl: "https://aiia.gov.in",
+      bio: "Apex institute for Ayurveda under the Ministry of Ayush advancing evidence-based botanical computing and clinical research.",
+    },
+    {
+      company: "Google India",
+      email: "university-india@google.com",
+      designation: "University Relations Lead",
+      dept: "Google Cloud & Applied AI",
+      loc: "Google India, Bengaluru",
+      skills: "Distributed Systems, TensorFlow, Cloud Architecture, Android Core",
+      websiteUrl: "https://about.google",
+      bio: "Pioneering AI research, hyper-scale cloud platforms, and mobile operating system ecosystems worldwide.",
+    },
+    {
+      company: "Microsoft India",
+      email: "india-recruitment@microsoft.com",
+      designation: "Campus Talent Director",
+      dept: "Azure Systems & Applied Research",
+      loc: "Microsoft India R&D, Hyderabad",
+      skills: "Azure Cloud, Generative AI, Copilot Ecosystem, Windows Core",
+      websiteUrl: "https://www.microsoft.com",
+      bio: "Empowering every person and organization to achieve more through world-class enterprise cloud and applied AI.",
+    },
+    {
+      company: "Amazon AWS",
+      email: "aws-university@amazon.com",
+      designation: "Academic Partnership Lead",
+      dept: "AWS Cloud Systems Architecture",
+      loc: "Amazon Development Centre, Bengaluru",
+      skills: "Distributed Storage, Serverless, Cloud Security, HPC",
+      websiteUrl: "https://aws.amazon.com",
+      bio: "The world's most comprehensive and broadly adopted cloud platform, offering over 200 fully featured services.",
+    },
+    {
+      company: "NVIDIA India",
+      email: "developer-edu@nvidia.com",
+      designation: "Director of Education Programs",
+      dept: "Deep Learning & Accelerated Computing",
+      loc: "NVIDIA Graphics Pvt Ltd, Pune",
+      skills: "CUDA, GPU Computing, TensorRT, LLM Acceleration, Robotics",
+      websiteUrl: "https://www.nvidia.com",
+      bio: "Global leader in GPU accelerated computing, neural network architectures, and industrial metaverse solutions.",
+    },
+    {
+      company: "Intel India",
+      email: "labs-fellowship@intel.com",
+      designation: "Staff Research Engineer",
+      dept: "Intel Labs & Silicon Design",
+      loc: "Intel Technology India, Bengaluru",
+      skills: "VLSI Design, Edge AI, RISC-V, OpenVINO, Computer Architecture",
+      websiteUrl: "https://www.intel.com",
+      bio: "Shaping the future of compute with silicon breakthroughs, open edge AI inference, and advanced semiconductor packaging.",
+    },
+    {
+      company: "Cisco Systems",
+      email: "networking-academy@cisco.com",
+      designation: "Technical Lead & Talent Architect",
+      dept: "Enterprise Networking & Security",
+      loc: "Cisco Systems India, Bengaluru",
+      skills: "Software Defined Networking, Zero-Trust, SD-WAN, Cloud Security",
+      websiteUrl: "https://www.cisco.com",
+      bio: "Powering an inclusive future for all by connecting people, security infrastructure, and mission-critical cloud networks.",
+    },
+    {
+      company: "IBM India Research",
+      email: "research-collaborations@ibm.com",
+      designation: "Principal Research Scientist",
+      dept: "Hybrid Cloud & Quantum Systems",
+      loc: "IBM India Research Laboratory, Bengaluru",
+      skills: "Quantum Computing, Red Hat OpenShift, Enterprise AI, Watsonx",
+      websiteUrl: "https://www.ibm.com",
+      bio: "Leading hybrid cloud and enterprise AI provider accelerating fundamental research in quantum and trustworthy AI.",
+    },
+    {
+      company: "Qualcomm India",
+      email: "campus-relations@qualcomm.com",
+      designation: "Senior Director of Engineering",
+      dept: "Wireless Systems & Modem Tech",
+      loc: "Qualcomm India, Hyderabad",
+      skills: "5G/6G Modems, RF Systems, Snapdragon Edge AI, Low-Power Embedded",
+      websiteUrl: "https://www.qualcomm.com",
+      bio: "World-leading wireless technology innovator and the driving force behind the development, launch, and expansion of 5G.",
+    },
+    {
+      company: "Adobe Systems",
+      email: "adobe-labs@adobe.com",
+      designation: "Engineering Director",
+      dept: "Digital Media & Experience Platform",
+      loc: "Adobe Systems India, Noida",
+      skills: "Creative Cloud, Computer Vision, Digital Experience, GenAI Firefly",
+      websiteUrl: "https://www.adobe.com",
+      bio: "Changing the world through digital experiences, creative expression algorithms, and enterprise content intelligence.",
+    },
+    {
+      company: "L&T Technology Services",
+      email: "careers@ltts.com",
+      designation: "Head of Industry-Academia Co-Innovation",
+      dept: "Smart Manufacturing & Mobility",
+      loc: "LTTS Innovation Centre, Vadodara",
+      skills: "Industry 4.0, Digital Twins, Industrial Automation, Smart Cities",
+      websiteUrl: "https://www.ltts.com",
+      bio: "Global engineering R&D services company delivering sustainable, disruptive engineering and manufacturing solutions.",
+    },
+    {
+      company: "Samsung R&D Institute",
+      email: "sri.collaborate@samsung.com",
+      designation: "Lead Research Architect",
+      dept: "Advanced Technology & Mobile Solutions",
+      loc: "Samsung R&D Institute India, Bengaluru",
+      skills: "Vision AI, Mobile OS, Knox Security, On-Device Intelligence",
+      websiteUrl: "https://research.samsung.com",
+      bio: "Premier research centre driving camera algorithms, multi-modal generative AI, and next-gen mobile communications.",
+    },
+    {
+      company: "Tata Motors",
+      email: "ev-innovation@tatamotors.com",
+      designation: "Principal Systems Architect",
+      dept: "Electric Mobility & Connected Vehicles",
+      loc: "Tata Motors Engineering Research Centre, Pune",
+      skills: "EV Battery Management, CAN Bus, Autonomous Telematics, Embedded Control",
+      websiteUrl: "https://www.tatamotors.com",
+      bio: "India's largest automotive manufacturer pioneering electric vehicle powertrain innovation and autonomous telematics.",
+    },
+    {
+      company: "Reliance Jio Platforms",
+      email: "jio-innovations@ril.com",
+      designation: "VP of Technology Programs",
+      dept: "5G Telecom & Cloud Platforms",
+      loc: "Reliance Corporate Park, Navi Mumbai",
+      skills: "5G Standalone Core, Cloud Native Telecom, Edge CDN, Indigenous AI",
+      websiteUrl: "https://www.jio.com",
+      bio: "Transforming India's digital ecosystem with indigenously engineered 5G networks, cloud services, and AI platforms.",
+    },
   ];
 
+  console.log(`Seeding ${industry.length} industry partner accounts...`);
   const industryUserIds: string[] = [];
-  for (const [company, email, designation, dept, loc] of industry) {
-    const user = await prisma.user.create({
-      data: {
-        name: company,
-        email,
-        passwordHash,
-        role: "INDUSTRY",
-        profile: {
-          create: {
-            companyName: company,
-            designation,
-            department: dept,
-            bio: `${company} collaborates with academia on skill-based hiring, capstone projects, and micro-consultancy work.`,
-            location: loc,
+  for (const item of industry) {
+    const user = await retry(() =>
+      prisma.user.create({
+        data: {
+          name: item.company,
+          email: item.email,
+          passwordHash,
+          role: "INDUSTRY",
+          profile: {
+            create: {
+              companyName: item.company,
+              designation: item.designation,
+              department: item.dept,
+              bio: item.bio,
+              location: item.loc,
+              skills: item.skills,
+              websiteUrl: item.websiteUrl,
+            },
           },
         },
-      },
-    });
+      })
+    );
     industryUserIds.push(user.id);
   }
+  console.log(`Created ${industryUserIds.length} industry partner accounts.`);
 
   // ----- INSTITUTIONS -----
   const institutions: Array<[string, string, string]> = [
@@ -137,24 +370,28 @@ async function main() {
     ["Mr. Suresh Babu", "tpo.assist@university.edu", "Assistant TPO"],
   ];
 
+  console.log("Seeding institution accounts...");
   for (const [name, email, designation] of institutions) {
-    await prisma.user.create({
-      data: {
-        name,
-        email,
-        passwordHash,
-        role: "INSTITUTION",
-        profile: {
-          create: {
-            designation,
-            department: "Training & Placement Cell",
-            bio: `${designation} overseeing industry partnerships, placements, and internship facilitation.`,
-            location: "University Campus",
+    await retry(() =>
+      prisma.user.create({
+        data: {
+          name,
+          email,
+          passwordHash,
+          role: "INSTITUTION",
+          profile: {
+            create: {
+              designation,
+              department: "Training & Placement Cell",
+              bio: `${designation} overseeing industry partnerships, placements, and internship facilitation.`,
+              location: "University Campus",
+            },
           },
         },
-      },
-    });
+      })
+    );
   }
+  console.log(`Created ${institutions.length} institution accounts.`);
 
   // ----- SYLLABUS -----
   const syllabi: Array<[string, string, string, number]> = [
@@ -411,6 +648,48 @@ async function main() {
       desc: "Develop a computer-vision and deep-learning pipeline to classify medicinal plants and detect commercial adulterants in raw herbal supplies for standard testing.",
       domain: "AI / Ayush Informatics", tech: "PyTorch, OpenCV, FastAPI", objs: "Multi-class herb classification, mobile camera inference",
       stipend: 22000, rnd: true, status: "OPEN", deadlineOffset: 35,
+    },
+    {
+      ind: 6, title: "Distributed RAG on Google Cloud", type: "R_AND_D",
+      desc: "Implement a low-latency enterprise document retrieval and knowledge generation pipeline using Google Vertex AI and vector search.",
+      domain: "AI / Cloud Systems", tech: "Python, Google Cloud, Vertex AI, BigQuery", objs: "Vector embeddings, multi-hop RAG, prompt grounding",
+      stipend: 25000, rnd: true, status: "OPEN", deadlineOffset: 28,
+    },
+    {
+      ind: 7, title: "Copilot Semantic Plugin for Clinical Records", type: "CAPSTONE",
+      desc: "Develop an intelligent semantic assistant plugin that synthesizes patient lab records and alerts practitioners to contraindicated prescriptions.",
+      domain: "Healthcare / Generative AI", tech: "Azure OpenAI, TypeScript, C#, FHIR", objs: "Semantic kernel orchestration, privacy-preserving LLM inference",
+      stipend: 22000, rnd: false, status: "OPEN", deadlineOffset: 22,
+    },
+    {
+      ind: 8, title: "High-Throughput Serverless Telemetry Pipeline", type: "CAPSTONE",
+      desc: "Design and benchmark a serverless streaming telemetry pipeline handling 100k events/sec with sub-second ingestion latency.",
+      domain: "Cloud Infrastructure", tech: "AWS Lambda, Kinesis, DynamoDB, CDK", objs: "Streaming ingestion, auto-partitioning, disaster recovery",
+      stipend: 20000, rnd: false, status: "OPEN", deadlineOffset: 33,
+    },
+    {
+      ind: 9, title: "Real-Time Object Tracking with TensorRT & DeepStream", type: "R_AND_D",
+      desc: "Accelerate multi-camera vision pipeline with sub-10ms latency using NVIDIA TensorRT and CUDA optimizations for autonomous factory robots.",
+      domain: "Edge AI / Accelerated Computing", tech: "CUDA, TensorRT, C++, OpenCV, DeepStream", objs: "Kernel optimization, FP16 quantization, video streaming",
+      stipend: 30000, rnd: true, status: "OPEN", deadlineOffset: 45,
+    },
+    {
+      ind: 10, title: "Low-Power Computer Vision with Intel OpenVINO", type: "R_AND_D",
+      desc: "Optimize deep neural network inference on Intel hybrid CPU/NPU architectures for automated optical inspection in semiconductor manufacturing.",
+      domain: "Semiconductor / AI Inference", tech: "Intel OpenVINO, C++, Python, ONNX", objs: "Model compression, INT8 calibration, NPU acceleration",
+      stipend: 22000, rnd: true, status: "OPEN", deadlineOffset: 26,
+    },
+    {
+      ind: 11, title: "Zero-Trust Microsegmentation Controller", type: "CAPSTONE",
+      desc: "Architect a network access controller utilizing eBPF packet inspection and zero-trust identity policies for hybrid cloud environments.",
+      domain: "Cybersecurity / Networking", tech: "Python, Docker, eBPF, Linux, Go", objs: "Policy enforcement, real-time packet inspection, threat telemetry",
+      stipend: 18000, rnd: false, status: "OPEN", deadlineOffset: 20,
+    },
+    {
+      ind: 17, title: "Battery Thermal Runaway Prediction in EV Fleets", type: "R_AND_D",
+      desc: "Formulate an electrochemical thermal estimation model predicting battery cell degradation and abnormal heat dissipation in commercial EV fleets.",
+      domain: "Automotive / Clean Energy", tech: "MATLAB, Python, CAN Bus, IoT Telematics", objs: "Cell temperature forecasting, early fault warning, CAN bus parsing",
+      stipend: 24000, rnd: true, status: "OPEN", deadlineOffset: 38,
     },
   ] as const;
 
@@ -697,6 +976,11 @@ async function main() {
     { ind: 4, title: "Edge AI Professional Certification", type: "CERTIFICATION", skills: "TensorFlow,Computer Vision,C++", desc: "Industry-validated certification on deploying computer-vision models to edge devices.", duration: "8 weeks", mode: "Online", cert: true },
     { ind: 0, title: "Frontend Engineer Intake 2026", type: "ENTRY_JOB", skills: "React,TypeScript,HTML/CSS", desc: "New-grad frontend role crafting design systems and high-traffic customer experiences.", duration: "Full-time", mode: "Hybrid", cert: false },
     { ind: 5, title: "Ayush Bio-Informatics & Quality Standardization Internship", type: "INTERNSHIP", skills: "Botanical AI Identification,Bioinformatics,Python", desc: "Collaborative research internship analyzing digitized herbal databases, pharmacovigilance reports, and clinical analytics under Ministry of Ayush guidelines.", duration: "6 months", mode: "Hybrid (New Delhi)", cert: true },
+    { ind: 6, title: "Cloud Systems & Vertex AI Engineering Fellowship", type: "INTERNSHIP", skills: "Google Cloud,Python,Vertex AI,BigQuery", desc: "6-month immersive engineering fellowship with Google Cloud applied research teams.", duration: "6 months", mode: "Hybrid (Bengaluru)", cert: true },
+    { ind: 7, title: "Applied AI Solutions Engineer - Entry Level", type: "ENTRY_JOB", skills: "Azure,C#,TypeScript,GenAI", desc: "Full-time entry-level solutions engineer role developing enterprise Copilot systems.", duration: "Full-time", mode: "Hybrid (Hyderabad)", cert: false },
+    { ind: 9, title: "CUDA Accelerated Computing Academy", type: "CERTIFICATION", skills: "CUDA,C++,GPU Optimization,TensorRT", desc: "Intensive 8-week certification track on parallel computing and high-performance neural acceleration.", duration: "8 weeks", mode: "Online", cert: true },
+    { ind: 10, title: "Silicon Architecture & Edge AI Internship", type: "INTERNSHIP", skills: "OpenVINO,VLSI,Embedded Systems,C++", desc: "Benchmarking and optimizing silicon firmware pipelines on hybrid Intel CPU/NPU architectures.", duration: "6 months", mode: "On-site (Bengaluru)", cert: true },
+    { ind: 17, title: "EV Powertrain & Telematics Graduate Engineer Trainee", type: "ENTRY_JOB", skills: "CAN Bus,Embedded C,MATLAB,Battery Tech", desc: "Graduate trainee program at Tata Motors ERC engineering next-gen electric mobility solutions.", duration: "Full-time", mode: "On-site (Pune)", cert: false },
   ] as const;
 
   for (const lp of learningProgramDefs) {
@@ -785,8 +1069,8 @@ async function main() {
   }
 
   console.log("Seeding complete!");
-  console.log(`  Users: ${8 + 4 + 5 + 2}`);
-  console.log(`  Students: 8, Faculty: 4, Industry: 5, Institutions: 2`);
+  console.log(`  Users: ${8 + 4 + industry.length + 2}`);
+  console.log(`  Students: 8, Faculty: 4, Industry: ${industry.length}, Institutions: 2`);
   console.log(`  Syllabi: ${syllabi.length}`);
   console.log(`  Projects: ${projectDefs.length}`);
   console.log(`  Skills: ${skillAssessments.length}`);
