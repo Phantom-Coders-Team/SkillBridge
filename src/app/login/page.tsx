@@ -110,7 +110,7 @@ export default function LoginPage() {
               <p className="text-xs">Live Projects</p>
             </div>
             <div>
-              <p className="text-2xl font-bold text-slate-900 dark:text-white">120+</p>
+              <p className="text-2xl font-bold text-slate-900 dark:text-white">15+</p>
               <p className="text-xs">Industry Partners</p>
             </div>
           </div>
