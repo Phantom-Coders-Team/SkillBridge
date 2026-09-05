@@ -3,7 +3,7 @@
 # 🎓 SkillBridge
 ### **Next-Gen AI & Blockchain-Powered Academia–Industry Collaboration Ecosystem**
 
-*Empowering Students, Faculty, Industry Leaders, and Academic Institutions through Verifiable Proof-of-Work, Joint Evaluation, AI Curriculum Modernization, and Reverse Campus Placement.*
+*Empowering Students, Faculty, Industry Leaders, and Academic Institutions through Verifiable Proof-of-Work, Joint Evaluation, AI Curriculum Modernization, ATS Kanban Pipelines, Custom Assessments, and Reverse Campus Placement.*
 
 ---
 
@@ -14,6 +14,7 @@
 [![Tailwind CSS v4](https://img.shields.io/badge/Tailwind%20CSS-v4.0-38B2AC?style=for-the-badge&logo=tailwind-css&logoColor=white)](https://tailwindcss.com/)
 [![Prisma ORM](https://img.shields.io/badge/Prisma-6.x-2D3748?style=for-the-badge&logo=prisma&logoColor=white)](https://www.prisma.io/)
 [![Google Gemini](https://img.shields.io/badge/Google%20Gemini-1.5%20Flash-4285F4?style=for-the-badge&logo=google&logoColor=white)](https://ai.google.dev/)
+[![Consortium Blockchain](https://img.shields.io/badge/Consortium-Blockchain%20SHA--256-6366F1?style=for-the-badge&logo=blockchaindotcom&logoColor=white)](#3-️-cryptographic-proof-of-work--consortium-blockchain)
 [![e-RUPI Ready](https://img.shields.io/badge/Digital%20India-e--RUPI%20Vouchers-008080?style=for-the-badge&logo=digitalocean&logoColor=white)](https://www.npci.org.in/)
 
 <br />
@@ -41,20 +42,22 @@ In India's higher education ecosystem, **over 80% of engineering graduates are d
           ▼                     ▼                     ▼
 ┌──────────────────┐  ┌──────────────────┐  ┌──────────────────┐
 │     STUDENTS     │  │     FACULTY      │  │ 19+ ENTERPRISES  │
-│ • Proof-of-Work  │  │ • Joint Eval     │  │ • Challenges     │
-│ • Public Portf.  │  │ • Lab Units      │  │ • Reverse Hire   │
-│ • Skill Decay    │  │ • AI Audit       │  │ • Mentor Clinics │
-│ • PRI Score      │  │ • Sabbaticals    │  │ • e-RUPI Vouchers│
-│ • Reverse Plcmt. │  │ • FDP Directory  │  │ • Live Pitches   │
+│ • Proof-of-Work  │  │ • Joint Eval     │  │ • ATS Kanban     │
+│ • Public Portf.  │  │ • Lab Units      │  │ • Custom Tests   │
+│ • Skill Decay    │  │ • AI Audit       │  │ • Reverse Hire   │
+│ • PRI Score      │  │ • Sabbaticals    │  │ • Mentor Clinics │
+│ • Reverse Plcmt. │  │ • Milestones &   │  │ • e-RUPI Vouchers│
+│ • Custom Quizzes │  │   Certificates   │  │ • Scorecards     │
 └─────────┬────────┘  └─────────┬────────┘  └─────────┬────────┘
           └─────────────────────┼─────────────────────┘
                                 ▼
                     ┌─────────────────────────┐
                     │      INSTITUTIONS       │
                     │ • Yearly Placement Stats│
+                    │ • Bulk Roster Importer  │
+                    │ • NAAC/NIRF Dossier     │
                     │ • Skill Gap Heatmaps    │
-                    │ • Accreditation Metrics │
-                    │ • NAAC/NIRF Data Export │
+                    │ • Accreditation Exports │
                     └─────────────────────────┘
 ```
 
@@ -102,63 +105,81 @@ Flips traditional campus hiring upside down. Students with **PRI ≥ 850** becom
 - **Target Career Roles & Guidance:** Recommends roles (*Full Stack Cloud Engineer, AI Solutions Architect, etc.*) with salary bands (₹16–30 LPA), demand tiers, and required core competency checklists.
 - **Curated Up-skilling Tracks:** Bridges skill gaps via direct 1-click enrollment into corporate partner training programs.
 
-### 6. 💼 6-Stage Internship Lifecycle, Progress Tracking & Mentor Feedback (`/internships`)
+### 6. 📋 Recruiter ATS Kanban Board, Bulk Shortlisting & Interviewer Scorecards (`/internships`)
 - **Complete End-to-End Pipeline:** Seamlessly guides candidates across all six stages:
   `Applied ➔ Shortlisted ➔ Interview ➔ Offered ➔ In Progress ➔ Completed`.
-- **In-Platform Mentor Evaluation Modal:** Corporate recruiters and mentors can:
-  - Advance status to `In Progress` (active work tracking).
-  - Award **1 to 5 Star Ratings** and performance grades (`Outstanding A+`, `Exceeds Expectations A`, etc.).
-  - Submit **Qualitative Mentor Recommendations & Feedback**.
-- **Automated Digital Credential Minting:** Marking an internship as completed automatically mints an authenticated, verified item directly onto the student's **Digital Portfolio** (`/portfolio`), immediately boosting their **Placement Readiness Index (PRI)**.
+- **Interactive Kanban ATS Board:** Visual stage columns with instant drag/advance actions, candidate match badges, and real-time status updates.
+- **Multi-Candidate Bulk Shortlist Bar:** Checkbox multi-select allowing enterprise recruiters to bulk shortlist candidates or bulk advance applicants to the interview stage with one click.
+- **Interviewer Scorecard Modal:** Corporate interviewers record structured quantitative scores (1–5 stars) and qualitative evaluation notes directly on the candidate's application record.
+- **Automated Digital Credential Minting:** Marking an internship as completed automatically mints an authenticated, verified credential directly onto the student's **Digital Portfolio** (`/portfolio`), immediately boosting their **Placement Readiness Index (PRI)**.
 
-### 7. 🤝 In-Browser Interactive Mentorship & Code Clinic Workspace (`/mentor-slots`)
+### 7. 🧪 Industry Custom Assessment Builder & Timed Student Quizzes (`/assessments`)
+- **Corporate Assessment Creator:** Enterprise partners can author bespoke online screening quizzes, defining title, category (Technical, Soft Skills, Aptitude), primary skill, duration in minutes, passing threshold, and multiple-choice questions with answer keys and explanations.
+- **Student Interactive Custom Quiz Modal:** Students take company-sponsored assessments with a real-time countdown timer, progress indicators, question skipping, instant scoring, answer explanations, and automated submission persistence.
+- **Direct Skill Graph Integration:** Passing custom assessments unlocks skill endorsements and adds verified credit toward student PRI calculations.
+
+### 8. 🎓 Faculty Milestone Tracker & Cryptographic Certification (`/faculty-portal`)
+- **Structured 5-Stage Project Progression:** Tracks faculty-guided student research, capstones, and industrial training across 5 formal milestones:
+  `1. Enrolled ➔ 2. Workplan Submitted ➔ 3. Midterm Review ➔ 4. Final Delivery ➔ 5. Certified`.
+- **Dual Deliverable Review:** Students submit workplan and final report links with repository artifacts; faculty evaluate progress with qualitative feedback and star ratings.
+- **Faculty Certificate Modal:** Faculty issue tamper-evident completion certificates with cryptographic SHA-256 integrity hashes, committing official academic endorsements directly to the student's verifiable profile.
+
+### 9. 👥 Institutional Bulk Student Roster Importer (`/analytics`)
+- **CSV / Excel Drag-and-Drop Ingestion:** University TPOs and administrators can bulk onboard entire student cohorts in seconds.
+- **Live Client-Side Parsing & Validation:** Instant preview of parsed records (Name, Email, Roll Number, Department, Year, Skills) with duplicate detection and missing field flags.
+- **1-Click Batch Account Provisioning:** Automatically provisions student user accounts, attaches departmental profiles, and seeds starter skill graphs with rollback safeguards.
+
+### 10. 📑 AICTE / NAAC / NIRF Institutional Accreditation Dossier (`/analytics`)
+- **Automated Compliance Dossier Generator:** Aggregates real-time institutional metrics into a standardized, audit-ready compliance document.
+- **Key Accreditation Mappings:**
+  - **NAAC Criteria 1 & 2:** Curricular relevance, industry syllabus audits, and experiential project work.
+  - **NAAC Criteria 5 & NIRF Placement:** Verified placement percentages, median CTC, highest packages, and corporate recruiter rosters.
+  - **AICTE & NIRF Research Metrics:** Active faculty industrial sabbaticals, collaborative lab units, and enterprise MoUs.
+- **Print & Export Ready:** Features a dedicated, styled print layout and instant 1-click Excel export via SheetJS (`xlsx`).
+
+### 11. 🤝 In-Browser Interactive Mentorship & Code Clinic Workspace (`/mentor-slots`)
 - **Unified Collaboration Suite:** Integrated directly into booked 1:1 mentor sessions.
 - **Live Code Review Canvas:** Real-time TypeScript/Python/SQL code review editor with syntax styling and 1-click code copying.
 - **Session Agenda Checklist:** Interactive checklist covering *Architecture Review*, *Code Profiling*, and *Skill Guidance*.
 - **Collaborative Notes & Action Items:** Shared notes saved for institutional NEP 2020 and NIRF industrial exposure compliance.
 - **Integrated WebRTC Video Bridge:** One-click toggle between the Code Review workspace and embedded video conference.
 
-### 8. 🏢 19 Corporate Industry Partners Ecosystem (`/partners`)
-- Interactive corporate directory featuring 19 multinational and indigenous enterprise partners including **Infosys, TCS, Wipro, Zoho, HCLTech, Google India, Microsoft India, Amazon AWS, NVIDIA India, Intel India, Samsung R&D, Tata Motors, Reliance Jio, and All India Institute of Ayurveda (AIIA)**.
+### 12. 🏢 19 Corporate Industry Partners Ecosystem (`/partners`)
+- Interactive corporate directory featuring 19 multinational and indigenous enterprise partners:
+  **Google India, Microsoft India, Amazon AWS, NVIDIA India, Intel India, Cisco Systems, IBM India Research, Oracle India, TCS, Infosys, Wipro, Zoho, HCLTech, L&T Technology Services, Tech Mahindra, Samsung R&D, Tata Motors, Reliance Jio, and All India Institute of Ayurveda (AIIA)**.
 - Live view of each corporate partner's active engineering challenges, learning programs, job pitches, and collaborative domains.
 - **1-Click Login & Demo Switcher:** Seamlessly log in as any of the 19 enterprise partners to evaluate recruiter workflows.
 
-### 9. 📊 Yearly Placement Analytics & Corporate Matching (`/placements`)
-- Comprehensive placement dashboard tracking yearly cohort performance, placement percentage, highest/average packages (CTC), and department distribution.
-- **Placement Records Management:** Create, edit, and manage student placement records tied to corporate partners.
-- **Accreditation-Ready Exports:** 1-click Excel export via SheetJS for **NAAC (Criteria 1 & 2)**, **NBA**, and **NIRF** reporting.
+### 13. 📊 Yearly Placement Analytics & Corporate Matching (`/placements`)
+- Comprehensive placement dashboard tracking 5-year cohort performance, placement percentage, highest/average packages (CTC), and department distribution.
+- **Category Classification:** Categorizes offers into *Super Dream* (₹20+ LPA), *Dream* (₹10–20 LPA), *Core R&D*, and *IT Services*.
+- **Corporate Matching Engine:** Matches campus placement records against verified SkillBridge corporate partners with badge highlights.
+- **Accreditation-Ready Exports:** 1-click Excel export via SheetJS for **NAAC**, **NBA**, and **NIRF** reporting.
 
-### 10. 🧠 AI-Powered Syllabus Obsolescence Engine (`/syllabus`)
+### 14. 🧠 AI-Powered Syllabus Obsolescence Engine (`/syllabus`)
 - Integrates pattern-matching heuristics and **Google Gemini 1.5 Flash LLM** to ingest university curricula.
 - Automatically flags obsolete topics (e.g., SOAP/CORBA, legacy frameworks) against live industry job market requirements.
 - Generates instant **Curriculum Patches & Micro-Modules** (e.g., gRPC, GraphQL, Event-Driven Streaming) for faculty boards of study.
 
-### 11. ⚖️ Standardized Joint Evaluation Matrix (`/dual-grading`)
+### 15. ⚖️ Standardized Joint Evaluation Matrix (`/dual-grading`)
 - Bridges academic rigor with industry standards through a dual-scoring model:
   - **Faculty:** Evaluates academic fundamentals (algorithms, documentation, discipline).
   - **Industry Mentors:** Evaluates enterprise readiness (production-level code, system design, test coverage, agility).
 - Full role-based **edit and delete permissions** for faculty and industry evaluators with instant recalculation of student PRI.
 
-### 12. 📝 Dynamic Skill Assessments & Adaptive Testing (`/assessments`)
-- Skill diagnostics, aptitude tests, and technical tracks with **question skipping** and **flexible submission**.
-- Automatically pinpoint strengths and upskill gaps into the student's verified skill graph with direct links to career guidance.
-
-### 13. 🏆 Industry Challenge & Capstone Marketplace (`/challenges`)
-- Real-world engineering challenges, micro-consultancy gigs, and R&D sprints posted directly by corporate sponsors with clear stipends and deadlines.
-- Role-based interaction: students apply with proposals and portfolio links; faculty review and form collaborative **Lab Units**; industry leads manage applicants and award contracts.
-
-### 14. ⏳ Temporal Skill Decay Engine
+### 16. ⏳ Temporal Skill Decay Engine
 - Recognizes that technology skills have a natural half-life.
 - Tracks skills across **ACTIVE ➔ STALE ➔ EXPIRED** states.
 - Incentivizes students to recertify, commit code, and attend mentorship clinics to keep their profile current.
 
-### 15. 🎟️ Digital India e-RUPI Vouchers & Skill Token Economy
+### 17. 🎟️ Digital India e-RUPI Vouchers & Skill Token Economy (`/tokens`)
 - **e-RUPI Vouchers:** Purpose-bound digital vouchers issued by corporate CSR/partners for certifications, lab equipment, and student training.
 - **Skill Tokens:** Internal token ledger allowing students to book 15-minute 1:1 Office Hours and Code Clinics with verified industry mentors.
 
-### 16. ⚡ High-Performance Glassmorphic UI & Split-Screen Experience
-- Built for blazingly fast load times with Next.js Server Components and Tailwind CSS v4.
-- Split-screen landing hero (**CAMPUS vs CORP**), ambient lighting, live ticker, and full dark/light theme support.
+### 18. 🛡️ Enterprise Security, Password Policy & TOTP 2FA (`/settings`, `/login`)
+- **Real-Time Password Complexity Engine:** Enforces minimum 8 characters, uppercase, lowercase, numbers, special characters, and email prefix collision checks with dynamic visual strength meters.
+- **Two-Factor Authentication (TOTP):** Time-based one-time password security via `otplib` with SVG QR code generation and 8 cryptographically hashed emergency backup codes.
+- **Secure Sessions:** HttpOnly cookie-based JWT authentication with strict Role-Based Access Control (RBAC).
 
 ---
 
@@ -166,10 +187,10 @@ Flips traditional campus hiring upside down. Students with **PRI ≥ 850** becom
 
 | Stakeholder | Key Features & Capabilities | SIH Impact & Value |
 |:---|:---|:---|
-| **👨‍🎓 Student** | • Multi-factor PRI 0–1000 Engine<br>• **Skill Mapping & Career Guidance Hub** (`/skills`)<br>• **6-Stage Internship Lifecycle** with mentor ratings & feedback<br>• Public Verifiable Portfolio (`/portfolio/[id]`)<br>• **4-Way Secure Document Vault** with cryptographic SHA-256 badges<br>• Adaptive Skill Assessments with Question Skip<br>• Reverse Placement Job Pitches (PRI ≥ 850)<br>• 1:1 Live Collaboration Clinic & WebRTC Meeting | Transforms passive learners into verified builders with immutable credentials and direct recruiter outreach. |
-| **👩‍🏫 Academician** | • Faculty Portal & Industry Sabbatical Exchange<br>• AI Syllabus Obsolescence Audit & Patch Generator<br>• Lab Unit Incubator Management<br>• Joint Evaluation Console (Full Edit/Delete)<br>• AICTE-Recognized Faculty Development Programs (FDP) | Enables faculty to stay synchronized with industry trends and engage in paid consultancies and research. |
-| **🏢 Industry Partner** | • 19 Seeded Corporate Partners with Rich Profiles<br>• Capstone & R&D Challenge Marketplace<br>• **Internship Evaluation & Feedback Modal** (Ratings + Verified Credentials)<br>• Reverse Placement Direct Candidate Outreach<br>• Joint Evaluation on Real-World Deliverables<br>• **Live Mentorship & Code Clinic Workspace**<br>• Purpose-Bound e-RUPI Education Vouchers | Cuts hiring turnaround time and retraining costs through verified talent pipelines and direct portfolio access. |
-| **🏛️ Institution / TPO** | • Institutional Admin View & Analytics Dashboard<br>• Yearly Placement Records & CTC Salary Trends<br>• Department-Level Skill Gap Heatmaps<br>• NAAC, NBA, and NIRF Accreditation Exports (Excel)<br>• Corporate Partner Matching & MoUs Directory | Provides actionable macro insights to modernize curricula and achieve 100% verified placement success. |
+| **👨‍🎓 Student** | • Multi-factor PRI 0–1000 Engine<br>• **Skill Mapping & Career Guidance Hub** (`/skills`)<br>• **6-Stage Internship Pipeline** & Status Tracking<br>• **Custom Company Screening Quizzes** (`/assessments`)<br>• Public Verifiable Portfolio (`/portfolio/[id]`)<br>• **4-Way Secure Document Vault** with SHA-256 badges<br>• Reverse Placement Job Pitches (PRI ≥ 850)<br>• 1:1 Live Collaboration Clinic & WebRTC Meeting | Transforms passive learners into verified builders with immutable credentials and direct recruiter outreach. |
+| **👩‍🏫 Academician** | • **Faculty Milestone Tracker** & Progress Grading<br>• **Tamper-Evident Faculty Certificates** (`FacultyCertificateModal`)<br>• AI Syllabus Obsolescence Audit & Patch Generator<br>• Lab Unit Incubator Management<br>• Joint Evaluation Console (Full Edit/Delete)<br>• AICTE-Recognized Faculty Development Programs (FDP) | Enables faculty to stay synchronized with industry trends, guide verified research capstones, and lead industry consultancies. |
+| **🏢 Industry Partner** | • **ATS Kanban Board** for candidate management<br>• **Multi-Candidate Bulk Shortlisting Bar**<br>• **Interviewer Scorecard Modal** (1–5 Stars + Notes)<br>• **Custom Assessment Builder** (Bespoke online screening)<br>• 19 Seeded Corporate Partners with Rich Profiles<br>• Capstone & R&D Challenge Marketplace<br>• Reverse Placement Direct Outreach & e-RUPI Vouchers | Cuts hiring turnaround time and retraining costs through verified talent pipelines, automated ATS tooling, and direct portfolio access. |
+| **🏛️ Institution / TPO** | • **AICTE / NAAC / NIRF Accreditation Dossier Generator**<br>• **Bulk Student Roster Importer** (CSV & Excel Drag/Drop)<br>• Yearly Placement Records & CTC Salary Trends<br>• Department-Level Skill Gap Heatmaps<br>• 1-Click Accreditation Excel Exports via SheetJS<br>• Corporate Partner Matching & MoUs Directory | Provides actionable macro insights to modernize curricula, automate administrative onboarding, and achieve 100% verified placement success. |
 
 ---
 
@@ -182,6 +203,11 @@ flowchart TB
         SplitHero["Split Screen Landing Hero (Campus vs Corp)"]
         Switcher["Floating 1-Click Demo Switcher (All Personas + 19 Partners)"]
         SkillMapping["Skill Mapping & Career Guidance Hub (/skills)"]
+        AtsBoard["Recruiter ATS Kanban Board & Scorecards (/internships)"]
+        CustomAssess["Custom Assessment Builder & Quiz Modal (/assessments)"]
+        FacultyTracker["Faculty Milestone Tracker & Certification (/faculty-portal)"]
+        RosterImporter["Bulk Student Roster Importer (/analytics)"]
+        AccredDossier["AICTE / NAAC / NIRF Accreditation Dossier (/analytics)"]
         CollabClinic["Live Mentorship & Code Clinic Workspace (/mentor-slots)"]
         DocVault["4-Way Tamper-Proof Document Vault (/portfolio)"]
         RechartsComp["Analytics & Skill Heatmaps (Recharts)"]
@@ -190,25 +216,25 @@ flowchart TB
 
     subgraph SecurityLayer ["Identity & Security Gateway"]
         JWT["HttpOnly Cookie JWT Session"]
-        Bcrypt["Bcrypt Password Hashing"]
-        TOTP["2FA Two-Factor Authentication (otplib)"]
+        Bcrypt["Bcrypt Password Hashing & Strength Meter"]
+        TOTP["2FA Two-Factor Authentication (otplib + Backup Codes)"]
         RBAC["Role-Based Access Control (4 Stakeholders)"]
     end
 
     subgraph CoreEngines ["Domain & Logic Engines"]
         PRI["Placement Readiness Index (PRI Engine 0-1000)"]
         CareerEngine["Skill Mapping & Industry Sector Recommendation Algorithm"]
-        InternshipEngine["6-Stage Internship Lifecycle & Mentor Feedback Engine"]
+        AtsEngine["ATS Kanban & Candidate Progression Engine"]
         DecayEngine["Temporal Skill Decay Engine (Active/Stale/Expired)"]
         JointGrading["Joint Evaluation Matrix (Academic + Industry)"]
         AuditEngine["AI Syllabus Obsolescence Engine (Gemini 1.5 Flash)"]
-        PlacementEngine["Yearly Placement Tracker & CTC Trends"]
+        PlacementEngine["Yearly Placement Tracker & Corporate Matching"]
         TokenLedger["Skill Token Economy & Office Hours Scheduler"]
     end
 
     subgraph VerificationLayer ["Verification & Ledger Layer"]
         Blockchain["Consortium Blockchain (Merkle Root + SHA-256)"]
-        QRGen["Public QR Proof Verification Badges"]
+        QRGen["Public QR Proof Verification Badges (/verify/[token])"]
         Erupi["Purpose-Bound e-RUPI Vouchers"]
     end
 
@@ -238,8 +264,8 @@ sequenceDiagram
 
     Industry->>Faculty: Post Industry Challenge (Capstone / R&D)
     Faculty->>Student: Form Lab Unit & Assign Milestones
-    Student->>Faculty: Submit Code Artifacts & Verifiable Proof
-    Faculty->>Industry: Initiate Joint Evaluation
+    Student->>Faculty: Submit Code Artifacts & Milestone Workplans
+    Faculty->>Industry: Initiate Joint Evaluation & Milestone Review
     Industry->>Student: Grade Corporate Readiness & Sign-Off Proof of Work
     Note over Student,Industry: SHA-256 Hashed, Block Committed, QR Badge Generated
     Student->>Student: PRI Engine Computes Verified Score (+Points)
@@ -248,6 +274,7 @@ sequenceDiagram
         Industry->>Student: Direct Job Pitch (Role + CTC Offer + Stipend)
         Student->>Industry: Accept Offer & Commit Output
         Industry->>TPO: Placement Records & Yearly Analytics Updated Live
+        TPO->>TPO: Generate AICTE / NAAC / NIRF Accreditation Dossier
     end
 ```
 
@@ -269,23 +296,23 @@ All demo accounts are pre-configured with the default password: `PASSWORD@123`
 
 | Persona | Role | Seeded Email | Key Areas to Evaluate |
 |:---|:---|:---|:---|
-| **Aarav Sharma** | `STUDENT` | `aarav.sharma@student.edu` | **PRI Breakdown (850+)**, Verifiable Proof-of-Work, Public Portfolio link, Resume View/Download, Skill Decay, Reverse Placement Pitches |
-| **Dr. Rajesh Kumar** | `ACADEMICIAN` | `rajesh.kumar@faculty.edu` | **AI Syllabus Obsolescence Audit**, Joint Evaluation Console (edit/delete), Lab Units, Sabbatical Listings |
-| **Infosys Campus Lead** | `INDUSTRY` | `recruit@infosys.com` | **Post Challenges**, Reverse Placement Direct Pitches, Candidate Portfolio inspection, Joint Evaluation sign-off |
-| **Dr. Lakshmi Narayanan** | `INSTITUTION` | `tpo@university.edu` | **Yearly Placement Analytics**, Placement Record Management, Skill Gap Heatmaps, NAAC/NIRF Excel Export |
+| **Aarav Sharma** | `STUDENT` | `aarav.sharma@student.edu` | **PRI Breakdown (850+)**, Verifiable Proof-of-Work, Public Portfolio link, Resume View/Download, Custom Quizzes, Skill Decay, Reverse Placement Pitches |
+| **Dr. Rajesh Kumar** | `ACADEMICIAN` | `rajesh.kumar@faculty.edu` | **Faculty Milestone Tracker**, Tamper-Evident Faculty Certificates, **AI Syllabus Obsolescence Audit**, Joint Evaluation Console (edit/delete), Lab Units, Sabbaticals |
+| **Infosys Campus Lead** | `INDUSTRY` | `recruit@infosys.com` | **ATS Kanban Board**, Bulk Shortlisting, Interviewer Scorecards, **Custom Assessment Builder**, Reverse Placement Direct Pitches, Joint Evaluation sign-off |
+| **Dr. Lakshmi Narayanan** | `INSTITUTION` | `tpo@university.edu` | **Bulk Student Roster Importer** (CSV/Excel), **AICTE/NAAC/NIRF Dossier Generator**, Yearly Placement Analytics, Skill Gap Heatmaps, NAAC/NIRF Excel Export |
 
 ### 3. 1-Click Login for All 19 Industry Corporate Partners
-On the [Login Page](/login), expand the **"Corporate & Enterprise Partners (19)"** accordion to log in with a single click as **Infosys, TCS, Wipro, Zoho, HCLTech, Google India, Microsoft India, Amazon AWS, NVIDIA India, Intel India, AIIA, Samsung R&D, Tata Motors, Reliance Jio**, and more!
+On the [Login Page](/login), expand the **"Corporate & Enterprise Partners (19)"** accordion to log in with a single click as **Infosys, TCS, Wipro, Zoho, HCLTech, Google India, Microsoft India, Amazon AWS, NVIDIA India, Intel India, Cisco Systems, IBM India, Oracle India, LTIMindtree, Tech Mahindra, AIIA, Samsung R&D, Tata Motors, Reliance Jio**, and more!
 
 ### 4. Suggested 3-Minute Hackathon Evaluation Flow
 1. **Landing Page:** Explore the responsive Split Screen Hero (**Campus vs Corp**), live data ticker, and feature highlights.
 2. **Skill Mapping & Career Guidance:** As **Aarav Sharma** (`STUDENT`), navigate to **Skills** to inspect the automated **Strengths vs. Skill Gaps Matrix**, **Industry Sector Matches** across 5 verticals, and targeted **Up-skilling Tracks**.
 3. **Public Portfolio & Document Vault:** Open the **Digital Portfolio** (`/portfolio`), test document filtering (Resumes, Certificates, Reports, Transcripts), view cryptographic **Tamper-Proof Badges**, and preview verified proof-of-work badges.
-4. **AI Syllabus Audit:** Switch to **Dr. Rajesh Kumar** (`ACADEMICIAN`), navigate to **Syllabus**, and trigger the AI audit to see obsolete topics flagged and curriculum patches recommended.
-5. **Joint Evaluation Console:** Navigate to **Joint Evaluation**, inspect academic and enterprise grading criteria, and test editing or deleting evaluation records.
-6. **Internship Lifecycle & Mentor Feedback:** Switch to **Infosys** (`INDUSTRY`), open **Internships**, advance an applicant from `Shortlisted` ➔ `Interview` ➔ `Approved`, click **"Complete & Issue Certificate"** to submit star ratings and qualitative remarks, and verify the credential automatically writes to the student's portfolio.
-7. **In-Browser Mentorship Clinic:** Navigate to **Mentor Slots**, click **"Open Collaboration Clinic"** to launch the live code review canvas, interactive agenda, and WebRTC video call.
-8. **Placements & Heatmaps:** Switch to **Dr. Lakshmi Narayanan** (`INSTITUTION`), review yearly placement trends, add a placement record, and export accreditation-ready Excel sheets for NAAC/NIRF.
+4. **Recruiter ATS Kanban & Custom Assessments:** Switch to **Infosys** (`INDUSTRY`), open **Internships** to test the **ATS Kanban Board**, drag/advance candidates, use the **Bulk Shortlist Bar**, and open an **Interviewer Scorecard**. Then navigate to **Assessments** and test the **Industry Assessment Builder**.
+5. **Faculty Milestone Tracker & Certification:** Switch to **Dr. Rajesh Kumar** (`ACADEMICIAN`), navigate to **Faculty Portal**, review student milestone progress (Workplan ➔ Midterm ➔ Final Delivery), and click **Issue Faculty Certificate** to mint a cryptographic credential.
+6. **AI Syllabus Audit:** In **Faculty Portal** or via **Syllabus**, trigger the AI audit to see obsolete topics flagged and modern curriculum patches recommended.
+7. **Bulk Roster & Accreditation Dossier:** Switch to **Dr. Lakshmi Narayanan** (`INSTITUTION`), test the **Bulk Roster Importer** with sample CSV download, and click **Generate AICTE / NAAC / NIRF Dossier** to inspect the institutional audit package.
+8. **In-Browser Mentorship Clinic:** Navigate to **Mentor Slots**, click **"Open Collaboration Clinic"** to launch the live code review canvas, interactive agenda, and WebRTC video call.
 
 ---
 
@@ -301,11 +328,11 @@ On the [Login Page](/login), expand the **"Corporate & Enterprise Partners (19)"
 ### Backend, Database & Ledger
 - **Runtime:** Node.js (Edge-compatible server actions)
 - **ORM:** Prisma Client 6.x (Multi-dialect: PostgreSQL in production, SQLite locally)
-- **Security:** JWT (HttpOnly, Secure Cookies) + BcryptJS password hashing
-- **Two-Factor Auth:** Time-based One-Time Passwords (`otplib` + QR verification)
+- **Security:** JWT (HttpOnly, Secure Cookies) + BcryptJS password hashing + Complexity Criteria Meter
+- **Two-Factor Auth:** Time-based One-Time Passwords (`otplib` + SVG QR code generator + 8 backup codes)
 - **Blockchain Simulation:** Merkle Tree root hashing, SHA-256 block header chaining, and validation consensus
 - **QR Code Engine:** `qrcode` SVG generator for cryptographic credential verification
-- **Spreadsheets:** SheetJS (`xlsx`) for institutional accreditation exports
+- **Spreadsheets & Roster:** SheetJS (`xlsx`) for institutional accreditation exports and bulk roster CSV/Excel parsing
 
 ### AI & External Services
 - **AI Model:** Google Gemini 1.5 Flash (via `@google/genai` / REST integration with resilient heuristics fallback)
@@ -368,15 +395,15 @@ Open [http://localhost:3000](http://localhost:3000) in your browser.
 ```
 SkillBridge/
 ├── prisma/
-│   ├── schema.prisma            # 25+ relational models (Users, PRI, Blockchain, e-RUPI, Placements, etc.)
+│   ├── schema.prisma            # 25+ relational models (Users, PRI, Blockchain, e-RUPI, Placements, Custom Assessments, etc.)
 │   └── seed.ts                  # Pre-seeded SIH personas, 19 corporate partners, and real-world scenario data
 ├── public/                      # Static assets, logos, and badges
 ├── src/
 │   ├── app/
 │   │   ├── (app)/               # Authenticated stakeholder application routes
 │   │   │   ├── dashboard/       # Unified stakeholder-aware dashboard
-│   │   │   ├── assessments/     # Adaptive skill diagnostics with skip functionality
-│   │   │   ├── analytics/       # Institutional admin view & aggregate data
+│   │   │   ├── assessments/     # Custom Assessment Builder, CustomQuizModal & adaptive skill testing
+│   │   │   ├── analytics/       # Institutional analytics, Bulk Roster Importer & AICTE/NAAC/NIRF Dossier
 │   │   │   ├── pri/             # Placement Readiness Index deep-dive & breakdown
 │   │   │   ├── proof-of-work/   # Verifiable project proofs & blockchain explorer
 │   │   │   ├── portfolio/       # Public verifiable digital portfolio & 4-way document vault
@@ -386,22 +413,23 @@ SkillBridge/
 │   │   │   ├── partners/        # 19 Corporate Enterprise Partners directory
 │   │   │   ├── syllabus/        # AI-driven syllabus obsolescence audit
 │   │   │   ├── dual-grading/    # Joint Evaluation console (Faculty + Industry)
+│   │   │   ├── faculty-portal/  # Faculty Milestone Tracker, Progress Grading & Certificate Modal
 │   │   │   ├── challenges/      # Industry challenges & capstone marketplace
 │   │   │   ├── lab-units/       # Faculty-led incubator teams
 │   │   │   ├── heatmap/         # Institutional department skill gap analytics
 │   │   │   ├── office-hours/    # 1:1 mentor booking via skill tokens
 │   │   │   ├── mentor-slots/    # Mentorship availability & MentorshipClinicModal (Live Collab)
 │   │   │   ├── sabbaticals/     # Faculty industrial training & consultancy
-│   │   │   ├── internships/     # 6-stage lifecycle, applicant tracking & mentor feedback modal
+│   │   │   ├── internships/     # Recruiter ATS Kanban, Bulk Shortlist Bar & Interviewer Scorecards
 │   │   │   ├── job-pitches/     # Corporate candidate outreach tracker
-│   │   │   └── settings/        # 2FA security, notifications, and profile
-│   │   ├── api/                 # API endpoints (demo switcher, syllabus, PRI, auth)
+│   │   │   └── settings/        # 2FA security (TOTP + QR + Backup codes) & password management
+│   │   ├── api/                 # API endpoints (demo switcher, syllabus, PRI, auth, roster)
 │   │   ├── login/               # Role-aware authentication with 1-click partner logins
-│   │   ├── signup/              # Multi-tenant onboarding
-│   │   ├── verify/              # Public QR cryptographic proof verification
+│   │   ├── signup/              # Multi-tenant onboarding with password criteria meter
+│   │   ├── verify/              # Public QR cryptographic proof verification (/verify/[token])
 │   │   └── page.tsx             # Split-screen responsive landing page
 │   ├── components/              # Modular UI components, demo switcher, and charts
-│   └── lib/                     # PRI calculation, blockchain logic, auth, AI audit
+│   └── lib/                     # PRI calculation, blockchain logic, auth, AI audit, matching engine
 ├── package.json
 └── README.md
 ```
@@ -417,8 +445,8 @@ SkillBridge/
    • Simulated Blockchain    • 100+ Enterprise MoUs   • Millions of Empowered Youth
 ```
 
-- **NEP 2020 Compliance:** Implements multidisciplinary learning, mandatory internships, and continuous credit bank integration.
-- **Accreditation Readiness:** Generates instant audit trails and Excel exports for NAAC Criteria 1 (Curricular Aspects) and Criteria 2 (Teaching-Learning).
+- **NEP 2020 Compliance:** Implements multidisciplinary learning, mandatory internships, continuous credit bank integration, and industry sabbatical exchanges.
+- **Accreditation Readiness:** Generates instant audit trails and Excel exports for NAAC Criteria 1 (Curricular Aspects), Criteria 2 (Teaching-Learning), and Criteria 5 (Student Support & Progression).
 - **Decentralized Verification:** Planned transition from consortium simulation to Hyperledger / Polygon ID for decentralized student digital credentials (W3C DID).
 
 ---
