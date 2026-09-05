@@ -3,6 +3,7 @@
 import { redirect } from "next/navigation";
 import { prisma } from "@/lib/prisma";
 import { hashPassword, createSession, normalizeRole } from "@/lib/auth";
+import { getPasswordValidationError } from "@/lib/password";
 import type { Role } from "@/lib/types";
 
 export interface SignupState {
@@ -24,13 +25,16 @@ export async function signupAction(_prevState: SignupState | null, formData: For
   const name = String(formData.get("name") || "").trim();
   const email = String(formData.get("email") || "").trim().toLowerCase();
   const password = String(formData.get("password") || "");
+  const confirmPassword = formData.has("confirmPassword")
+    ? String(formData.get("confirmPassword") || "")
+    : undefined;
   const role = normalizeRole(String(formData.get("role") || "STUDENT"));
 
   // Role-specific onboarding fields
   const collegeName = String(formData.get("collegeName") || "").trim() || null;
   const department = String(formData.get("department") || "").trim() || null;
   const yearInput = formData.get("year");
-  const year = yearInput && !isNaN(Number(yearInput)) ? Number(yearInput) : null;
+  const year = yearInput && String(yearInput).trim() !== "" && !isNaN(Number(yearInput)) ? Number(yearInput) : null;
   const rollNumber = String(formData.get("rollNumber") || "").trim() || null;
   const skills = String(formData.get("skills") || "").trim() || null;
   const companyName = String(formData.get("companyName") || "").trim() || null;
@@ -54,8 +58,9 @@ export async function signupAction(_prevState: SignupState | null, formData: For
     return { error: "Please enter a valid email address." };
   }
 
-  if (password.length < 8) {
-    return { error: "Password must be at least 8 characters." };
+  const passwordError = getPasswordValidationError(password, confirmPassword, { name, email });
+  if (passwordError) {
+    return { error: passwordError };
   }
 
   if (!ALLOWED_ROLES.includes(role)) {

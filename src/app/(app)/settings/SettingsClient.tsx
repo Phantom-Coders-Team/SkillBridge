@@ -24,6 +24,7 @@ import {
 } from "lucide-react";
 import { Button, Card } from "@/components/ui";
 import { cn } from "@/lib/cn";
+import { evaluatePassword } from "@/lib/password";
 import type { SessionUser } from "@/lib/types";
 import {
   initTwoFactorSetupAction,
@@ -54,6 +55,10 @@ export function SettingsClient({
   const [passwordState, setPasswordState] = useState({ current: "", newPass: "", confirm: "" });
   const [passMsg, setPassMsg] = useState<string | null>(null);
 
+  const newPassResult = evaluatePassword(passwordState.newPass, { name: user.name, email: user.email });
+  const settingsPassMatch = passwordState.confirm.length > 0 && passwordState.newPass === passwordState.confirm;
+  const settingsPassMismatch = passwordState.confirm.length > 0 && passwordState.newPass !== passwordState.confirm;
+
   // Security 2FA state
   const [twoFactorEnabled, setTwoFactorEnabled] = useState(initialTwoFactor);
   const [setupStep, setSetupStep] = useState<"idle" | "scanning" | "backupCodes" | "disabling">("idle");
@@ -81,6 +86,10 @@ export function SettingsClient({
     e.preventDefault();
     if (!passwordState.current || !passwordState.newPass) {
       setPassMsg("Please fill in all password fields.");
+      return;
+    }
+    if (!newPassResult.isValid) {
+      setPassMsg(newPassResult.errors[0] || "New password does not meet the minimum security requirements.");
       return;
     }
     if (passwordState.newPass !== passwordState.confirm) {
@@ -230,6 +239,67 @@ export function SettingsClient({
                   placeholder="Minimum 8 characters"
                   className="w-full rounded-xl border border-border-muted bg-surface px-3 py-2 text-sm text-slate-900 outline-none focus:border-amber-500 dark:text-slate-100"
                 />
+
+                {passwordState.newPass.length > 0 && (
+                  <div className="mt-2.5 rounded-xl border border-border-muted bg-surface-subtle/70 p-3 space-y-2 dark:bg-slate-900/60">
+                    <div className="flex items-center justify-between text-[11px]">
+                      <span className="font-medium text-slate-500 dark:text-slate-400">Password Strength</span>
+                      <span
+                        className={cn(
+                          "font-bold text-[11px] px-2 py-0.5 rounded-md",
+                          newPassResult.strength === "very-weak" && "bg-rose-100 text-rose-700 dark:bg-rose-950/70 dark:text-rose-300",
+                          newPassResult.strength === "weak" && "bg-orange-100 text-orange-700 dark:bg-orange-950/70 dark:text-orange-300",
+                          newPassResult.strength === "fair" && "bg-amber-100 text-amber-700 dark:bg-amber-950/70 dark:text-amber-300",
+                          newPassResult.strength === "strong" && "bg-sky-100 text-sky-700 dark:bg-sky-950/70 dark:text-sky-300",
+                          newPassResult.strength === "very-strong" && "bg-emerald-100 text-emerald-700 dark:bg-emerald-950/70 dark:text-emerald-300"
+                        )}
+                      >
+                        {newPassResult.strengthLabel}
+                      </span>
+                    </div>
+
+                    <div className="grid grid-cols-5 gap-1.5 h-1.5 w-full">
+                      {[1, 2, 3, 4, 5].map((lvl) => (
+                        <div
+                          key={lvl}
+                          className={cn(
+                            "h-full rounded-full transition-all duration-300",
+                            newPassResult.score >= lvl
+                              ? newPassResult.score <= 1
+                                ? "bg-rose-500"
+                                : newPassResult.score === 2
+                                ? "bg-orange-500"
+                                : newPassResult.score === 3
+                                ? "bg-amber-500"
+                                : newPassResult.score === 4
+                                ? "bg-sky-500"
+                                : "bg-emerald-500"
+                              : "bg-slate-200 dark:bg-slate-800"
+                          )}
+                        />
+                      ))}
+                    </div>
+
+                    <div className="pt-1 text-[11px] space-y-1">
+                      {newPassResult.requirements.map((req) => (
+                        <div
+                          key={req.id}
+                          className={cn(
+                            "flex items-center gap-1.5",
+                            req.met ? "text-emerald-600 dark:text-emerald-400 font-medium" : "text-slate-400 dark:text-slate-500"
+                          )}
+                        >
+                          {req.met ? (
+                            <Check className="size-3 text-emerald-500 stroke-[3]" />
+                          ) : (
+                            <span className="size-1 rounded-full bg-slate-300 dark:bg-slate-600 mx-1" />
+                          )}
+                          <span>{req.label}</span>
+                        </div>
+                      ))}
+                    </div>
+                  </div>
+                )}
               </div>
 
               <div>
@@ -241,8 +311,34 @@ export function SettingsClient({
                   value={passwordState.confirm}
                   onChange={(e) => setPasswordState({ ...passwordState, confirm: e.target.value })}
                   placeholder="Repeat new password"
-                  className="w-full rounded-xl border border-border-muted bg-surface px-3 py-2 text-sm text-slate-900 outline-none focus:border-amber-500 dark:text-slate-100"
+                  className={cn(
+                    "w-full rounded-xl border bg-surface px-3 py-2 text-sm text-slate-900 outline-none focus:border-amber-500 dark:text-slate-100",
+                    settingsPassMismatch
+                      ? "border-rose-300 dark:border-rose-800"
+                      : settingsPassMatch
+                      ? "border-emerald-300 dark:border-emerald-800"
+                      : "border-border-muted"
+                  )}
                 />
+
+                {passwordState.confirm.length > 0 && (
+                  <p
+                    className={cn(
+                      "mt-1 text-[11px] font-medium flex items-center gap-1",
+                      settingsPassMatch ? "text-emerald-600 dark:text-emerald-400" : "text-rose-500 dark:text-rose-400"
+                    )}
+                  >
+                    {settingsPassMatch ? (
+                      <>
+                        <Check className="size-3 stroke-[3]" /> Passwords match
+                      </>
+                    ) : (
+                      <>
+                        <X className="size-3 stroke-[3]" /> Passwords do not match
+                      </>
+                    )}
+                  </p>
+                )}
               </div>
 
               {passMsg && (

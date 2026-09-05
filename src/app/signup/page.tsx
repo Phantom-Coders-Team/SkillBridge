@@ -25,8 +25,12 @@ import {
   Wrench,
   CheckCircle2,
   AlertCircle,
+  Check,
+  X,
+  ShieldCheck,
 } from "lucide-react";
 import { signupAction } from "./actions";
+import { evaluatePassword } from "@/lib/password";
 import { cn } from "@/lib/cn";
 import ThemeToggle from "@/components/ThemeToggle";
 import { SkillBridgeLogo, SkillBridgeWordmark } from "@/components/SkillBridgeLogo";
@@ -137,7 +141,46 @@ function RoleParamSync({ onSelect }: { onSelect: (r: string) => void }) {
 export default function SignupPage() {
   const [state, formAction, pending] = useActionState(signupAction, null);
   const [showPassword, setShowPassword] = useState(false);
+  const [showConfirmPassword, setShowConfirmPassword] = useState(false);
+  const [password, setPassword] = useState("");
+  const [confirmPassword, setConfirmPassword] = useState("");
+  const [name, setName] = useState("");
+  const [email, setEmail] = useState("");
+  const [clientError, setClientError] = useState<string | null>(null);
   const [selectedRole, setSelectedRole] = useState("STUDENT");
+
+  const passwordResult = evaluatePassword(password, { name, email });
+  const passwordsMatch = confirmPassword.length > 0 && password === confirmPassword;
+  const passwordsMismatch = confirmPassword.length > 0 && password !== confirmPassword;
+
+  function handleSubmit(e: React.FormEvent<HTMLFormElement>) {
+    setClientError(null);
+    if (!name.trim()) {
+      e.preventDefault();
+      setClientError("Please enter your full name.");
+      return;
+    }
+    if (!email.trim() || !/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email.trim())) {
+      e.preventDefault();
+      setClientError("Please enter a valid email address.");
+      return;
+    }
+    if (!password) {
+      e.preventDefault();
+      setClientError("Please create a password.");
+      return;
+    }
+    if (!passwordResult.isValid) {
+      e.preventDefault();
+      setClientError(passwordResult.errors[0] || "Password does not meet all security criteria.");
+      return;
+    }
+    if (confirmPassword !== password) {
+      e.preventDefault();
+      setClientError("Passwords do not match. Please re-enter to confirm.");
+      return;
+    }
+  }
 
   const currentPitch = ROLE_PITCHES[selectedRole] || ROLE_PITCHES.STUDENT;
 
@@ -221,7 +264,7 @@ export default function SignupPage() {
             <h2 className="text-2xl font-bold tracking-tight text-slate-900 dark:text-slate-100">Create your account</h2>
             <p className="mt-1 text-xs text-slate-500 dark:text-slate-400">Select your role to configure your personalized portal.</p>
 
-            <form action={formAction} className="mt-5 space-y-4" noValidate>
+            <form action={formAction} onSubmit={handleSubmit} className="mt-5 space-y-4" noValidate>
               {/* Role Selection Tabs */}
               <div>
                 <label className="mb-1.5 block text-xs font-bold text-slate-700 dark:text-slate-300">
@@ -273,6 +316,8 @@ export default function SignupPage() {
                       type="text"
                       autoComplete="name"
                       required
+                      value={name}
+                      onChange={(e) => setName(e.target.value)}
                       placeholder="e.g. Rahul Sharma"
                       className="h-10 w-full rounded-xl border border-border-muted bg-surface-subtle pl-9 pr-3 text-xs text-slate-900 placeholder:text-slate-400 transition-colors focus:border-indigo-500 focus:ring-2 focus:ring-indigo-500/30 focus:outline-none dark:border-slate-700/80 dark:bg-slate-900/80 dark:text-slate-100 dark:placeholder:text-slate-500"
                     />
@@ -291,6 +336,8 @@ export default function SignupPage() {
                       type="email"
                       autoComplete="email"
                       required
+                      value={email}
+                      onChange={(e) => setEmail(e.target.value)}
                       placeholder={
                         selectedRole === "STUDENT"
                           ? "student@college.edu"
@@ -304,32 +351,182 @@ export default function SignupPage() {
                 </div>
               </div>
 
-              <div>
-                <label htmlFor="password" className="mb-1 block text-xs font-medium text-slate-700 dark:text-slate-300">
-                  Password <span className="text-rose-500">*</span>
-                </label>
-                <div className="relative">
-                  <Lock aria-hidden className="pointer-events-none absolute left-3 top-1/2 size-3.5 -translate-y-1/2 text-slate-400 dark:text-slate-500" />
-                  <input
-                    id="password"
-                    name="password"
-                    type={showPassword ? "text" : "password"}
-                    autoComplete="new-password"
-                    required
-                    minLength={8}
-                    placeholder="Min. 8 characters"
-                    className="h-10 w-full rounded-xl border border-border-muted bg-surface-subtle pl-9 pr-9 text-xs text-slate-900 placeholder:text-slate-400 transition-colors focus:border-indigo-500 focus:ring-2 focus:ring-indigo-500/30 focus:outline-none dark:border-slate-700/80 dark:bg-slate-900/80 dark:text-slate-100 dark:placeholder:text-slate-500"
-                  />
-                  <button
-                    type="button"
-                    onClick={() => setShowPassword((v) => !v)}
-                    aria-label={showPassword ? "Hide password" : "Show password"}
-                    className="absolute right-2 top-1/2 flex size-7 -translate-y-1/2 items-center justify-center rounded-lg text-slate-400 hover:bg-slate-100 hover:text-slate-600 dark:text-slate-500 dark:hover:bg-slate-700 dark:hover:text-slate-300 transition-colors cursor-pointer"
-                  >
-                    {showPassword ? <EyeOff aria-hidden className="size-3.5" /> : <Eye aria-hidden className="size-3.5" />}
-                  </button>
+              {/* Secure Password & Confirmation */}
+              <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
+                <div>
+                  <div className="mb-1 flex items-center justify-between">
+                    <label htmlFor="password" className="block text-xs font-medium text-slate-700 dark:text-slate-300">
+                      Create Password <span className="text-rose-500">*</span>
+                    </label>
+                  </div>
+                  <div className="relative">
+                    <Lock aria-hidden className="pointer-events-none absolute left-3 top-1/2 size-3.5 -translate-y-1/2 text-slate-400 dark:text-slate-500" />
+                    <input
+                      id="password"
+                      name="password"
+                      type={showPassword ? "text" : "password"}
+                      autoComplete="new-password"
+                      required
+                      minLength={8}
+                      maxLength={128}
+                      value={password}
+                      onChange={(e) => setPassword(e.target.value)}
+                      placeholder="Min. 8 characters"
+                      className="h-10 w-full rounded-xl border border-border-muted bg-surface-subtle pl-9 pr-9 text-xs text-slate-900 placeholder:text-slate-400 transition-colors focus:border-indigo-500 focus:ring-2 focus:ring-indigo-500/30 focus:outline-none dark:border-slate-700/80 dark:bg-slate-900/80 dark:text-slate-100 dark:placeholder:text-slate-500"
+                    />
+                    <button
+                      type="button"
+                      onClick={() => setShowPassword((v) => !v)}
+                      aria-label={showPassword ? "Hide password" : "Show password"}
+                      className="absolute right-2 top-1/2 flex size-7 -translate-y-1/2 items-center justify-center rounded-lg text-slate-400 hover:bg-slate-100 hover:text-slate-600 dark:text-slate-500 dark:hover:bg-slate-700 dark:hover:text-slate-300 transition-colors cursor-pointer"
+                    >
+                      {showPassword ? <EyeOff aria-hidden className="size-3.5" /> : <Eye aria-hidden className="size-3.5" />}
+                    </button>
+                  </div>
+                </div>
+
+                <div>
+                  <div className="mb-1 flex items-center justify-between">
+                    <label htmlFor="confirmPassword" className="block text-xs font-medium text-slate-700 dark:text-slate-300">
+                      Confirm Password <span className="text-rose-500">*</span>
+                    </label>
+                  </div>
+                  <div className="relative">
+                    <Lock aria-hidden className="pointer-events-none absolute left-3 top-1/2 size-3.5 -translate-y-1/2 text-slate-400 dark:text-slate-500" />
+                    <input
+                      id="confirmPassword"
+                      name="confirmPassword"
+                      type={showConfirmPassword ? "text" : "password"}
+                      autoComplete="new-password"
+                      required
+                      value={confirmPassword}
+                      onChange={(e) => setConfirmPassword(e.target.value)}
+                      placeholder="Re-enter password"
+                      className={cn(
+                        "h-10 w-full rounded-xl border bg-surface-subtle pl-9 pr-9 text-xs text-slate-900 placeholder:text-slate-400 transition-colors focus:ring-2 focus:outline-none dark:bg-slate-900/80 dark:text-slate-100 dark:placeholder:text-slate-500",
+                        passwordsMismatch
+                          ? "border-rose-300 focus:border-rose-500 focus:ring-rose-500/30 dark:border-rose-800"
+                          : passwordsMatch
+                          ? "border-emerald-300 focus:border-emerald-500 focus:ring-emerald-500/30 dark:border-emerald-800"
+                          : "border-border-muted focus:border-indigo-500 focus:ring-indigo-500/30 dark:border-slate-700/80"
+                      )}
+                    />
+                    <button
+                      type="button"
+                      onClick={() => setShowConfirmPassword((v) => !v)}
+                      aria-label={showConfirmPassword ? "Hide password" : "Show password"}
+                      className="absolute right-2 top-1/2 flex size-7 -translate-y-1/2 items-center justify-center rounded-lg text-slate-400 hover:bg-slate-100 hover:text-slate-600 dark:text-slate-500 dark:hover:bg-slate-700 dark:hover:text-slate-300 transition-colors cursor-pointer"
+                    >
+                      {showConfirmPassword ? <EyeOff aria-hidden className="size-3.5" /> : <Eye aria-hidden className="size-3.5" />}
+                    </button>
+                  </div>
                 </div>
               </div>
+
+              {/* Password Strength Meter & Live Security Checklist */}
+              {password.length > 0 && (
+                <div className="rounded-2xl border border-border-muted bg-surface-subtle/70 p-3.5 space-y-3 dark:bg-slate-900/60 dark:border-slate-800">
+                  {/* Strength Bar */}
+                  <div className="space-y-1.5">
+                    <div className="flex items-center justify-between text-[11px]">
+                      <span className="font-medium text-slate-500 dark:text-slate-400">Password Strength</span>
+                      <span
+                        className={cn(
+                          "font-bold text-[11px] px-2 py-0.5 rounded-md",
+                          passwordResult.strength === "very-weak" && "bg-rose-100 text-rose-700 dark:bg-rose-950/70 dark:text-rose-300",
+                          passwordResult.strength === "weak" && "bg-orange-100 text-orange-700 dark:bg-orange-950/70 dark:text-orange-300",
+                          passwordResult.strength === "fair" && "bg-amber-100 text-amber-700 dark:bg-amber-950/70 dark:text-amber-300",
+                          passwordResult.strength === "strong" && "bg-sky-100 text-sky-700 dark:bg-sky-950/70 dark:text-sky-300",
+                          passwordResult.strength === "very-strong" && "bg-emerald-100 text-emerald-700 dark:bg-emerald-950/70 dark:text-emerald-300"
+                        )}
+                      >
+                        {passwordResult.strengthLabel}
+                      </span>
+                    </div>
+
+                    <div className="grid grid-cols-5 gap-1.5 h-1.5 w-full">
+                      {[1, 2, 3, 4, 5].map((lvl) => (
+                        <div
+                          key={lvl}
+                          className={cn(
+                            "h-full rounded-full transition-all duration-300",
+                            passwordResult.score >= lvl
+                              ? passwordResult.score <= 1
+                                ? "bg-rose-500"
+                                : passwordResult.score === 2
+                                ? "bg-orange-500"
+                                : passwordResult.score === 3
+                                ? "bg-amber-500"
+                                : passwordResult.score === 4
+                                ? "bg-sky-500"
+                                : "bg-emerald-500"
+                              : "bg-slate-200 dark:bg-slate-800"
+                          )}
+                        />
+                      ))}
+                    </div>
+                  </div>
+
+                  {/* Requirements Checklist */}
+                  <div className="border-t border-border-muted/60 pt-2.5 dark:border-slate-800">
+                    <p className="text-[11px] font-semibold text-slate-700 dark:text-slate-300 flex items-center gap-1.5 mb-1.5">
+                      <ShieldCheck className="size-3.5 text-indigo-500 shrink-0" />
+                      Minimum Security Requirements:
+                    </p>
+                    <div className="grid grid-cols-1 sm:grid-cols-2 gap-x-3 gap-y-1.5 text-[11px]">
+                      {passwordResult.requirements.map((req) => (
+                        <div
+                          key={req.id}
+                          className={cn(
+                            "flex items-center gap-1.5 transition-colors duration-150",
+                            req.met
+                              ? "text-emerald-600 dark:text-emerald-400 font-medium"
+                              : "text-slate-400 dark:text-slate-500"
+                          )}
+                        >
+                          {req.met ? (
+                            <span className="flex size-3.5 shrink-0 items-center justify-center rounded-full bg-emerald-100 text-emerald-600 dark:bg-emerald-950/70 dark:text-emerald-400">
+                              <Check className="size-2.5 stroke-[3]" />
+                            </span>
+                          ) : (
+                            <span className="flex size-3.5 shrink-0 items-center justify-center">
+                              <span className="size-1.5 rounded-full bg-slate-300 dark:bg-slate-600" />
+                            </span>
+                          )}
+                          <span>{req.label}</span>
+                        </div>
+                      ))}
+                    </div>
+                  </div>
+
+                  {/* Confirmation match warning / success */}
+                  {confirmPassword.length > 0 && (
+                    <div className="border-t border-border-muted/60 pt-2 dark:border-slate-800">
+                      {passwordsMatch ? (
+                        <div className="flex items-center gap-1.5 text-[11px] font-medium text-emerald-600 dark:text-emerald-400">
+                          <span className="flex size-3.5 shrink-0 items-center justify-center rounded-full bg-emerald-100 text-emerald-600 dark:bg-emerald-950/70 dark:text-emerald-400">
+                            <Check className="size-2.5 stroke-[3]" />
+                          </span>
+                          <span>Passwords match perfectly</span>
+                        </div>
+                      ) : (
+                        <div className="flex items-center gap-1.5 text-[11px] font-medium text-rose-500 dark:text-rose-400">
+                          <span className="flex size-3.5 shrink-0 items-center justify-center rounded-full bg-rose-100 text-rose-600 dark:bg-rose-950/70 dark:text-rose-400">
+                            <X className="size-2.5 stroke-[3]" />
+                          </span>
+                          <span>Passwords do not match yet</span>
+                        </div>
+                      )}
+                    </div>
+                  )}
+
+                  {passwordResult.errors.length > 0 && (
+                    <p className="text-[10.5px] font-medium text-rose-500 dark:text-rose-400">
+                      {passwordResult.errors[0]}
+                    </p>
+                  )}
+                </div>
+              )}
 
               {/* ROLE-SPECIFIC ONBOARDING FIELDS */}
 
@@ -376,12 +573,14 @@ export default function SignupPage() {
                       <select
                         id="year"
                         name="year"
+                        defaultValue=""
                         className="h-9 w-full rounded-lg border border-slate-300 bg-white px-3 text-xs text-slate-900 focus:border-indigo-500 focus:outline-none dark:border-slate-700 dark:bg-slate-900 dark:text-slate-100 cursor-pointer"
                       >
+                        <option value="" disabled>Select year of study</option>
                         <option value="1">1st Year</option>
                         <option value="2">2nd Year</option>
                         <option value="3">3rd Year</option>
-                        <option value="4" selected>4th Year / Final</option>
+                        <option value="4">4th Year / Final</option>
                         <option value="5">Postgraduate (M.Tech / MS)</option>
                       </select>
                     </div>
@@ -650,9 +849,9 @@ export default function SignupPage() {
                 </div>
               )}
 
-              {state?.error && (
+              {(clientError || state?.error) && (
                 <p className="rounded-xl bg-red-50 px-3.5 py-2.5 text-xs text-red-600 dark:bg-red-500/15 dark:text-red-300 border border-red-200 dark:border-red-500/30" role="alert">
-                  {state.error}
+                  {clientError || state?.error}
                 </p>
               )}
 

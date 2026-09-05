@@ -32,7 +32,7 @@ const PROTECTED_PREFIXES = [
   "/settings",
 ];
 
-const AUTH_PAGES = ["/login", "/signup"];
+const AUTH_PAGES = ["/login"];
 
 function isTokenExpiredOrInvalid(token: string): boolean {
   try {
