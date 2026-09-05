@@ -30,6 +30,7 @@ const STUDENT_NAV: NavItem[] = [
   { label: "Skill Assessments", href: "/assessments", icon: ClipboardCheck },
   { label: "Internships & Opportunities", href: "/internships", icon: Briefcase },
   { label: "Proof of Work & Badges", href: "/proof-of-work", icon: Award },
+  { label: "Joint Evaluation (Dual)", href: "/dual-grading", icon: Scale },
   { label: "Reverse Placement", href: "/reverse-placement", icon: TrendingUp },
   { label: "Mentor Office Hours", href: "/office-hours", icon: CalendarClock },
   { label: "Digital Portfolio", href: "/portfolio", icon: ScrollText },
@@ -40,7 +41,7 @@ const ACADEMICIAN_NAV: NavItem[] = [
   { label: "AI Syllabus Gap Audit", href: "/syllabus", icon: BookOpen },
   { label: "R&D Lab Units", href: "/lab-units", icon: FlaskConical },
   { label: "Challenge Marketplace", href: "/challenges", icon: Sparkles },
-  { label: "Dual Grading", href: "/dual-grading", icon: Scale },
+  { label: "Joint Evaluation (Dual)", href: "/dual-grading", icon: Scale },
   { label: "Academician Development", href: "/faculty-portal", icon: Building2 },
   { label: "Proof of Work Review", href: "/proof-of-work", icon: Award },
   { label: "Candidate Talent Radar", href: "/reverse-placement", icon: TrendingUp },
@@ -52,13 +53,14 @@ const INDUSTRIES_NAV: NavItem[] = [
   { label: "Challenge Marketplace", href: "/challenges", icon: Sparkles },
   { label: "Reverse Placement (Pitches)", href: "/reverse-placement", icon: TrendingUp },
   { label: "Host Mentor Slots", href: "/mentor-slots", icon: CalendarClock },
-  { label: "Dual Grading", href: "/dual-grading", icon: Scale },
+  { label: "Joint Evaluation (Dual)", href: "/dual-grading", icon: Scale },
 ];
 
 const INSTITUTIONS_NAV: NavItem[] = [
   { label: "Dashboard", href: "/dashboard", icon: LayoutDashboard },
   { label: "Skill Deficit Heatmap", href: "/heatmap", icon: BarChart3 },
   { label: "Placement Records", href: "/placements", icon: Target },
+  { label: "Joint Evaluation (Dual)", href: "/dual-grading", icon: Scale },
   { label: "Corporate Partners", href: "/partners", icon: Building2 },
   { label: "Reverse Placement Radar", href: "/reverse-placement", icon: TrendingUp },
   { label: "Cohort Analytics", href: "/analytics", icon: ClipboardCheck },

@@ -484,6 +484,21 @@ async function main() {
     },
   });
 
+  const labUnit4 = await prisma.labUnit.create({
+    data: {
+      name: "GreenTech Carbon Squad",
+      facultyId: facultyIds[0],
+      challengeId: createdChallenges[1],
+      status: "ACTIVE",
+      members: {
+        create: [
+          { studentId: studentUserIds[3] },
+          { studentId: studentUserIds[4] },
+        ],
+      },
+    },
+  });
+
   // ----- CHALLENGE APPLICATIONS -----
   await prisma.challengeApplication.create({
     data: {
@@ -509,29 +524,60 @@ async function main() {
       status: "SHORTLISTED",
     },
   });
+  await prisma.challengeApplication.create({
+    data: {
+      challengeId: createdChallenges[1],
+      labUnitId: labUnit4.id,
+      proposal: "Corporate Scope 1-3 carbon emissions calculator with automated ESG disclosure generator.",
+      status: "SELECTED",
+    },
+  });
 
   // ----- DUAL GRADINGS (Faculty academic marks + Industry job readiness) -----
+  // 1. Completed Dual Grading (Both Academic + Industry)
   await prisma.dualGrading.create({
     data: {
       challengeId: createdChallenges[3],
       labUnitId: labUnit3.id,
-      academicMarks: 86,
-      jobReadinessScore: 82,
-      facultyRemarks: "Strong technical depth; add production hardening.",
-      industryRemarks: "Edge latency within spec; interview-ready.",
+      academicMarks: 88,
+      jobReadinessScore: 84,
+      facultyRemarks: "Strong algorithmic depth; excellent edge quantization benchmarks.",
+      industryRemarks: "Production latency <45ms achieved on test harness. Ready for interview fast-track.",
       gradedByFacultyId: facultyIds[1],
       gradedByIndustryId: industryUserIds[3],
       submittedAt: new Date(now - 3 * day),
     },
   });
 
+  // 2. Awaiting Industry Job Readiness (Faculty graded, awaiting Infosys)
   await prisma.dualGrading.create({
     data: {
       challengeId: createdChallenges[0],
       labUnitId: labUnit1.id,
-      academicMarks: 89,
-      facultyRemarks: "Excellent grounding in RAG techniques.",
+      academicMarks: 91,
+      facultyRemarks: "Outstanding vector retrieval grounding and thorough architectural documentation.",
       gradedByFacultyId: facultyIds[0],
+      submittedAt: new Date(now - 1 * day),
+    },
+  });
+
+  // 3. Awaiting Faculty Academic Evaluation (Industry graded, awaiting Faculty)
+  await prisma.dualGrading.create({
+    data: {
+      challengeId: createdChallenges[2],
+      labUnitId: labUnit2.id,
+      jobReadinessScore: 87,
+      industryRemarks: "Feature engineering matches enterprise CRM standards; good test coverage on prediction pipeline.",
+      gradedByIndustryId: industryUserIds[2],
+      submittedAt: new Date(now - 2 * day),
+    },
+  });
+
+  // 4. Pending Both Evaluators (Recently initiated challenge-lab unit pairing)
+  await prisma.dualGrading.create({
+    data: {
+      challengeId: createdChallenges[1],
+      labUnitId: labUnit4.id,
     },
   });
 
