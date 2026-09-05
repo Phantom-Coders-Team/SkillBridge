@@ -28,6 +28,7 @@ const STUDENT_NAV: NavItem[] = [
   { label: "Dashboard", href: "/dashboard", icon: LayoutDashboard },
   { label: "Skill Radar & Diagnostic", href: "/skills", icon: Radar },
   { label: "Skill Assessments", href: "/assessments", icon: ClipboardCheck },
+  { label: "Challenge Marketplace", href: "/challenges", icon: Sparkles },
   { label: "Internships & Opportunities", href: "/internships", icon: Briefcase },
   { label: "Proof of Work & Badges", href: "/proof-of-work", icon: Award },
   { label: "Joint Evaluation", href: "/dual-grading", icon: Scale },
@@ -59,6 +60,7 @@ const INDUSTRIES_NAV: NavItem[] = [
 
 const INSTITUTIONS_NAV: NavItem[] = [
   { label: "Dashboard", href: "/dashboard", icon: LayoutDashboard },
+  { label: "Challenge Marketplace", href: "/challenges", icon: Sparkles },
   { label: "Skill Deficit Heatmap", href: "/heatmap", icon: BarChart3 },
   { label: "Placement Records", href: "/placements", icon: Target },
   { label: "Joint Evaluation", href: "/dual-grading", icon: Scale },

@@ -1,39 +1,51 @@
 import { redirect } from "next/navigation";
-import { Building2, Sparkles, Users2 } from "lucide-react";
+import { Sparkles } from "lucide-react";
 import { getCurrentUser } from "@/lib/auth";
 import { prisma } from "@/lib/prisma";
-import { Badge, Card, EmptyState, PageHeader, type BadgeTone } from "@/components/ui";
-import PostChallengeModal from "./PostChallengeModal";
-import MyChallengesModal, { type SerializedChallenge } from "./MyChallengesModal";
-
-const TYPE_TONE: Record<string, BadgeTone> = {
-  CAPSTONE: "blue",
-  R_AND_D: "purple",
-  MICRO_CONSULTANCY: "orange",
-};
-
-const STATUS_TONE: Record<string, BadgeTone> = {
-  OPEN: "green",
-  ASSIGNED: "amber",
-  IN_PROGRESS: "blue",
-  COMPLETED: "emerald",
-  CLOSED: "gray",
-};
+import { PageHeader } from "@/components/ui";
+import ChallengeMarketplaceClient, {
+  type ChallengeItem,
+  type LabUnitBrief,
+  type StudentBrief,
+  type StudentLabMembership,
+  type FacultyBrief,
+} from "./ChallengeMarketplaceClient";
+import type { SerializedChallenge } from "./MyChallengesModal";
 
 export default async function ChallengesPage() {
   const user = await getCurrentUser();
   if (!user) redirect("/login");
 
-  const isIndustry = user.role === "INDUSTRIES" || user.role === "INDUSTRY";
+  const isIndustry = user.role === "INDUSTRY";
+  const isAcademician = user.role === "ACADEMICIAN";
+  const isStudent = user.role === "STUDENT";
+  const isInstitution = user.role === "INSTITUTION";
 
-  const [challenges, myChallengesRaw] = await Promise.all([
+  // Parallel fetches for general and role-specific data
+  const [
+    challengesRaw,
+    myChallengesRaw,
+    academicianLabUnitsRaw,
+    availableStudentsRaw,
+    studentLabUnitsRaw,
+    availableFacultyRaw,
+    institutionStatsRaw,
+  ] = await Promise.all([
+    // 1. All industry challenges
     prisma.industryChallenge.findMany({
       include: {
-        industry: { select: { name: true, profile: { select: { companyName: true } } } },
+        industry: {
+          select: {
+            name: true,
+            profile: { select: { companyName: true } },
+          },
+        },
         _count: { select: { applications: true, labUnits: true } },
       },
       orderBy: { createdAt: "desc" },
     }),
+
+    // 2. Industry: challenges posted by this industry partner
     isIndustry
       ? prisma.industryChallenge.findMany({
           where: { industryId: user.id },
@@ -64,8 +76,103 @@ export default async function ChallengesPage() {
           orderBy: { createdAt: "desc" },
         })
       : [],
+
+    // 3. Academician: lab units supervised by this faculty
+    isAcademician
+      ? prisma.labUnit.findMany({
+          where: { facultyId: user.id },
+          include: {
+            _count: { select: { members: true } },
+            applications: { select: { challengeId: true, status: true } },
+          },
+          orderBy: { createdAt: "desc" },
+        })
+      : [],
+
+    // 4. Academician: list of students to invite to lab units
+    isAcademician
+      ? prisma.user.findMany({
+          where: { role: "STUDENT" },
+          select: {
+            id: true,
+            name: true,
+            email: true,
+            profile: { select: { department: true } },
+          },
+          orderBy: { name: "asc" },
+        })
+      : [],
+
+    // 5. Student: lab units where this student is an active member
+    isStudent
+      ? prisma.labUnit.findMany({
+          where: {
+            members: {
+              some: { studentId: user.id },
+            },
+          },
+          include: {
+            faculty: { select: { name: true } },
+            applications: {
+              select: {
+                challengeId: true,
+                status: true,
+                proposal: true,
+              },
+            },
+          },
+        })
+      : [],
+
+    // 6. Student: available faculty mentors to sponsor team
+    isStudent
+      ? prisma.user.findMany({
+          where: {
+            OR: [{ role: "ACADEMICIAN" }, { role: "FACULTY" }],
+          },
+          select: {
+            id: true,
+            name: true,
+            email: true,
+            profile: { select: { department: true } },
+          },
+          orderBy: { name: "asc" },
+        })
+      : [],
+
+    // 7. Institution: college-wide metrics
+    isInstitution
+      ? Promise.all([
+          prisma.user.count({ where: { OR: [{ role: "INDUSTRY" }, { role: "INDUSTRIES" }] } }),
+          prisma.labUnit.count(),
+          prisma.labUnitMember.count(),
+        ])
+      : null,
   ]);
 
+  // Transform challenges for client
+  const challenges: ChallengeItem[] = challengesRaw.map((c) => ({
+    id: c.id,
+    industryId: c.industryId,
+    title: c.title,
+    description: c.description,
+    challengeType: c.challengeType,
+    domain: c.domain,
+    techStack: c.techStack,
+    objectives: c.objectives,
+    stipend: c.stipend,
+    status: c.status,
+    deadline: c.deadline ? c.deadline.toISOString() : null,
+    rndOnly: c.rndOnly,
+    createdAt: c.createdAt.toISOString(),
+    industry: {
+      name: c.industry.name,
+      profile: c.industry.profile ? { companyName: c.industry.profile.companyName } : null,
+    },
+    _count: c._count,
+  }));
+
+  // Transform serialized my challenges for industry
   const serializedMyChallenges: SerializedChallenge[] = myChallengesRaw.map((c) => ({
     id: c.id,
     title: c.title,
@@ -102,94 +209,80 @@ export default async function ChallengesPage() {
     _count: c._count,
   }));
 
+  // Transform academician lab units
+  const academicianLabUnits: LabUnitBrief[] = academicianLabUnitsRaw.map((lu) => ({
+    id: lu.id,
+    name: lu.name,
+    status: lu.status,
+    membersCount: lu._count.members,
+    hasApplied: lu.applications.length > 0,
+    challengeId: lu.challengeId,
+  }));
+
+  // Transform available students
+  const availableStudents: StudentBrief[] = availableStudentsRaw.map((s) => ({
+    id: s.id,
+    name: s.name,
+    email: s.email,
+    department: s.profile?.department ?? null,
+  }));
+
+  // Transform student lab memberships
+  const studentLabUnits: StudentLabMembership[] = studentLabUnitsRaw.map((slu) => ({
+    id: slu.id,
+    name: slu.name,
+    facultyName: slu.faculty.name,
+    challengeId: slu.challengeId,
+    applications: slu.applications.map((app) => ({
+      challengeId: app.challengeId,
+      status: app.status,
+      proposal: app.proposal,
+    })),
+  }));
+
+  // Transform available faculty
+  const availableFaculty: FacultyBrief[] = availableFacultyRaw.map((f) => ({
+    id: f.id,
+    name: f.name,
+    email: f.email,
+    department: f.profile?.department ?? null,
+  }));
+
+  // Institution stats
+  const institutionStats = institutionStatsRaw
+    ? {
+        totalPartners: institutionStatsRaw[0],
+        totalCollegeLabUnits: institutionStatsRaw[1],
+        totalActiveStudents: institutionStatsRaw[2],
+      }
+    : undefined;
+
   return (
-    <div className="mx-auto max-w-6xl">
+    <div className="mx-auto max-w-7xl space-y-6 pb-12">
       <PageHeader
         title="Challenge Marketplace"
-        subtitle="Capstones, R&D sprints and micro-consultancy gigs posted by industry partners."
-        icon={Sparkles}
-        actions={
-          isIndustry ? (
-            <div className="flex flex-wrap items-center gap-2">
-              <MyChallengesModal challenges={serializedMyChallenges} />
-              <PostChallengeModal />
-            </div>
-          ) : undefined
+        subtitle={
+          isIndustry
+            ? "Post real-world industry problem statements, review academic team proposals, and jointly grade student outcomes."
+            : isAcademician
+            ? "Connect student research lab units with industry capstones, R&D sprints, and funded corporate grants."
+            : isStudent
+            ? "Tackle real industry challenges, collaborate in faculty-guided lab units, and earn verified proof-of-work."
+            : "Monitor corporate challenge sponsorships, department lab unit engagements, and campus research outcomes."
         }
+        icon={Sparkles}
       />
 
-      {challenges.length === 0 ? (
-        <EmptyState
-          icon={Sparkles}
-          title="No challenges posted yet"
-          description="When industry partners post challenges, they'll appear here."
-        />
-      ) : (
-        <div className="grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-3">
-          {challenges.map((c) => (
-            <Card key={c.id} hover className="flex flex-col p-5">
-              <div className="mb-2 flex items-center justify-between gap-2">
-                <div className="flex items-center gap-1.5 flex-wrap">
-                  <Badge tone={TYPE_TONE[c.challengeType] ?? "gray"}>
-                    {c.challengeType.replaceAll("_", " ")}
-                  </Badge>
-                  {isIndustry && c.industryId === user.id && (
-                    <Badge tone="purple">Your Posting</Badge>
-                  )}
-                </div>
-                <Badge tone={STATUS_TONE[c.status] ?? "gray"}>
-                  {c.status.replaceAll("_", " ")}
-                </Badge>
-              </div>
-
-              <h3 className="text-base font-semibold text-slate-900 dark:text-slate-100">{c.title}</h3>
-              <p className="mt-1 line-clamp-3 flex-1 text-sm leading-relaxed text-slate-500 dark:text-slate-400">{c.description}</p>
-
-              {(c.domain || c.techStack) && (
-                <dl className="mt-3 space-y-1 text-xs text-slate-500 dark:text-slate-400">
-                  {c.domain && (
-                    <div className="flex gap-1.5"><dt className="font-medium text-slate-400 dark:text-slate-500">Domain:</dt><dd>{c.domain}</dd></div>
-                  )}
-                  {c.techStack && (
-                    <div className="flex gap-1.5"><dt className="font-medium text-slate-400 dark:text-slate-500">Stack:</dt><dd>{c.techStack}</dd></div>
-                  )}
-                </dl>
-              )}
-
-              <div className="mt-3 flex flex-wrap items-center gap-x-4 gap-y-1 text-xs text-slate-500 dark:text-slate-400">
-                {c.stipend !== null && (
-                  <span className="font-semibold text-emerald-700 dark:text-emerald-400">₹{c.stipend.toLocaleString("en-IN")}</span>
-                )}
-                {c.deadline && (
-                  <span>
-                    Due {new Date(c.deadline).toLocaleDateString("en-IN", { day: "numeric", month: "short" })}
-                  </span>
-                )}
-              </div>
-
-              {c.rndOnly && (
-                <span className="mt-3 inline-block w-fit rounded-lg bg-violet-50 dark:bg-violet-950/60 px-2.5 py-1 text-[11px] font-semibold text-violet-700 dark:text-violet-300">
-                  R&D only — lab unit required
-                </span>
-              )}
-
-              <div className="mt-4 flex items-center justify-between border-t border-border-muted pt-3 text-xs text-slate-400 dark:text-slate-500">
-                <span className="inline-flex items-center gap-1.5">
-                  <Building2 aria-hidden className="size-3.5" />
-                  {c.industry.profile?.companyName || c.industry.name}
-                  {c._count.labUnits > 0 && (
-                    <span className="text-slate-300 dark:text-slate-600">· {c._count.labUnits} team{c._count.labUnits !== 1 ? "s" : ""}</span>
-                  )}
-                </span>
-                <span className="inline-flex items-center gap-1.5">
-                  <Users2 aria-hidden className="size-3.5" />
-                  {c._count.applications} applicant{c._count.applications !== 1 ? "s" : ""}
-                </span>
-              </div>
-            </Card>
-          ))}
-        </div>
-      )}
+      <ChallengeMarketplaceClient
+        user={user}
+        challenges={challenges}
+        myChallengesRaw={serializedMyChallenges}
+        academicianLabUnits={academicianLabUnits}
+        availableStudents={availableStudents}
+        studentLabUnits={studentLabUnits}
+        availableFaculty={availableFaculty}
+        institutionStats={institutionStats}
+      />
     </div>
   );
 }
