@@ -213,7 +213,7 @@ export default async function Home() {
                 <span className="relative inline-flex size-2 rounded-full bg-emerald-500" />
               </span>
               <Sparkles aria-hidden className="size-3.5 text-indigo-600 dark:text-indigo-400" />
-              <span>Four doors, One platform</span>
+              <span>Three doors, One platform</span>
             </div>
           </div>
 
