@@ -2,9 +2,10 @@
 
 import { useEffect, useState } from "react";
 import Link from "next/link";
-import { ArrowRight, GraduationCap } from "lucide-react";
+import { ArrowRight } from "lucide-react";
 import ThemeToggle from "@/components/ThemeToggle";
 import type { SessionUser } from "@/lib/types";
+import { SkillBridgeLogo, SkillBridgeWordmark } from "@/components/SkillBridgeLogo";
 
 export default function LandingNav({ user }: { user: SessionUser | null }) {
   const [scrolled, setScrolled] = useState(false);
@@ -26,13 +27,8 @@ export default function LandingNav({ user }: { user: SessionUser | null }) {
     >
       <nav className="mx-auto flex h-16 max-w-6xl items-center justify-between px-4 sm:px-6">
         <Link href="/" className="flex items-center gap-3 group">
-          <span className="flex size-9 items-center justify-center rounded-xl bg-gradient-to-br from-indigo-600 to-violet-600 text-white shadow-sm transition-transform duration-200 group-hover:scale-105">
-            <GraduationCap aria-hidden className="size-5" />
-          </span>
-          <span className="leading-tight">
-            <span className="block text-sm font-bold tracking-tight text-slate-900 dark:text-slate-100">Skill Bridge</span>
-            <span className="block text-[11px] font-medium text-slate-500 dark:text-slate-400">Academia × Industry</span>
-          </span>
+          <SkillBridgeLogo size="md" className="group-hover:scale-105" />
+          <SkillBridgeWordmark size="md" />
         </Link>
 
         {/* Section anchor links for quick navigation */}

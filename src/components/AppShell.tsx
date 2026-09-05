@@ -3,7 +3,7 @@
 import Link from "next/link";
 import { usePathname } from "next/navigation";
 import { useState } from "react";
-import { GraduationCap, Menu, X, ChevronLeft, ChevronRight, Sparkles, User, Settings } from "lucide-react";
+import { Menu, X, ChevronLeft, ChevronRight, Sparkles, User, Settings } from "lucide-react";
 import type { SessionUser } from "@/lib/types";
 import { ROLE_LABELS, ROLE_COLORS } from "@/lib/types";
 import { NAV_ITEMS } from "@/lib/navigation";
@@ -12,6 +12,7 @@ import { Avatar } from "@/components/ui";
 import ThemeToggle from "@/components/ThemeToggle";
 import { NotificationCenter } from "@/components/NotificationCenter";
 import { DemoSwitcher } from "@/components/DemoSwitcher";
+import { SkillBridgeLogo, SkillBridgeWordmark } from "@/components/SkillBridgeLogo";
 import { cn } from "@/lib/cn";
 
 function isActive(href: string, pathname: string): boolean {
@@ -94,10 +95,10 @@ function Brand({ collapsed = false, onToggle }: { collapsed?: boolean; onToggle?
       <div className="flex h-16 shrink-0 items-center justify-center border-b border-border-muted px-2">
         <Link
           href="/dashboard"
-          className="flex size-9 items-center justify-center rounded-xl bg-gradient-to-br from-indigo-600 to-violet-600 text-white shadow-sm transition-transform hover:scale-105"
+          className="transition-transform hover:scale-105"
           title="Skill Bridge"
         >
-          <GraduationCap aria-hidden className="size-5" />
+          <SkillBridgeLogo size="sm" />
         </Link>
       </div>
     );
@@ -105,14 +106,9 @@ function Brand({ collapsed = false, onToggle }: { collapsed?: boolean; onToggle?
 
   return (
     <div className="flex h-16 shrink-0 items-center justify-between border-b border-border-muted px-4">
-      <Link href="/dashboard" className="flex items-center gap-3 overflow-hidden">
-        <span className="flex size-9 shrink-0 items-center justify-center rounded-xl bg-gradient-to-br from-indigo-600 to-violet-600 text-white shadow-sm">
-          <GraduationCap aria-hidden className="size-5" />
-        </span>
-        <span className="leading-tight">
-          <span className="block text-sm font-bold tracking-tight text-slate-900 dark:text-slate-100">Skill Bridge</span>
-          <span className="block text-[11px] font-medium text-slate-500 dark:text-slate-400">Academia × Industry</span>
-        </span>
+      <Link href="/dashboard" className="flex items-center gap-3 overflow-hidden group">
+        <SkillBridgeLogo size="md" className="group-hover:scale-105" />
+        <SkillBridgeWordmark size="md" />
       </Link>
       {onToggle && (
         <button
@@ -237,11 +233,9 @@ export function AppShell({ user, children }: { user: SessionUser; children: Reac
               <p className="truncate text-sm font-semibold text-slate-900 dark:text-slate-100">{currentItem?.label ?? "Dashboard"}</p>
               <p className="text-xs text-slate-500 dark:text-slate-400">Welcome back, {user.name.split(" ")[0]}</p>
             </div>
-            <div className="flex items-center gap-2 lg:hidden">
-              <span className="flex size-8 items-center justify-center rounded-lg bg-gradient-to-br from-indigo-600 to-violet-600 text-white">
-                <GraduationCap aria-hidden className="size-4.5" />
-              </span>
-              <span className="text-sm font-bold text-slate-900 dark:text-slate-100">Skill Bridge</span>
+            <div className="flex items-center gap-2.5 lg:hidden">
+              <SkillBridgeLogo size="sm" />
+              <SkillBridgeWordmark size="sm" showSubtitle={false} />
             </div>
           </div>
 

@@ -2,10 +2,11 @@
 
 import Link from "next/link";
 import { useActionState, useState } from "react";
-import { ArrowLeft, ArrowRight, Eye, EyeOff, GraduationCap, Loader2, Lock, Mail, Sparkles } from "lucide-react";
+import { ArrowLeft, ArrowRight, Eye, EyeOff, Loader2, Lock, Mail, Sparkles } from "lucide-react";
 import { loginAction, plainLoginAction } from "./actions";
 import { cn } from "@/lib/cn";
 import ThemeToggle from "@/components/ThemeToggle";
+import { SkillBridgeLogo, SkillBridgeWordmark } from "@/components/SkillBridgeLogo";
 
 const DEMO_ACCOUNTS = [
   {
@@ -55,12 +56,10 @@ export default function LoginPage() {
       <header className="relative z-20 mx-auto flex h-16 w-full max-w-6xl items-center justify-between px-4 sm:px-6">
         <Link
           href="/"
-          className="group flex items-center gap-2.5 text-sm font-semibold text-slate-700 hover:text-indigo-600 dark:text-slate-300 dark:hover:text-indigo-400 transition-colors"
+          className="group flex items-center gap-2.5 text-sm font-semibold transition-colors"
         >
-          <span className="flex size-8 items-center justify-center rounded-xl bg-gradient-to-br from-indigo-600 to-violet-600 text-white shadow-sm transition-transform duration-200 group-hover:scale-105">
-            <GraduationCap aria-hidden className="size-4.5" />
-          </span>
-          <span className="font-bold tracking-tight">Skill Bridge</span>
+          <SkillBridgeLogo size="sm" className="group-hover:scale-105" />
+          <SkillBridgeWordmark size="sm" showSubtitle={false} />
         </Link>
 
         <div className="flex items-center gap-3">
@@ -121,10 +120,8 @@ export default function LoginPage() {
         <div className="w-full">
           <div className="rounded-3xl border border-border-muted bg-surface/90 p-6 shadow-pop backdrop-blur-md sm:p-8 dark:bg-surface/95">
             <div className="mb-6 flex items-center gap-3 lg:hidden">
-              <span className="flex size-10 items-center justify-center rounded-xl bg-gradient-to-br from-indigo-500 to-violet-500 text-white shadow-sm">
-                <GraduationCap aria-hidden className="size-5" />
-              </span>
-              <span className="text-lg font-bold tracking-tight text-slate-900 dark:text-slate-100">Skill Bridge</span>
+              <SkillBridgeLogo size="lg" />
+              <SkillBridgeWordmark size="lg" showSubtitle={false} />
             </div>
 
             <h2 className="text-2xl font-bold tracking-tight text-slate-900 dark:text-slate-100">Welcome Back</h2>

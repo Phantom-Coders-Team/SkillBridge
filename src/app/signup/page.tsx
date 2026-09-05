@@ -23,10 +23,13 @@ import {
   Award,
   Hash,
   Wrench,
+  CheckCircle2,
+  AlertCircle,
 } from "lucide-react";
 import { signupAction } from "./actions";
 import { cn } from "@/lib/cn";
 import ThemeToggle from "@/components/ThemeToggle";
+import { SkillBridgeLogo, SkillBridgeWordmark } from "@/components/SkillBridgeLogo";
 
 const ROLE_OPTIONS = [
   {
@@ -155,12 +158,10 @@ export default function SignupPage() {
       <header className="relative z-20 mx-auto flex h-16 w-full max-w-6xl items-center justify-between px-4 sm:px-6">
         <Link
           href="/"
-          className="group flex items-center gap-2.5 text-sm font-semibold text-slate-700 hover:text-indigo-600 dark:text-slate-300 dark:hover:text-indigo-400 transition-colors"
+          className="group flex items-center gap-2.5 text-sm font-semibold transition-colors"
         >
-          <span className="flex size-8 items-center justify-center rounded-xl bg-gradient-to-br from-indigo-600 to-violet-600 text-white shadow-sm transition-transform duration-200 group-hover:scale-105">
-            <GraduationCap aria-hidden className="size-4.5" />
-          </span>
-          <span className="font-bold tracking-tight">Skill Bridge</span>
+          <SkillBridgeLogo size="sm" className="group-hover:scale-105" />
+          <SkillBridgeWordmark size="sm" showSubtitle={false} />
         </Link>
 
         <div className="flex items-center gap-3">
@@ -211,10 +212,8 @@ export default function SignupPage() {
           <div className="rounded-3xl border border-border-muted bg-surface/95 p-6 shadow-card backdrop-blur-md sm:p-8 dark:border-slate-800/80 max-h-[90vh] overflow-y-auto">
             <div className="mb-4 flex items-center justify-between lg:hidden">
               <div className="flex items-center gap-3">
-                <span className="flex size-10 items-center justify-center rounded-xl bg-gradient-to-br from-indigo-500 to-violet-500 text-white shadow-sm">
-                  <GraduationCap aria-hidden className="size-5" />
-                </span>
-                <span className="text-lg font-bold tracking-tight text-slate-900 dark:text-slate-100">Skill Bridge</span>
+                <SkillBridgeLogo size="lg" />
+                <SkillBridgeWordmark size="lg" showSubtitle={false} />
               </div>
               <ThemeToggle />
             </div>

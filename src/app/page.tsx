@@ -5,7 +5,6 @@ import {
   BarChart3,
   Database,
   FileCheck,
-  GraduationCap,
   Layers,
   Lock,
   Quote,
@@ -19,6 +18,7 @@ import {
 import { getCurrentUser } from "@/lib/auth";
 import LandingNav from "@/components/LandingNav";
 import Reveal from "@/components/Reveal";
+import { SkillBridgeLogo, SkillBridgeWordmark } from "@/components/SkillBridgeLogo";
 
 const TICKER_ITEMS = [
   { label: "skill_gap(SQL) → 5 departments", highlight: true },
@@ -622,12 +622,8 @@ export default async function Home() {
           <div className="grid grid-cols-1 gap-10 sm:grid-cols-2 md:grid-cols-5">
             <div className="md:col-span-2">
               <div className="flex items-center gap-2.5">
-                <span className="flex size-8 items-center justify-center rounded-xl bg-gradient-to-br from-indigo-600 to-violet-600 text-white shadow-sm">
-                  <GraduationCap aria-hidden className="size-4.5" />
-                </span>
-                <span className="font-extrabold tracking-tight text-slate-900 dark:text-white text-base">
-                  Skill<span className="bg-gradient-to-r from-indigo-600 to-amber-500 bg-clip-text text-transparent">Bridge</span>
-                </span>
+                <SkillBridgeLogo size="sm" />
+                <SkillBridgeWordmark size="md" showSubtitle={false} />
               </div>
               <p className="mt-4 max-w-sm text-xs leading-relaxed text-slate-500 dark:text-slate-400">
                 One secure, scalable platform for skill development, internships, and placements — connecting campus and
