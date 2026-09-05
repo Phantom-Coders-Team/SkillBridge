@@ -28,29 +28,29 @@ async function main() {
   const tables = [
     () => prisma.blockchainTransaction.deleteMany(),
     () => prisma.erupiVoucher.deleteMany(),
-    () => prisma.jobPitch.deleteMany(),
     () => prisma.dualGrading.deleteMany(),
     () => prisma.challengeApplication.deleteMany(),
     () => prisma.labUnitMember.deleteMany(),
     () => prisma.labUnit.deleteMany(),
-    () => prisma.industryChallenge.deleteMany(),
+    () => prisma.jobPitch.deleteMany(),
     () => prisma.mentorSlot.deleteMany(),
+    () => prisma.industryChallenge.deleteMany(),
+    () => prisma.facultyProgramApplication.deleteMany(),
+    () => prisma.facultyProgramListing.deleteMany(),
+    () => prisma.internshipApplication.deleteMany(),
+    () => prisma.learningProgram.deleteMany(),
+    () => prisma.sabbaticalListing.deleteMany(),
+    () => prisma.portfolioItem.deleteMany(),
+    () => prisma.userDocument.deleteMany(),
     () => prisma.tokenTransaction.deleteMany(),
     () => prisma.tokenLedger.deleteMany(),
     () => prisma.skillAssessment.deleteMany(),
     () => prisma.proofOfWork.deleteMany(),
     () => prisma.project.deleteMany(),
     () => prisma.syllabus.deleteMany(),
+    () => prisma.hiringBenchmark.deleteMany(),
     () => prisma.profile.deleteMany(),
     () => prisma.user.deleteMany(),
-    () => prisma.hiringBenchmark.deleteMany(),
-    () => prisma.sabbaticalListing.deleteMany(),
-    () => prisma.userDocument.deleteMany(),
-    () => prisma.portfolioItem.deleteMany(),
-    () => prisma.facultyProgramApplication.deleteMany(),
-    () => prisma.facultyProgramListing.deleteMany(),
-    () => prisma.internshipApplication.deleteMany(),
-    () => prisma.learningProgram.deleteMany(),
   ];
 
   for (const del of tables) {
@@ -77,8 +77,14 @@ async function main() {
   const studentUserIds: string[] = [];
   for (const [name, email, roll, details] of students) {
     const user = await retry(() =>
-      prisma.user.create({
-        data: {
+      prisma.user.upsert({
+        where: { email },
+        update: {
+          name,
+          passwordHash,
+          role: "STUDENT",
+        },
+        create: {
           name,
           email,
           passwordHash,
@@ -112,8 +118,14 @@ async function main() {
   const facultyIds: string[] = [];
   for (const [name, email, designation, dept] of faculty) {
     const user = await retry(() =>
-      prisma.user.create({
-        data: {
+      prisma.user.upsert({
+        where: { email },
+        update: {
+          name,
+          passwordHash,
+          role: "ACADEMICIAN",
+        },
+        create: {
           name,
           email,
           passwordHash,
@@ -340,8 +352,14 @@ async function main() {
   const industryUserIds: string[] = [];
   for (const item of industry) {
     const user = await retry(() =>
-      prisma.user.create({
-        data: {
+      prisma.user.upsert({
+        where: { email: item.email },
+        update: {
+          name: item.company,
+          passwordHash,
+          role: "INDUSTRY",
+        },
+        create: {
           name: item.company,
           email: item.email,
           passwordHash,
@@ -373,8 +391,14 @@ async function main() {
   console.log("Seeding institution accounts...");
   for (const [name, email, designation] of institutions) {
     await retry(() =>
-      prisma.user.create({
-        data: {
+      prisma.user.upsert({
+        where: { email },
+        update: {
+          name,
+          passwordHash,
+          role: "INSTITUTION",
+        },
+        create: {
           name,
           email,
           passwordHash,
@@ -497,26 +521,79 @@ async function main() {
   const now = Date.now();
   const day = 86400000;
   const mentorSlotDefs = [
-    [industryUserIds[0], studentUserIds[0], 2, "Career guidance & placement prep"],
+    // 0: Infosys
+    [industryUserIds[0], studentUserIds[0], 2, "Career guidance & enterprise GenAI placement prep"],
+    [industryUserIds[0], null, 1, "Open mentorship - GenAI careers & cloud engineering"],
+    // 1: TCS
     [industryUserIds[1], studentUserIds[4], 5, "Resume review & portfolio guidance"],
-    [industryUserIds[2], studentUserIds[1], 8, "Tech stack roadmap discussion"],
-    [industryUserIds[3], null, 4, "Open office hours - building systems"],
-    [industryUserIds[4], studentUserIds[7], 10, "Microservices architecture deep-dive"],
-    [industryUserIds[0], null, 1, "Open mentorship - GenAI careers"],
+    [industryUserIds[1], null, 3, "Open office hours - BFSI cloud transformation"],
+    // 2: Wipro
+    [industryUserIds[2], studentUserIds[1], 8, "Tech stack roadmap discussion & cyber resilience"],
+    [industryUserIds[2], null, 6, "Open office hours - DevSecOps best practices"],
+    // 3: Zoho
+    [industryUserIds[3], null, 4, "Open office hours - building bootstrapped SaaS systems"],
+    [industryUserIds[3], studentUserIds[7], 7, "Low-latency systems architecture clinic"],
+    // 4: HCLTech
+    [industryUserIds[4], studentUserIds[7], 10, "Microservices & Edge AI architecture deep-dive"],
+    [industryUserIds[4], null, 5, "Open office hours - IoT embedded product engineering"],
+    // 5: AIIA
+    [industryUserIds[5], studentUserIds[0], 4, "Ayush informatics & computer vision for botanical testing"],
+    [industryUserIds[5], null, 9, "Open office hours - Digital Health & Herbal Drug Discovery"],
+    // 6: Google India
+    [industryUserIds[6], studentUserIds[0], 3, "Google Cloud, Vertex AI & Large-Scale Systems Interview Prep"],
+    [industryUserIds[6], null, 6, "Open office hours - Distributed computing & TensorFlow Core"],
+    // 7: Microsoft India
+    [industryUserIds[7], studentUserIds[1], 4, "Azure architecture, Semantic Kernel & Copilot plugins"],
+    [industryUserIds[7], null, 8, "Open office hours - Applied AI & enterprise scale"],
+    // 8: Amazon AWS
+    [industryUserIds[8], studentUserIds[5], 5, "High-throughput serverless systems & AWS solutions architecture"],
+    [industryUserIds[8], null, 7, "Open office hours - Distributed storage & Kinesis streaming"],
+    // 9: NVIDIA India
+    [industryUserIds[9], studentUserIds[0], 6, "CUDA kernel optimization & TensorRT deep-dive"],
+    [industryUserIds[9], null, 11, "Open office hours - High-performance GPU computing & robotics"],
+    // 10: Intel India
+    [industryUserIds[10], studentUserIds[6], 4, "VLSI design, RISC-V & Intel OpenVINO edge compilation"],
+    [industryUserIds[10], null, 8, "Open office hours - Semiconductor packaging & NPU architectures"],
+    // 11: Cisco Systems
+    [industryUserIds[11], studentUserIds[2], 5, "Zero-trust network architecture & eBPF packet inspection"],
+    [industryUserIds[11], null, 9, "Open office hours - SD-WAN & mission-critical cloud networking"],
+    // 12: IBM India Research
+    [industryUserIds[12], studentUserIds[7], 7, "Quantum state tomography & Qiskit noise mitigation"],
+    [industryUserIds[12], null, 12, "Open office hours - Hybrid cloud & enterprise quantum readiness"],
+    // 13: Qualcomm India
+    [industryUserIds[13], studentUserIds[6], 6, "5G/6G physical layer modem architecture & Snapdragon NPU"],
+    [industryUserIds[13], null, 10, "Open office hours - Low-power RF & edge DSP engineering"],
+    // 14: Adobe Systems
+    [industryUserIds[14], studentUserIds[4], 3, "Creative Cloud WebGPU shaders & generative canvas pipelines"],
+    [industryUserIds[14], null, 7, "Open office hours - Browser rendering engines & Firefly GenAI"],
+    // 15: L&T Technology Services
+    [industryUserIds[15], studentUserIds[3], 5, "Industry 4.0 digital twins & industrial automation telematics"],
+    [industryUserIds[15], null, 9, "Open office hours - Smart manufacturing & mechatronics"],
+    // 16: Samsung R&D Institute
+    [industryUserIds[16], studentUserIds[0], 4, "Mobile vision AI, computational photography & Knox security"],
+    [industryUserIds[16], null, 8, "Open office hours - On-device intelligence & multimodal models"],
+    // 17: Tata Motors
+    [industryUserIds[17], studentUserIds[3], 5, "EV battery thermal management & CAN bus telematics"],
+    [industryUserIds[17], null, 10, "Open office hours - Connected vehicles & clean mobility systems"],
+    // 18: Reliance Jio Platforms
+    [industryUserIds[18], studentUserIds[2], 6, "Cloud-native 5G standalone core & Kubernetes network slicing"],
+    [industryUserIds[18], null, 11, "Open office hours - Indigenous telecom & edge content networks"],
   ] as const;
 
   for (const [ind, stu, offsetDays, topic] of mentorSlotDefs) {
     const status = stu ? "BOOKED" : "AVAILABLE";
-    await prisma.mentorSlot.create({
-      data: {
-        industryId: ind as string,
-        studentId: (stu as string | null) ?? undefined,
-        timeSlot: new Date(now + (offsetDays as number) * day),
-        durationMins: 30,
-        topic: topic as string,
-        status: status,
-      },
-    });
+    await retry(() =>
+      prisma.mentorSlot.create({
+        data: {
+          industryId: ind as string,
+          studentId: (stu as string | null) ?? undefined,
+          timeSlot: new Date(now + (offsetDays as number) * day),
+          durationMins: 30,
+          topic: topic as string,
+          status: status,
+        },
+      })
+    );
   }
 
   // ----- JOB PITCHES -----
@@ -526,19 +603,35 @@ async function main() {
     [industryUserIds[2], studentUserIds[4], 0.81, "PITCHED", 22000, "Mobile App Developer"],
     [industryUserIds[3], studentUserIds[7], 0.94, "ACCEPTED", 40000, "Platform Engineer"],
     [industryUserIds[4], studentUserIds[5], 0.76, "PITCHED", 20000, "Data Analyst Intern"],
+    [industryUserIds[5], studentUserIds[0], 0.91, "OFFERED", 24000, "Ayush AI Bioinformatics Research Fellow"],
+    [industryUserIds[6], studentUserIds[0], 0.96, "OFFERED", 45000, "Cloud & Applied AI Systems Engineer"],
+    [industryUserIds[7], studentUserIds[1], 0.89, "SHORTLISTED", 38000, "Azure Copilot Solutions Specialist"],
+    [industryUserIds[8], studentUserIds[7], 0.93, "OFFERED", 42000, "Distributed Cloud Infrastructure Engineer"],
+    [industryUserIds[9], studentUserIds[0], 0.95, "OFFERED", 48000, "CUDA Accelerated Computing Research Engineer"],
+    [industryUserIds[10], studentUserIds[6], 0.88, "SHORTLISTED", 34000, "Edge AI & Silicon Firmware Engineer"],
+    [industryUserIds[11], studentUserIds[2], 0.84, "PITCHED", 28000, "Zero-Trust Cloud Network Engineer"],
+    [industryUserIds[12], studentUserIds[7], 0.91, "SHORTLISTED", 36000, "Quantum Systems & Hybrid Cloud Associate"],
+    [industryUserIds[13], studentUserIds[6], 0.87, "SHORTLISTED", 32000, "Snapdragon Modem & Wireless Systems Engineer"],
+    [industryUserIds[14], studentUserIds[4], 0.88, "PITCHED", 35000, "Creative Cloud Web Platform Engineer"],
+    [industryUserIds[15], studentUserIds[3], 0.82, "PITCHED", 26000, "Industrial IoT & Digital Twin Specialist"],
+    [industryUserIds[16], studentUserIds[0], 0.93, "OFFERED", 40000, "On-Device Neural Processing Engineer"],
+    [industryUserIds[17], studentUserIds[3], 0.85, "SHORTLISTED", 30000, "EV Powertrain & Telematics Systems Engineer"],
+    [industryUserIds[18], studentUserIds[2], 0.86, "PITCHED", 28000, "5G Cloud Core & Edge Telecom Engineer"],
   ] as const;
 
   for (const [ind, stu, pri, status, stipend, role] of jobPitchDefs) {
-    await prisma.jobPitch.create({
-      data: {
-        industryId: ind as string,
-        studentId: stu as string,
-        priScore: pri as number,
-        status: status,
-        stipend: stipend as number,
-        roleDetails: role as string,
-      },
-    });
+    await retry(() =>
+      prisma.jobPitch.create({
+        data: {
+          industryId: ind as string,
+          studentId: stu as string,
+          priScore: pri as number,
+          status: status,
+          stipend: stipend as number,
+          roleDetails: role as string,
+        },
+      })
+    );
   }
 
   // ----- PROOFS OF WORK -----
@@ -613,90 +706,181 @@ async function main() {
 
   // ----- INDUSTRY CHALLENGES (Capstone & R&D Marketplace) -----
   const challengeDefs = [
+    // 0: Infosys
     {
       ind: 0, title: "GenAI Document Intelligence", type: "R_AND_D",
       desc: "Build an enterprise document Q&A system with grounded retrieval for contract analysis.",
       domain: "Generative AI", tech: "Python, LangChain, Vector DB", objs: "LLM integration, RAG pipeline, evaluation",
       stipend: 15000, rnd: true, status: "OPEN", deadlineOffset: 25,
     },
+    // 1: TCS
     {
       ind: 1, title: "Sustainability Footprint Dashboard", type: "CAPSTONE",
       desc: "Create a corporate carbon-footprint calculator with ESG reporting for client engagements.",
       domain: "Sustainability / Analytics", tech: "React, Python", objs: "Data modeling, dashboard, ESG standards",
       stipend: 12000, rnd: false, status: "OPEN", deadlineOffset: 18,
     },
+    // 2: Wipro
     {
       ind: 2, title: "Predictive Attrition Model", type: "R_AND_D",
       desc: "Develop an ML model predicting workforce attrition using employee engagement telemetry.",
       domain: "HR Analytics / ML", tech: "Python, Scikit-learn", objs: "Feature engineering, model training, explainability",
       stipend: 18000, rnd: true, status: "OPEN", deadlineOffset: 30,
     },
+    // 3: Zoho
     {
       ind: 3, title: "Edge-AI Anomaly Detection", type: "MICRO_CONSULTANCY",
       desc: "Design a lightweight anomaly-detection pipeline that runs on retail edge devices.",
       domain: "Edge Computing", tech: "TensorFlow Lite, C++", objs: "Model quantization, on-device latency",
       stipend: 20000, rnd: true, status: "ASSIGNED", deadlineOffset: 12,
     },
+    // 4: HCLTech
     {
       ind: 4, title: "Digital Twin for Campus Energy", type: "CAPSTONE",
       desc: "Simulate a campus energy grid as a digital twin to optimize power consumption.",
       domain: "IoT / Digital Twin", tech: "Simulation, IoT", objs: "Real-time simulation, optimization algorithms",
       stipend: 10000, rnd: false, status: "OPEN", deadlineOffset: 40,
     },
+    // 5: AIIA
     {
       ind: 5, title: "AyurVision: AI Botanical Identification & Adulteration Screening", type: "R_AND_D",
       desc: "Develop a computer-vision and deep-learning pipeline to classify medicinal plants and detect commercial adulterants in raw herbal supplies for standard testing.",
       domain: "AI / Ayush Informatics", tech: "PyTorch, OpenCV, FastAPI", objs: "Multi-class herb classification, mobile camera inference",
       stipend: 22000, rnd: true, status: "OPEN", deadlineOffset: 35,
     },
+    // 6: Google India
     {
       ind: 6, title: "Distributed RAG on Google Cloud", type: "R_AND_D",
       desc: "Implement a low-latency enterprise document retrieval and knowledge generation pipeline using Google Vertex AI and vector search.",
       domain: "AI / Cloud Systems", tech: "Python, Google Cloud, Vertex AI, BigQuery", objs: "Vector embeddings, multi-hop RAG, prompt grounding",
       stipend: 25000, rnd: true, status: "OPEN", deadlineOffset: 28,
     },
+    // 7: Microsoft India
     {
       ind: 7, title: "Copilot Semantic Plugin for Clinical Records", type: "CAPSTONE",
       desc: "Develop an intelligent semantic assistant plugin that synthesizes patient lab records and alerts practitioners to contraindicated prescriptions.",
       domain: "Healthcare / Generative AI", tech: "Azure OpenAI, TypeScript, C#, FHIR", objs: "Semantic kernel orchestration, privacy-preserving LLM inference",
       stipend: 22000, rnd: false, status: "OPEN", deadlineOffset: 22,
     },
+    // 8: Amazon AWS
     {
       ind: 8, title: "High-Throughput Serverless Telemetry Pipeline", type: "CAPSTONE",
       desc: "Design and benchmark a serverless streaming telemetry pipeline handling 100k events/sec with sub-second ingestion latency.",
       domain: "Cloud Infrastructure", tech: "AWS Lambda, Kinesis, DynamoDB, CDK", objs: "Streaming ingestion, auto-partitioning, disaster recovery",
       stipend: 20000, rnd: false, status: "OPEN", deadlineOffset: 33,
     },
+    // 9: NVIDIA India
     {
       ind: 9, title: "Real-Time Object Tracking with TensorRT & DeepStream", type: "R_AND_D",
       desc: "Accelerate multi-camera vision pipeline with sub-10ms latency using NVIDIA TensorRT and CUDA optimizations for autonomous factory robots.",
       domain: "Edge AI / Accelerated Computing", tech: "CUDA, TensorRT, C++, OpenCV, DeepStream", objs: "Kernel optimization, FP16 quantization, video streaming",
       stipend: 30000, rnd: true, status: "OPEN", deadlineOffset: 45,
     },
+    // 10: Intel India
     {
       ind: 10, title: "Low-Power Computer Vision with Intel OpenVINO", type: "R_AND_D",
       desc: "Optimize deep neural network inference on Intel hybrid CPU/NPU architectures for automated optical inspection in semiconductor manufacturing.",
       domain: "Semiconductor / AI Inference", tech: "Intel OpenVINO, C++, Python, ONNX", objs: "Model compression, INT8 calibration, NPU acceleration",
       stipend: 22000, rnd: true, status: "OPEN", deadlineOffset: 26,
     },
+    // 11: Cisco Systems
     {
       ind: 11, title: "Zero-Trust Microsegmentation Controller", type: "CAPSTONE",
       desc: "Architect a network access controller utilizing eBPF packet inspection and zero-trust identity policies for hybrid cloud environments.",
       domain: "Cybersecurity / Networking", tech: "Python, Docker, eBPF, Linux, Go", objs: "Policy enforcement, real-time packet inspection, threat telemetry",
       stipend: 18000, rnd: false, status: "OPEN", deadlineOffset: 20,
     },
+    // 12: Tata Motors
     {
       ind: 17, title: "Battery Thermal Runaway Prediction in EV Fleets", type: "R_AND_D",
       desc: "Formulate an electrochemical thermal estimation model predicting battery cell degradation and abnormal heat dissipation in commercial EV fleets.",
       domain: "Automotive / Clean Energy", tech: "MATLAB, Python, CAN Bus, IoT Telematics", objs: "Cell temperature forecasting, early fault warning, CAN bus parsing",
       stipend: 24000, rnd: true, status: "OPEN", deadlineOffset: 38,
     },
+    // 13: IBM India Research
+    {
+      ind: 12, title: "Quantum State Tomography & Noise Mitigation with Qiskit", type: "R_AND_D",
+      desc: "Implement zero-noise extrapolation and dynamical decoupling on simulated noisy quantum hardware to recover high-fidelity quantum circuits.",
+      domain: "Quantum Computing / Cloud", tech: "Python, Qiskit, OpenPulse, NumPy, SciPy", objs: "Zero-noise extrapolation, quantum state fidelity benchmark >92%",
+      stipend: 28000, rnd: true, status: "OPEN", deadlineOffset: 42,
+    },
+    // 14: Qualcomm India
+    {
+      ind: 13, title: "Ultra-Low Power Modem AI for 5G-Advanced Telemetry", type: "R_AND_D",
+      desc: "Formulate a neural network-based channel estimation pipeline optimized for Snapdragon Neural Processing SDK with sub-1mW power budget.",
+      domain: "Wireless Systems / Edge AI", tech: "C++, Snapdragon SNPE SDK, Python, PyTorch", objs: "Neural channel estimation, INT8 DSP quantization",
+      stipend: 26000, rnd: true, status: "OPEN", deadlineOffset: 36,
+    },
+    // 15: Adobe Systems
+    {
+      ind: 14, title: "Real-Time Neural Video Inpainting & Vector Generation", type: "CAPSTONE",
+      desc: "Architect a high-performance in-browser canvas renderer combining WebGPU compute shaders and quantized latent diffusion for automated vector generation.",
+      domain: "Computer Vision / Generative AI", tech: "TypeScript, WebGPU, WebAssembly, Python, PyTorch", objs: "Sub-100ms inpainting latency, zero-lag browser canvas",
+      stipend: 25000, rnd: false, status: "OPEN", deadlineOffset: 30,
+    },
+    // 16: L&T Technology Services
+    {
+      ind: 15, title: "Industrial IoT Predictive Maintenance for Smart Turbines", type: "CAPSTONE",
+      desc: "Build an edge streaming analytics pipeline collecting high-frequency vibration telemetry via MQTT/OPC-UA and classifying bearing anomaly faults.",
+      domain: "Smart Manufacturing / Industry 4.0", tech: "Go, MQTT, Time-Series DB, Docker, OPC-UA, Python", objs: "Vibration FFT analysis, sub-second anomaly alert trigger",
+      stipend: 20000, rnd: false, status: "OPEN", deadlineOffset: 24,
+    },
+    // 17: Samsung R&D Institute
+    {
+      ind: 16, title: "On-Device Multimodal Emotion & Gaze Tracking", type: "R_AND_D",
+      desc: "Develop an ultra-fast on-device computer vision engine tracking 3D facial landmarks, gaze vectors, and emotional cues with zero cloud offload.",
+      domain: "Mobile AI / Vision", tech: "Android NDK, C++, TensorFlow Lite, OpenCV", objs: "Sub-15ms face mesh tracking, privacy-first local processing",
+      stipend: 27000, rnd: true, status: "OPEN", deadlineOffset: 34,
+    },
+    // 18: Reliance Jio Platforms
+    {
+      ind: 18, title: "Cloud-Native 5G Core Network Slicing Orchestrator", type: "CAPSTONE",
+      desc: "Design a Kubernetes-native orchestration controller for dynamic 5G user plane function (UPF) slicing and automated SLA traffic steering.",
+      domain: "Telecom / Cloud Native", tech: "Kubernetes, Go, Prometheus, Open5GS, gRPC", objs: "Dynamic slice provisioning in <5s, real-time SLA metrics",
+      stipend: 22000, rnd: false, status: "OPEN", deadlineOffset: 32,
+    },
+    // 19: Infosys (Additional Capstone)
+    {
+      ind: 0, title: "Autonomous Legacy Code Refactoring with LLM Agents", type: "CAPSTONE",
+      desc: "Develop an automated AST parsing and LLM transformation tool to convert legacy monolithic Java EE services into cloud-native microservices.",
+      domain: "Cloud Transformation / GenAI", tech: "Java, TypeScript, LangChain, AST Parser", objs: "Automated unit test generation, AST verification",
+      stipend: 16000, rnd: false, status: "OPEN", deadlineOffset: 29,
+    },
+    // 20: Google India (Additional Capstone)
+    {
+      ind: 6, title: "Edge TPU Computer Vision for Smart Agriculture", type: "CAPSTONE",
+      desc: "Deploy lightweight MobileNet vision pipelines onto Google Coral Edge TPU microcontrollers for real-time crop soil hydration monitoring.",
+      domain: "Edge AI / IoT", tech: "TensorFlow Lite, Python, Coral Edge TPU, OpenCV", objs: "Sub-20ms inference latency, solar-powered low-power operation",
+      stipend: 24000, rnd: false, status: "OPEN", deadlineOffset: 40,
+    },
+    // 21: Microsoft India (Additional R&D)
+    {
+      ind: 7, title: "Confidential Computing Enclaves on Azure Confidential VMs", type: "R_AND_D",
+      desc: "Implement privacy-preserving multi-party data analytics utilizing AMD SEV-SNP hardware enclaves on Azure Confidential Computing.",
+      domain: "Cybersecurity / Cloud Systems", tech: "C++, Rust, Azure Confidential Computing, Linux", objs: "Attestation verification, cryptographic memory isolation",
+      stipend: 26000, rnd: true, status: "OPEN", deadlineOffset: 37,
+    },
+    // 22: Amazon AWS (Additional R&D)
+    {
+      ind: 8, title: "Multi-Region Event-Driven Disaster Recovery Fabric", type: "R_AND_D",
+      desc: "Design a zero-RPO/RTO multi-region active-active distributed ledger synchronization pipeline over AWS Global Accelerator and DynamoDB Global Tables.",
+      domain: "Cloud Infrastructure / Distributed Systems", tech: "AWS CDK, Go, DynamoDB, EventBridge, CloudWatch", objs: "Sub-500ms cross-region replication, fault injection resilience",
+      stipend: 25000, rnd: true, status: "OPEN", deadlineOffset: 39,
+    },
+    // 23: NVIDIA India (Additional Capstone)
+    {
+      ind: 9, title: "Industrial Digital Twin Simulation in NVIDIA Omniverse", type: "CAPSTONE",
+      desc: "Build a physics-accurate digital twin simulation of an automated warehouse robot using Universal Scene Description (USD) and Isaac Sim.",
+      domain: "Robotics / Industrial Metaverse", tech: "Python, NVIDIA Isaac Sim, USD, Omniverse", objs: "Physics-accurate collision modeling, ROS2 bridge integration",
+      stipend: 28000, rnd: false, status: "OPEN", deadlineOffset: 44,
+    },
   ] as const;
 
   const createdChallenges: string[] = [];
-  await Promise.all(
-    challengeDefs.map(async (c, idx) => {
-      const challenge = await prisma.industryChallenge.create({
+  for (let idx = 0; idx < challengeDefs.length; idx++) {
+    const c = challengeDefs[idx];
+    const challenge = await retry(() =>
+      prisma.industryChallenge.create({
         data: {
           industryId: industryUserIds[c.ind],
           title: c.title,
@@ -710,11 +894,10 @@ async function main() {
           status: c.status,
           deadline: new Date(now + (c.deadlineOffset + idx) * day),
         },
-      });
-      createdChallenges.push(challenge.id);
-      return challenge;
-    }),
-  );
+      })
+    );
+    createdChallenges.push(challenge.id);
+  }
 
   // ----- LAB UNITS (Faculty + Student R&D teams) -----
   const labUnit1 = await prisma.labUnit.create({
@@ -915,6 +1098,7 @@ async function main() {
 
   // ----- SABBATICAL LISTINGS (Phase 4: Faculty Industrial Sabbatical Exchange) -----
   const sabbaticalDefs = [
+    // 0: Infosys
     {
       company: 0, title: "GenAI Research Engineering Immersion",
       desc: "8-week summer immersion building production RAG systems alongside our applied research team. Faculty will co-design evaluation frameworks and mentor graduate interns.",
@@ -922,6 +1106,7 @@ async function main() {
       duration: "8 weeks (Jun-Aug)", location: "Bengaluru (Hybrid)",
       compensation: "Stipend + accommodation",
     },
+    // 1: TCS
     {
       company: 1, title: "Enterprise Data Platforms Fellowship",
       desc: "Summer residency with our cloud data platform group. Contribute to real client data pipelines and share insights back with campus curriculum.",
@@ -929,6 +1114,7 @@ async function main() {
       duration: "10 weeks (Jun-Aug)", location: "Pune",
       compensation: "Paid fellowship + travel",
     },
+    // 2: Wipro
     {
       company: 2, title: "Edge AI Applied Research Program",
       desc: "Hands-on program deploying lightweight computer-vision models on retail edge hardware. Ideal for ECE/CS faculty exploring IoT + ML.",
@@ -936,6 +1122,7 @@ async function main() {
       duration: "6 weeks (Jul-Aug)", location: "Bengaluru",
       compensation: "Honorarium",
     },
+    // 3: Zoho
     {
       company: 3, title: "Platform Engineering Faculty Residency",
       desc: "Embed with our platform engineering org to ship internal developer tooling. Open to CS/IT faculty with systems interest.",
@@ -943,6 +1130,7 @@ async function main() {
       duration: "12 weeks (Summer)", location: "Chennai",
       compensation: "Competitive stipend",
     },
+    // 4: HCLTech
     {
       company: 4, title: "Digital Twin & Sustainability Lab",
       desc: "Collaborate on campus energy digital-twin simulation research for one summer. Deliverables include a published technical report.",
@@ -950,76 +1138,254 @@ async function main() {
       duration: "8 weeks (Jun-Jul)", location: "Noida",
       compensation: "Stipend + research budget",
     },
+    // 5: AIIA
+    {
+      company: 5, title: "Ayurvedic Bio-Informatics & Evidence Computing Sabbatical",
+      desc: "Co-author clinical standards and machine learning extraction pipelines from digitized botanical manuscripts and clinical trial registries.",
+      domain: "Digital Health / Ayush Informatics",
+      duration: "8 weeks (Jun-Aug)", location: "New Delhi",
+      compensation: "Honorarium + research travel grant",
+    },
+    // 6: Google India
+    {
+      company: 6, title: "Hyper-Scale Systems & Applied AI Faculty Immersion",
+      desc: "Spend 8 weeks with Google Cloud applied research team studying distributed model training, Vertex AI pipelines, and curriculum modernizations.",
+      domain: "Distributed Systems / Cloud AI",
+      duration: "8 weeks (Jun-Aug)", location: "Bengaluru",
+      compensation: "Competitive research fellowship grant",
+    },
+    // 7: Microsoft India
+    {
+      company: 7, title: "Azure Enterprise AI & Copilot Academic Fellowship",
+      desc: "Residency with Azure Systems team exploring semantic orchestration, responsible AI governance, and enterprise retrieval architectures.",
+      domain: "Applied AI / Cloud Architecture",
+      duration: "10 weeks (Summer)", location: "Hyderabad",
+      compensation: "Full faculty fellowship stipend",
+    },
+    // 8: Amazon AWS
+    {
+      company: 8, title: "Serverless & Distributed Systems Faculty Residency",
+      desc: "Embed with AWS cloud infrastructure architects to analyze distributed fault tolerance and co-develop cloud architecture course modules.",
+      domain: "Cloud Infrastructure / Serverless",
+      duration: "8 weeks (Jun-Jul)", location: "Bengaluru",
+      compensation: "Stipend + AWS Cloud Research Credits",
+    },
+    // 9: NVIDIA India
+    {
+      company: 9, title: "Accelerated Computing & LLM Inference Sabbatical",
+      desc: "Collaborate with NVIDIA Deep Learning Institute to design high-performance CUDA parallel algorithms and TensorRT inference labs.",
+      domain: "GPU Computing / Accelerated AI",
+      duration: "8 weeks (Jun-Aug)", location: "Pune",
+      compensation: "Research stipend + NVIDIA GPU cluster access",
+    },
+    // 10: Intel India
+    {
+      company: 10, title: "Silicon Architecture & OpenVINO Faculty Exchange",
+      desc: "Hands-on silicon firmware design, RISC-V exploration, and Intel OpenVINO compilation residency for electronics and computer science faculty.",
+      domain: "VLSI / Silicon Architecture",
+      duration: "8 weeks (Summer)", location: "Bengaluru",
+      compensation: "Stipend + campus lab equipment sponsorship",
+    },
+    // 11: Cisco Systems
+    {
+      company: 11, title: "Zero-Trust Enterprise Networks Faculty Fellowship",
+      desc: "Engage with enterprise networking leaders on automated policy enforcement, eBPF telemetry, and SDN network virtualization.",
+      domain: "Cybersecurity / Networking",
+      duration: "8 weeks (Jun-Aug)", location: "Bengaluru",
+      compensation: "Competitive stipend + lab access",
+    },
+    // 12: IBM India Research
+    {
+      company: 12, title: "Quantum Information & Hybrid Cloud Residency",
+      desc: "Collaborate with IBM Quantum research scientists on variational quantum algorithms, noise mitigation, and hybrid OpenShift orchestration.",
+      domain: "Quantum Computing / Cloud",
+      duration: "10 weeks (Jun-Aug)", location: "Bengaluru",
+      compensation: "IBM Research Fellowship Grant",
+    },
+    // 13: Qualcomm India
+    {
+      company: 13, title: "5G-Advanced & Snapdragon Edge AI Sabbatical",
+      desc: "Residency focused on physical-layer low-power modem engineering and DSP neural quantization for telecommunications and electronics faculty.",
+      domain: "Wireless Telecommunications / DSP",
+      duration: "8 weeks (Summer)", location: "Hyderabad",
+      compensation: "Stipend + accommodation",
+    },
+    // 14: Adobe Systems
+    {
+      company: 14, title: "Digital Media & Creative Intelligence Sabbatical",
+      desc: "Work alongside Adobe Firefly research teams on generative canvas models, WebGPU shader pipelines, and digital content authentication.",
+      domain: "Generative Media / Computer Vision",
+      duration: "8 weeks (Jun-Aug)", location: "Noida",
+      compensation: "Competitive honorarium + travel",
+    },
+    // 15: L&T Technology Services
+    {
+      company: 15, title: "Industry 4.0 & Cyber-Physical Systems Exchange",
+      desc: "Co-innovate on industrial automation, SCADA security, and IoT digital twin platforms for modern mechanical and mechatronics faculty.",
+      domain: "Smart Manufacturing / Mechatronics",
+      duration: "8 weeks (Summer)", location: "Vadodara",
+      compensation: "Stipend + travel allowance",
+    },
+    // 16: Samsung R&D Institute
+    {
+      company: 16, title: "Mobile Neural Processing & Camera Vision Immersion",
+      desc: "Embed with Samsung research scientists advancing neural image signal processing, mobile gaze tracking, and on-device machine learning.",
+      domain: "Computer Vision / Mobile Systems",
+      duration: "10 weeks (Jun-Aug)", location: "Bengaluru",
+      compensation: "Full faculty research grant",
+    },
+    // 17: Tata Motors
+    {
+      company: 17, title: "EV Powertrain & Battery Management Systems Sabbatical",
+      desc: "Summer immersion at Tata Motors Engineering Research Centre analyzing real-world battery thermal runaway telemetry and autonomous drive CAN bus.",
+      domain: "Electric Vehicles / Automotive Mechatronics",
+      duration: "8 weeks (Summer)", location: "Pune",
+      compensation: "Stipend + living allowance",
+    },
+    // 18: Reliance Jio Platforms
+    {
+      company: 18, title: "Indigenous 5G Cloud & Edge Telecom Fellowship",
+      desc: "Residency with Jio Platforms network virtualization group on cloud-native telecom orchestration and real-time packet telemetry.",
+      domain: "Telecommunications / Cloud Native",
+      duration: "8 weeks (Jun-Aug)", location: "Navi Mumbai",
+      compensation: "Competitive fellowship stipend",
+    },
   ] as const;
 
   for (const s of sabbaticalDefs) {
-    await prisma.sabbaticalListing.create({
-      data: {
-        companyId: industryUserIds[s.company],
-        title: s.title,
-        description: s.desc,
-        domain: s.domain,
-        duration: s.duration,
-        location: s.location,
-        compensation: s.compensation,
-        status: "OPEN",
-      },
-    });
+    await retry(() =>
+      prisma.sabbaticalListing.create({
+        data: {
+          companyId: industryUserIds[s.company],
+          title: s.title,
+          description: s.desc,
+          domain: s.domain,
+          duration: s.duration,
+          location: s.location,
+          compensation: s.compensation,
+          status: "OPEN",
+        },
+      })
+    );
   }
 
   // ----- LEARNING PROGRAMS (Internships, Jobs & Industry Learning) -----
   const learningProgramDefs = [
+    // 0: Infosys
     { ind: 0, title: "Systems Engineer Intern - GenAI Track", type: "INTERNSHIP", skills: "Python,Machine Learning,LLM", desc: "6-month paid internship building enterprise GenAI document-intelligence products. Work closely with applied research.", duration: "6 months", mode: "Hybrid", cert: true },
-    { ind: 1, title: "Java Backend Developer - Entry", type: "ENTRY_JOB", skills: "Java,Spring Boot,SQL", desc: "Full-time entry-level role on our wealth-management platform team. Strong mentoring culture.", duration: "Full-time", mode: "On-site", cert: false },
-    { ind: 2, title: "Data Analyst Apprentice", type: "APPRENTICESHIP", skills: "SQL,Excel,Data Analysis,Power BI", desc: "1-year apprenticeship rotating across business units learning analytics tooling and reporting.", duration: "12 months", mode: "Hybrid", cert: true },
-    { ind: 3, title: "Cloud Foundations Training", type: "TRAINING", skills: "AWS,Docker,Linux", desc: "12-week sponsored training program covering cloud fundamentals with a guaranteed project placement.", duration: "12 weeks", mode: "Online", cert: true },
-    { ind: 4, title: "Edge AI Professional Certification", type: "CERTIFICATION", skills: "TensorFlow,Computer Vision,C++", desc: "Industry-validated certification on deploying computer-vision models to edge devices.", duration: "8 weeks", mode: "Online", cert: true },
     { ind: 0, title: "Frontend Engineer Intake 2026", type: "ENTRY_JOB", skills: "React,TypeScript,HTML/CSS", desc: "New-grad frontend role crafting design systems and high-traffic customer experiences.", duration: "Full-time", mode: "Hybrid", cert: false },
+    // 1: TCS
+    { ind: 1, title: "Java Backend Developer - Entry", type: "ENTRY_JOB", skills: "Java,Spring Boot,SQL", desc: "Full-time entry-level role on our wealth-management platform team. Strong mentoring culture.", duration: "Full-time", mode: "On-site", cert: false },
+    // 2: Wipro
+    { ind: 2, title: "Data Analyst Apprentice", type: "APPRENTICESHIP", skills: "SQL,Excel,Data Analysis,Power BI", desc: "1-year apprenticeship rotating across business units learning analytics tooling and reporting.", duration: "12 months", mode: "Hybrid", cert: true },
+    // 3: Zoho
+    { ind: 3, title: "Cloud Foundations Training", type: "TRAINING", skills: "AWS,Docker,Linux", desc: "12-week sponsored training program covering cloud fundamentals with a guaranteed project placement.", duration: "12 weeks", mode: "Online", cert: true },
+    // 4: HCLTech
+    { ind: 4, title: "Edge AI Professional Certification", type: "CERTIFICATION", skills: "TensorFlow,Computer Vision,C++", desc: "Industry-validated certification on deploying computer-vision models to edge devices.", duration: "8 weeks", mode: "Online", cert: true },
+    // 5: AIIA
     { ind: 5, title: "Ayush Bio-Informatics & Quality Standardization Internship", type: "INTERNSHIP", skills: "Botanical AI Identification,Bioinformatics,Python", desc: "Collaborative research internship analyzing digitized herbal databases, pharmacovigilance reports, and clinical analytics under Ministry of Ayush guidelines.", duration: "6 months", mode: "Hybrid (New Delhi)", cert: true },
+    // 6: Google India
     { ind: 6, title: "Cloud Systems & Vertex AI Engineering Fellowship", type: "INTERNSHIP", skills: "Google Cloud,Python,Vertex AI,BigQuery", desc: "6-month immersive engineering fellowship with Google Cloud applied research teams.", duration: "6 months", mode: "Hybrid (Bengaluru)", cert: true },
+    // 7: Microsoft India
     { ind: 7, title: "Applied AI Solutions Engineer - Entry Level", type: "ENTRY_JOB", skills: "Azure,C#,TypeScript,GenAI", desc: "Full-time entry-level solutions engineer role developing enterprise Copilot systems.", duration: "Full-time", mode: "Hybrid (Hyderabad)", cert: false },
+    // 8: Amazon AWS
+    { ind: 8, title: "Cloud Systems & Serverless Architecture Internship", type: "INTERNSHIP", skills: "AWS,DynamoDB,Serverless,Node.js", desc: "6-month high-impact internship architecting fault-tolerant microservices on AWS.", duration: "6 months", mode: "Hybrid", cert: true },
+    // 9: NVIDIA India
     { ind: 9, title: "CUDA Accelerated Computing Academy", type: "CERTIFICATION", skills: "CUDA,C++,GPU Optimization,TensorRT", desc: "Intensive 8-week certification track on parallel computing and high-performance neural acceleration.", duration: "8 weeks", mode: "Online", cert: true },
+    // 10: Intel India
     { ind: 10, title: "Silicon Architecture & Edge AI Internship", type: "INTERNSHIP", skills: "OpenVINO,VLSI,Embedded Systems,C++", desc: "Benchmarking and optimizing silicon firmware pipelines on hybrid Intel CPU/NPU architectures.", duration: "6 months", mode: "On-site (Bengaluru)", cert: true },
+    // 11: Cisco Systems
+    { ind: 11, title: "Zero-Trust Cloud Network Security Apprenticeship", type: "APPRENTICESHIP", skills: "Networking,Python,Zero-Trust,Cybersecurity", desc: "1-year immersive apprenticeship developing automated policy compliance and threat telemetry.", duration: "12 months", mode: "Hybrid", cert: true },
+    // 12: IBM India Research
+    { ind: 12, title: "Quantum Information Science Fellowship", type: "INTERNSHIP", skills: "Qiskit,Quantum Algorithms,Python,Linear Algebra", desc: "6-month research fellowship investigating noise mitigation and variational quantum eigensolvers.", duration: "6 months", mode: "Hybrid", cert: true },
+    // 13: Qualcomm India
+    { ind: 13, title: "Embedded DSP & Wireless Systems Trainee", type: "ENTRY_JOB", skills: "C++,DSP,Embedded Systems,5G Core", desc: "Full-time entry-level wireless engineer designing physical-layer firmware for Snapdragon platforms.", duration: "Full-time", mode: "On-site", cert: false },
+    // 14: Adobe Systems
+    { ind: 14, title: "Creative Cloud Platform Engineer Intake", type: "ENTRY_JOB", skills: "TypeScript,WebGPU,React,C++", desc: "Full-time graduate software engineer building next-gen browser canvas and media rendering engines.", duration: "Full-time", mode: "Hybrid", cert: false },
+    // 15: L&T Technology Services
+    { ind: 15, title: "Industry 4.0 Digital Twin Engineer", type: "ENTRY_JOB", skills: "IoT,Digital Twins,Python,Industrial Automation", desc: "Full-time role designing cyber-physical telemetry systems for global manufacturing clients.", duration: "Full-time", mode: "On-site", cert: false },
+    // 16: Samsung R&D Institute
+    { ind: 16, title: "Mobile Vision AI Research Internship", type: "INTERNSHIP", skills: "PyTorch,Computer Vision,C++,Mobile OS", desc: "6-month research residency advancing multi-camera computational photography and on-device models.", duration: "6 months", mode: "Hybrid", cert: true },
+    // 17: Tata Motors
     { ind: 17, title: "EV Powertrain & Telematics Graduate Engineer Trainee", type: "ENTRY_JOB", skills: "CAN Bus,Embedded C,MATLAB,Battery Tech", desc: "Graduate trainee program at Tata Motors ERC engineering next-gen electric mobility solutions.", duration: "Full-time", mode: "On-site (Pune)", cert: false },
+    // 18: Reliance Jio Platforms
+    { ind: 18, title: "5G Cloud Telecom Engineer Trainee", type: "ENTRY_JOB", skills: "Kubernetes,Go,Linux,5G Standalone", desc: "Full-time role in India's leading indigenous telecom cloud core engineering division.", duration: "Full-time", mode: "On-site", cert: false },
   ] as const;
 
   for (const lp of learningProgramDefs) {
-    await prisma.learningProgram.create({
-      data: {
-        companyId: industryUserIds[lp.ind],
-        title: lp.title,
-        description: lp.desc,
-        programType: lp.type,
-        skills: lp.skills,
-        duration: lp.duration,
-        mode: lp.mode,
-        certification: lp.cert,
-      },
-    });
+    await retry(() =>
+      prisma.learningProgram.create({
+        data: {
+          companyId: industryUserIds[lp.ind],
+          title: lp.title,
+          description: lp.desc,
+          programType: lp.type,
+          skills: lp.skills,
+          duration: lp.duration,
+          mode: lp.mode,
+          certification: lp.cert,
+        },
+      })
+    );
   }
 
   // ----- FACULTY PROGRAM LISTINGS (Faculty Development Portal) -----
   const facultyProgramDefs = [
+    // 0: Infosys
     { ind: 0, title: "GenAI Research Engineering Immersion", type: "RESEARCH", domain: "Generative AI", dur: "8 weeks (Jun-Aug)", loc: "Bengaluru (Hybrid)", comp: "Stipend + accommodation", desc: "Co-design RAG evaluation frameworks and mentor graduate interns on applied GenAI." },
+    // 1: TCS
     { ind: 1, title: "Summer Faculty Fellowship on Data Platforms", type: "FDP", domain: "Data Engineering / Cloud", dur: "10 weeks (Jun-Aug)", loc: "Pune", comp: "Paid fellowship", desc: "Embed with the cloud data platform group and bring insights back to curriculum." },
+    // 2: Wipro
     { ind: 2, title: "Edge AI Applied Research Program", type: "INDUSTRIAL_TRAINING", domain: "Edge Computing / CV", dur: "6 weeks (Jul-Aug)", loc: "Bengaluru", comp: "Honorarium", desc: "Deploy lightweight computer-vision models on retail edge hardware with the research team." },
+    // 3: Zoho
     { ind: 3, title: "Platform Engineering Faculty Residency", type: "CONSULTANCY", domain: "DevOps", dur: "12 weeks (Summer)", loc: "Chennai", comp: "Competitive stipend", desc: "Ship internal developer tooling alongside the platform engineering organization." },
+    // 4: HCLTech
     { ind: 4, title: "Faculty Internship - Sustainability Lab", type: "FACULTY_INTERNSHIP", domain: "IoT / Sustainability", dur: "8 weeks (Jun-Jul)", loc: "Noida", comp: "Stipend + research budget", desc: "Collaborate on campus energy digital-twin simulation research and co-author a report." },
+    // 5: AIIA
+    { ind: 5, title: "Digital Herbal Pharmacopoeia Research Workshop", type: "RESEARCH", domain: "Ayush Informatics", dur: "4 weeks (Summer)", loc: "New Delhi", comp: "Grant + travel", desc: "Faculty training on digital standardization and botanical spectral databases." },
+    // 6: Google India
+    { ind: 6, title: "Google Cloud AI Curriculum Masterclass", type: "FDP", domain: "Cloud AI / Vertex", dur: "2 weeks (Online)", loc: "Online", comp: "Sponsored FDP", desc: "Faculty development program on incorporating Vertex AI and Gemini APIs into university syllabi." },
+    // 7: Microsoft India
+    { ind: 7, title: "Microsoft Azure Academic Research Symposium", type: "CONSULTANCY", domain: "Cloud & Copilot", dur: "6 weeks (Hybrid)", loc: "Hyderabad", comp: "Azure grant $10,000", desc: "Consultancy and academic curriculum co-design for next-gen generative AI applications." },
+    // 8: Amazon AWS
+    { ind: 8, title: "AWS Cloud Architecture Faculty Immersion", type: "INDUSTRIAL_TRAINING", domain: "Serverless & HPC", dur: "4 weeks (Summer)", loc: "Bengaluru", comp: "Training certificate + credits", desc: "Industrial training program on architecting resilient microservices on AWS." },
+    // 9: NVIDIA India
+    { ind: 9, title: "NVIDIA Deep Learning Institute Educators Program", type: "FDP", domain: "CUDA & Parallel AI", dur: "3 weeks (Hybrid)", loc: "Pune", comp: "DLI Teaching Kit + GPU hours", desc: "Intensive training for professors teaching high-performance computing and neural networks." },
+    // 10: Intel India
+    { ind: 10, title: "Intel Semiconductor & RISC-V Education Initiative", type: "INDUSTRIAL_TRAINING", domain: "VLSI / Silicon", dur: "4 weeks (On-site)", loc: "Bengaluru", comp: "Hardware development kit", desc: "Hands-on training on modern RISC-V emulation and OpenVINO hardware toolchains." },
+    // 11: Cisco Systems
+    { ind: 11, title: "Cisco Networking Academy Instructor Accelerator", type: "FDP", domain: "Zero-Trust & SDN", dur: "3 weeks (Online)", loc: "Online", comp: "Instructor certification", desc: "Accredited training for computer network faculty on modern cyber defense." },
+    // 12: IBM India Research
+    { ind: 12, title: "IBM Quantum Educators & Qiskit Residency", type: "RESEARCH", domain: "Quantum Computing", dur: "6 weeks (Hybrid)", loc: "Bengaluru", comp: "IBM Qiskit grant", desc: "Empowering university faculty to establish quantum computing introductory courses." },
+    // 13: Qualcomm India
+    { ind: 13, title: "Qualcomm Wireless Systems Academy for Faculty", type: "INDUSTRIAL_TRAINING", domain: "5G/6G & DSP", dur: "4 weeks (Hybrid)", loc: "Hyderabad", comp: "Honorarium + hardware", desc: "Specialized training on 5G-Advanced physical layer and Snapdragon NPU pipelines." },
+    // 14: Adobe Systems
+    { ind: 14, title: "Adobe Creative Technology Faculty Fellowship", type: "CONSULTANCY", domain: "WebGPU & Digital Media", dur: "6 weeks (Summer)", loc: "Noida", comp: "Competitive stipend", desc: "Co-designing next-generation computer graphics and interactive media curricula." },
+    // 15: L&T Technology Services
+    { ind: 15, title: "L&T Smart Manufacturing Industry Exchange", type: "INDUSTRIAL_TRAINING", domain: "Industry 4.0 / SCADA", dur: "4 weeks (On-site)", loc: "Vadodara", comp: "Stipend + accommodation", desc: "Hands-on experience with industrial IoT testbeds and smart turbine telemetry." },
+    // 16: Samsung R&D Institute
+    { ind: 16, title: "Samsung On-Device AI Faculty Development Program", type: "FDP", domain: "Mobile Vision & Security", dur: "3 weeks (Hybrid)", loc: "Bengaluru", comp: "Samsung Research award", desc: "Deep-dive into camera vision pipelines, mobile OS internals, and Knox security." },
+    // 17: Tata Motors
+    { ind: 17, title: "Tata Motors EV Powertrain Faculty Fellowship", type: "RESEARCH", domain: "EV & Battery Systems", dur: "6 weeks (On-site)", loc: "Pune", comp: "Research fellowship", desc: "Collaborate with Tata Motors automotive engineers on electrochemical battery safety research." },
+    // 18: Reliance Jio Platforms
+    { ind: 18, title: "Reliance Jio 5G Telecom Virtualization Masterclass", type: "FDP", domain: "5G Core & Kubernetes", dur: "2 weeks (Online)", loc: "Online", comp: "Jio Certificate", desc: "Training engineering professors on indigenously engineered 5G networks and edge CDNs." },
   ] as const;
 
   for (const fp of facultyProgramDefs) {
-    await prisma.facultyProgramListing.create({
-      data: {
-        companyId: industryUserIds[fp.ind],
-        title: fp.title,
-        description: fp.desc,
-        programType: fp.type,
-        domain: fp.domain,
-        duration: fp.dur,
-        location: fp.loc,
-        compensation: fp.comp,
-      },
-    });
+    await retry(() =>
+      prisma.facultyProgramListing.create({
+        data: {
+          companyId: industryUserIds[fp.ind],
+          title: fp.title,
+          description: fp.desc,
+          programType: fp.type,
+          domain: fp.domain,
+          duration: fp.dur,
+          location: fp.loc,
+          compensation: fp.comp,
+        },
+      })
+    );
   }
 
   // ----- PORTFOLIO ITEMS (Student digital portfolio) -----
