@@ -23,6 +23,11 @@ import {
   X,
 } from "lucide-react";
 import { Badge, Button, Card, EmptyState, PageHeader } from "@/components/ui";
+import {
+  YEARLY_PLACEMENT_DATA,
+  matchCorporatePartner,
+  type CompanyPlacementRecord,
+} from "@/lib/placementYearlyData";
 
 export interface PartnerData {
   id: string;
@@ -202,7 +207,7 @@ const CATEGORIES = [
 export function PartnersClient({ partners }: PartnersClientProps) {
   const [searchQuery, setSearchQuery] = useState("");
   const [selectedCategory, setSelectedCategory] = useState<string>("All Domains");
-  const [activeFilter, setActiveFilter] = useState<"ALL" | "CHALLENGES" | "INTERNSHIPS" | "STRATEGIC">("ALL");
+  const [activeFilter, setActiveFilter] = useState<"ALL" | "CHALLENGES" | "INTERNSHIPS" | "STRATEGIC" | "PLACEMENTS">("ALL");
   const [collaborationTarget, setCollaborationTarget] = useState<PartnerData | null>(null);
   const [proposalSuccess, setProposalSuccess] = useState<string | null>(null);
   const [isSubmitting, setIsSubmitting] = useState(false);
@@ -266,10 +271,42 @@ export function PartnersClient({ partners }: PartnersClientProps) {
       if (activeFilter === "STRATEGIC" && !meta.tier.includes("Strategic")) {
         return false;
       }
+      if (activeFilter === "PLACEMENTS") {
+        const hasPlacement = YEARLY_PLACEMENT_DATA.some((yd) =>
+          yd.companies.some((c) => {
+            const matched = matchCorporatePartner(c.companyName);
+            return (
+              matched === name ||
+              c.companyName.toLowerCase() === name.toLowerCase() ||
+              c.companyName.toLowerCase().includes(name.toLowerCase()) ||
+              name.toLowerCase().includes(c.companyName.toLowerCase())
+            );
+          })
+        );
+        if (!hasPlacement) return false;
+      }
 
       return true;
     });
   }, [partners, searchQuery, selectedCategory, activeFilter]);
+
+  const getPartnerPlacementRecord = (companyName: string) => {
+    for (const yd of YEARLY_PLACEMENT_DATA) {
+      const found = yd.companies.find((c) => {
+        const matched = matchCorporatePartner(c.companyName);
+        return (
+          matched === companyName ||
+          c.companyName.toLowerCase() === companyName.toLowerCase() ||
+          c.companyName.toLowerCase().includes(companyName.toLowerCase()) ||
+          companyName.toLowerCase().includes(c.companyName.toLowerCase())
+        );
+      });
+      if (found) {
+        return { ...found, batchYear: yd.year };
+      }
+    }
+    return null;
+  };
 
   const handleInitiateCollab = (e: React.FormEvent) => {
     e.preventDefault();
@@ -448,6 +485,16 @@ export function PartnersClient({ partners }: PartnersClientProps) {
             >
               With Internships
             </button>
+            <button
+              onClick={() => setActiveFilter("PLACEMENTS")}
+              className={`rounded-xl px-3 py-1.5 text-xs font-semibold transition-all ${
+                activeFilter === "PLACEMENTS"
+                  ? "bg-indigo-600 text-white shadow-xs"
+                  : "bg-slate-100 text-slate-600 hover:bg-slate-200/80 dark:bg-slate-800 dark:text-slate-300 dark:hover:bg-slate-700"
+              }`}
+            >
+              Campus Recruiters
+            </button>
           </div>
         </div>
 
@@ -463,7 +510,7 @@ export function PartnersClient({ partners }: PartnersClientProps) {
               className={`rounded-lg px-2.5 py-1 text-xs font-medium transition-all ${
                 selectedCategory === category
                   ? "bg-indigo-50 font-semibold text-indigo-700 ring-1 ring-indigo-300/80 dark:bg-indigo-500/20 dark:text-indigo-300 dark:ring-indigo-500/40"
-                  : "text-slate-500 hover:bg-slate-100 hover:text-slate-800 dark:text-slate-400 dark:hover:bg-slate-800 dark:hover:text-slate-200"
+                  : "bg-slate-100/80 text-slate-600 hover:bg-slate-200/70 dark:bg-slate-800/80 dark:text-slate-400 dark:hover:bg-slate-700"
               }`}
             >
               {category}
@@ -517,6 +564,8 @@ export function PartnersClient({ partners }: PartnersClientProps) {
 
             const websiteUrl =
               partner.profile?.websiteUrl || `https://www.google.com/search?q=${encodeURIComponent(companyName)}`;
+
+            const placementRecord = getPartnerPlacementRecord(companyName);
 
             return (
               <Card
@@ -598,6 +647,40 @@ export function PartnersClient({ partners }: PartnersClientProps) {
                         )}
                       </div>
                     )}
+
+                    {/* Campus Placement Record Match */}
+                    {placementRecord && (
+                      <div className="mt-3.5 rounded-xl border border-indigo-100 bg-indigo-50/60 p-3 text-xs dark:border-indigo-900/50 dark:bg-indigo-950/25">
+                        <div className="flex items-center justify-between">
+                          <span className="flex items-center gap-1.5 font-bold text-indigo-700 dark:text-indigo-300">
+                            <Briefcase className="size-3.5 text-indigo-600 dark:text-indigo-400" />
+                            Campus Recruiter ({placementRecord.batchYear})
+                          </span>
+                          <span className="rounded-full bg-indigo-100 px-2 py-0.5 text-[10px] font-extrabold text-indigo-800 dark:bg-indigo-900/70 dark:text-indigo-200">
+                            {placementRecord.placedCount} Placed
+                          </span>
+                        </div>
+                        <div className="mt-1.5 flex items-center justify-between text-[11px] text-slate-600 dark:text-slate-300">
+                          <span>
+                            CTC: <strong className="text-slate-900 dark:text-slate-100">{placementRecord.ctcRange}</strong>
+                          </span>
+                          <span className="font-semibold text-emerald-600 dark:text-emerald-400">
+                            Avg ₹{placementRecord.avgCtcLpa} LPA
+                          </span>
+                        </div>
+                        <div className="mt-2 pt-1.5 border-t border-indigo-100 dark:border-indigo-900/40 flex items-center justify-between text-[10px]">
+                          <span className="text-slate-500 dark:text-slate-400 truncate max-w-[170px]">
+                            {placementRecord.roles[0]}
+                          </span>
+                          <Link
+                            href={`/placements?search=${encodeURIComponent(companyName)}`}
+                            className="font-semibold text-indigo-600 hover:text-indigo-700 dark:text-indigo-400 hover:underline inline-flex items-center gap-0.5 shrink-0"
+                          >
+                            <span>Placement Records →</span>
+                          </Link>
+                        </div>
+                      </div>
+                    )}
                   </div>
                 </div>
 
@@ -639,9 +722,17 @@ export function PartnersClient({ partners }: PartnersClientProps) {
 
                     <Link
                       href="/challenges"
-                      className="inline-flex h-8 items-center justify-center rounded-xl bg-indigo-50 px-3 text-xs font-semibold text-indigo-700 hover:bg-indigo-100 dark:bg-indigo-500/15 dark:text-indigo-300 dark:hover:bg-indigo-500/25"
+                      className="inline-flex h-8 items-center justify-center rounded-xl bg-indigo-50 px-2.5 text-xs font-semibold text-indigo-700 hover:bg-indigo-100 dark:bg-indigo-500/15 dark:text-indigo-300 dark:hover:bg-indigo-500/25"
                     >
                       Challenges →
+                    </Link>
+
+                    <Link
+                      href={`/placements?search=${encodeURIComponent(companyName)}`}
+                      className="inline-flex h-8 items-center justify-center rounded-xl border border-border-muted bg-surface px-2.5 text-xs font-semibold text-slate-700 hover:border-indigo-300 hover:text-indigo-600 dark:text-slate-300 dark:hover:text-indigo-400 transition-colors"
+                      title="View campus placement history in Placement Tracker"
+                    >
+                      Placements →
                     </Link>
 
                     {websiteUrl && (
