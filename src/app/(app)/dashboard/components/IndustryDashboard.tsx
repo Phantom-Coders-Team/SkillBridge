@@ -322,6 +322,14 @@ export function IndustryDashboard({
                 title="Student Projects Awaiting Industry Sign-Off"
                 subtitle="Validate student capstones to certify industry readiness."
                 icon={Award}
+                action={
+                  <Link
+                    href="/proof-of-work"
+                    className="text-xs font-semibold text-amber-600 hover:underline dark:text-amber-400"
+                  >
+                    View All ({stats.pendingProofsCount}) →
+                  </Link>
+                }
               />
               <div className="divide-y divide-border-muted">
                 {pendingProofs.map((proof) => (
@@ -335,7 +343,7 @@ export function IndustryDashboard({
                       </p>
                     </div>
                     <Link
-                      href="/proof-of-work"
+                      href={`/proof-of-work/${proof.id}`}
                       className="rounded-lg bg-amber-50 px-3 py-1 text-xs font-semibold text-amber-700 hover:bg-amber-100 dark:bg-amber-500/15 dark:text-amber-300"
                     >
                       Verify →

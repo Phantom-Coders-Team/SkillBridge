@@ -54,6 +54,7 @@ const INDUSTRIES_NAV: NavItem[] = [
   { label: "Reverse Placement (Pitches)", href: "/reverse-placement", icon: TrendingUp },
   { label: "Host Mentor Slots", href: "/mentor-slots", icon: CalendarClock },
   { label: "Joint Evaluation (Dual)", href: "/dual-grading", icon: Scale },
+  { label: "Proof of Work Review", href: "/proof-of-work", icon: Award },
 ];
 
 const INSTITUTIONS_NAV: NavItem[] = [
