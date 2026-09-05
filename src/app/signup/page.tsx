@@ -87,10 +87,10 @@ const ROLE_PITCHES: Record<
     tag: "For Academicians & Faculty",
     heading: "Bridge academic excellence with real industry.",
     description:
-      "Mentor student capstone challenges, supervise industry R&D labs, collaborate on sabbaticals, and award dual gradings.",
+      "Mentor student capstone challenges, supervise industry R&D labs, collaborate on sabbaticals, and perform joint evaluations.",
     features: [
       "Capstone problem review & R&D lab supervision",
-      "Dual-grading portal with Placement Readiness Index (PRI)",
+      "Joint evaluation portal with Placement Readiness Index (PRI)",
       "Faculty-industry sabbatical and training exchange",
       "Cross-college mentorship & live office hours",
     ],

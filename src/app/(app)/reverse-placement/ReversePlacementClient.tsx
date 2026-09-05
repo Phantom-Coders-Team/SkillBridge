@@ -325,7 +325,7 @@ export function ReversePlacementClient({
                     <span className="font-bold text-slate-800 dark:text-slate-200">{myCandidate.pri.breakdown.proofOfWork}/150</span>
                   </div>
                   <div className="flex items-center justify-between p-2 rounded-lg bg-surface-muted">
-                    <span className="text-slate-500">Dual Grading:</span>
+                    <span className="text-slate-500">Joint Evaluation:</span>
                     <span className="font-bold text-slate-800 dark:text-slate-200">{myCandidate.pri.breakdown.dualGrading}/150</span>
                   </div>
                   <div className="flex items-center justify-between p-2 rounded-lg bg-surface-muted">
@@ -485,7 +485,7 @@ export function ReversePlacementClient({
                 Placement Readiness Index Leaderboard
               </h2>
               <p className="text-xs text-slate-500 dark:text-slate-400">
-                Ranked by multi-factor PRI score: skills, projects, proofs of work, dual grading, mentorship and challenges.
+                Ranked by multi-factor PRI score: skills, projects, proofs of work, joint evaluation, mentorship and challenges.
               </p>
             </div>
 
@@ -796,12 +796,12 @@ export function ReversePlacementClient({
                   </span>
                 </div>
 
-                {/* 4. Dual Grading */}
+                {/* 4. Joint Evaluation */}
                 <div className="p-2.5 rounded-xl border border-border-muted bg-surface-muted/50 flex items-center justify-between">
                   <div className="flex items-center gap-2">
                     <BookOpen className="size-4 text-amber-600" />
                     <div>
-                      <p className="font-semibold text-slate-900 dark:text-slate-100">Academic & Industry Dual Grading</p>
+                      <p className="font-semibold text-slate-900 dark:text-slate-100">Academic & Industry Joint Evaluation</p>
                       <p className="text-[11px] text-slate-400">Standardized capstone rubrics</p>
                     </div>
                   </div>

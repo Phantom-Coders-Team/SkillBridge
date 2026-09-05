@@ -20,7 +20,7 @@ export default async function DualGradingPage() {
 
   const normalizedRole = normalizeRole(user.role);
 
-  // Fetch dual grading records
+  // Fetch joint evaluation records
   // For maximum utility during judging and real workflows, we fetch records
   // with full relational metadata: challenge, lab unit squad, and evaluators.
   const [gradings, challenges, labUnits] = await Promise.all([
@@ -202,8 +202,8 @@ export default async function DualGradingPage() {
       {/* Top Header */}
       <PageHeader
         icon={Scale}
-        title="Dual-Grading Matrix & Evaluation Console"
-        subtitle="Simultaneous academic rigor & corporate job-readiness evaluation. Dual sign-offs feed student Placement Readiness Index (PRI) and verify cryptographic proof-of-work."
+        title="Joint Evaluation Console"
+        subtitle="Simultaneous academic rigor & corporate job-readiness evaluation. Joint sign-offs feed student Placement Readiness Index (PRI) and verify cryptographic proof-of-work."
       />
 
       {/* KPI Stat Cards */}
@@ -213,7 +213,7 @@ export default async function DualGradingPage() {
           value={totalCount}
           icon={FlaskConical}
           tone="indigo"
-          sub={`${completedCount} dual-certified`}
+          sub={`${completedCount} joint-certified`}
         />
         <StatCard
           label="Avg Academic Rigor"

@@ -156,7 +156,7 @@ export default function DualGradingClient({
                       Your capstone deliverables are evaluated simultaneously by your
                       <strong className="text-indigo-900 dark:text-indigo-200"> Faculty Advisor</strong> (academic rigor) and your
                       <strong className="text-purple-900 dark:text-purple-200"> Corporate Sponsor</strong> (production readiness).
-                      Completed dual reviews contribute up to <span className="font-semibold text-emerald-700 dark:text-emerald-400">+150 points to your PRI score</span> and seal your tamper-proof Proof of Work!
+                      Completed joint reviews contribute up to <span className="font-semibold text-emerald-700 dark:text-emerald-400">+150 points to your PRI score</span> and seal your tamper-proof Proof of Work!
                     </>
                   ) : isIndustry ? (
                     <>
@@ -171,7 +171,7 @@ export default function DualGradingClient({
                   ) : (
                     <>
                       Monitor collaborative student-industry capstone evaluations across all engineering departments.
-                      Dual-evaluated projects provide 100% auditable documentation for <span className="font-semibold text-emerald-700 dark:text-emerald-400">NAAC Criteria 1 & 2</span> and NBA accreditation.
+                      Joint-evaluated projects provide 100% auditable documentation for <span className="font-semibold text-emerald-700 dark:text-emerald-400">NAAC Criteria 1 & 2</span> and NBA accreditation.
                     </>
                   )}
                 </p>
@@ -296,7 +296,7 @@ export default function DualGradingClient({
             }`}
           >
             <CheckCircle2 className="size-3.5" />
-            Dual-Certified
+            Joint-Certified
             <span className={`rounded-full px-1.5 py-0.2 text-[10px] ${
               activeTab === "completed" ? "bg-white/20 text-white" : "bg-emerald-100 text-emerald-800 dark:bg-emerald-900/60 dark:text-emerald-200"
             }`}>
@@ -324,7 +324,7 @@ export default function DualGradingClient({
               className="inline-flex h-9 items-center gap-1.5 rounded-xl bg-indigo-600 px-3.5 text-xs font-semibold text-white shadow-sm hover:bg-indigo-700 active:scale-[0.98]"
             >
               <Plus className="size-4" />
-              <span>Initiate Dual Grading</span>
+              <span>Initiate Joint Evaluation</span>
             </button>
           )}
         </div>
@@ -337,7 +337,7 @@ export default function DualGradingClient({
             <Scale className="size-6" />
           </div>
           <h3 className="mt-3 text-sm font-bold text-slate-900 dark:text-slate-100">
-            No matching dual-grading records
+            No matching joint evaluation records
           </h3>
           <p className="mt-1 text-xs text-slate-500 dark:text-slate-400 max-w-sm">
             {searchQuery
@@ -346,7 +346,7 @@ export default function DualGradingClient({
               ? "All your assigned deliverables have been evaluated. Great job!"
               : activeTab === "mySquad"
               ? "No active project deliverables found for your student squad yet."
-              : "No dual grading sessions initiated in this category yet."}
+              : "No joint evaluation sessions initiated in this category yet."}
           </p>
           {(isFaculty || isIndustry) && (
             <button
@@ -354,7 +354,7 @@ export default function DualGradingClient({
               className="mt-4 inline-flex items-center gap-1.5 rounded-xl bg-indigo-600 px-4 py-2 text-xs font-semibold text-white shadow-xs hover:bg-indigo-700"
             >
               <Plus className="size-3.5" />
-              Initiate New Grading Session
+              Initiate Joint Evaluation Session
             </button>
           )}
         </div>
@@ -366,6 +366,8 @@ export default function DualGradingClient({
               grading={g}
               role={role}
               currentUserId={userId}
+              availableChallenges={availableChallenges}
+              availableLabUnits={availableLabUnits}
             />
           ))}
         </div>

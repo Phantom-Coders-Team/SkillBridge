@@ -370,7 +370,7 @@ export function InstitutionDashboard({
             <div className="mt-4 space-y-2">
               <div className="rounded-xl bg-white/10 p-3 text-xs">
                 <p className="font-semibold text-white">NBA OBE Compliance</p>
-                <p className="mt-0.5 text-amber-100">Course Outcomes (CO) directly map to Industry Challenge dual grading.</p>
+                <p className="mt-0.5 text-amber-100">Course Outcomes (CO) directly map to Industry Challenge joint evaluation.</p>
               </div>
               <div className="rounded-xl bg-white/10 p-3 text-xs">
                 <p className="font-semibold text-white">Placement Transparency</p>

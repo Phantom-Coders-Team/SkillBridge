@@ -34,7 +34,7 @@ const DEMO_ACCOUNTS = [
 const FEATURES = [
   "Verifiable proof of work & credentials",
   "Capstone and R&D challenge marketplace",
-  "Dual-graded placements with live PRI scores",
+  "Joint evaluation placements with live PRI scores",
   "1:1 Industry mentorship & live code clinics",
 ];
 

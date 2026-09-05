@@ -3,7 +3,7 @@
 # 🎓 SkillBridge
 ### **Next-Gen AI & Blockchain-Powered Academia–Industry Collaboration Ecosystem**
 
-*Empowering Students, Faculty, Industry Leaders, and Academic Institutions through Verifiable Skills, Dual Grading, AI Curriculum Modernization, and Reverse Campus Placement.*
+*Empowering Students, Faculty, Industry Leaders, and Academic Institutions through Verifiable Skills, Joint Evaluation, AI Curriculum Modernization, and Reverse Campus Placement.*
 
 ---
 
@@ -41,7 +41,7 @@ In India's higher education ecosystem, **over 80% of engineering graduates are d
           ▼                     ▼                     ▼
 ┌──────────────────┐  ┌──────────────────┐  ┌──────────────────┐
 │     STUDENTS     │  │     FACULTY      │  │    INDUSTRY      │
-│ • Proof-of-Work  │  │ • Dual Grading   │  │ • Challenges     │
+│ • Proof-of-Work  │  │ • Joint Eval     │  │ • Challenges     │
 │ • Skill Decay    │  │ • Lab Units      │  │ • Job Pitches    │
 │ • PRI Score      │  │ • AI Audit       │  │ • Mentorship     │
 │ • Reverse Plcmt. │  │ • Sabbaticals    │  │ • e-RUPI Vouchers│
@@ -65,7 +65,7 @@ A dynamic, tamper-resistant score that replaces static CGPA with continuous, mul
 - **Skill Competency Score:** Up to 300 pts (Calibrated via diagnostic assessments)
 - **Verified Projects Completed:** Up to 250 pts (Verified milestone deliveries)
 - **Verifiable Proof of Work:** Up to 150 pts (Faculty + Industry dual signatures)
-- **Dual Grading Performance:** Up to 150 pts (Academic marks + Corporate readiness)
+- **Joint Evaluation Performance:** Up to 150 pts (Academic marks + Corporate readiness)
 - **Mentorship & Office Hours:** Up to 100 pts (Active participation in 1:1 clinics)
 - **Industry Challenge Solves:** Up to 50 pts (Micro-consultancies & hackathons)
 
@@ -86,7 +86,7 @@ Flips traditional campus hiring upside down. Students with **PRI ≥ 850** becom
 - **Dynamic Assessments:** Aptitude, Logical Reasoning, and Technical tracks that automatically pinpoint strengths and upskill gaps into a verified skill graph.
 - **AI Resume Parser:** 1-click automatic skill extraction directly into the student's digital portfolio.
 
-### 6. ⚖️ Dual Grading Matrix
+### 6. ⚖️ Joint Evaluation Matrix
 - Bridges academic rigor with industry standards.
 - Faculty assess academic fundamentals (algorithms, documentation, discipline).
 - Corporate leads assess enterprise readiness (production-level code, system design, test coverage, agility).
@@ -111,8 +111,8 @@ Flips traditional campus hiring upside down. Students with **PRI ≥ 850** becom
 | Stakeholder | Key Features & Capabilities | SIH Impact & Value |
 |:---|:---|:---|
 | **👨‍🎓 Student** | • Multi-factor PRI 0–1000 Tracker<br>• Proof-of-Work Portfolio with QR Verification<br>• Dynamic Skill Assessments & Auto-Resume Parsing<br>• Reverse Placement Job Pitches<br>• 1:1 Mentor Booking & Office Hours<br>• Internship & Apprenticeship Marketplace | Transforms passive learners into verified builders with immutable credentials. |
-| **👩‍🏫 Academician** | • Faculty Portal & Industry Sabbatical Exchange<br>• AI Syllabus Obsolescence Audit & Patching<br>• Lab Unit Incubator Management<br>• Dual Grading Evaluation Console<br>• AICTE-Recognized Faculty Development Programs (FDP) | Enables faculty to stay updated with industry trends and engage in paid consultancies. |
-| **🏢 Industry Partner** | • Capstone & R&D Challenge Marketplace<br>• Reverse Placement Direct Candidate Outreach<br>• Dual Grading on Real-World Deliverables<br>• Mentor Slot Scheduling & 1:1 Code Clinics<br>• Purpose-Bound e-RUPI Education Voucher Issuance | Drastically cuts hiring turnaround time and retraining costs through verified talent pipelines. |
+| **👩‍🏫 Academician** | • Faculty Portal & Industry Sabbatical Exchange<br>• AI Syllabus Obsolescence Audit & Patching<br>• Lab Unit Incubator Management<br>• Joint Evaluation Console<br>• AICTE-Recognized Faculty Development Programs (FDP) | Enables faculty to stay updated with industry trends and engage in paid consultancies. |
+| **🏢 Industry Partner** | • Capstone & R&D Challenge Marketplace<br>• Reverse Placement Direct Candidate Outreach<br>• Joint Evaluation on Real-World Deliverables<br>• Mentor Slot Scheduling & 1:1 Code Clinics<br>• Purpose-Bound e-RUPI Education Voucher Issuance | Drastically cuts hiring turnaround time and retraining costs through verified talent pipelines. |
 | **🏛️ Institution / TPO** | • Institutional Admin View & Analytics Dashboard<br>• Department-Level Skill Gap Heatmaps<br>• Real-Time Placement Tracker & Job Pitch Funnel<br>• NAAC, NBA, and NIRF Accreditation Metrics<br>• Industry Partner Directory & MoUs | Provides actionable macro insights to modernize curricula and achieve 100% placement success. |
 
 ---
@@ -138,7 +138,7 @@ flowchart TB
     subgraph CoreEngines ["Domain & Logic Engines"]
         PRI["Placement Readiness Index (PRI Engine 0-1000)"]
         DecayEngine["Temporal Skill Decay Engine (Active/Stale/Expired)"]
-        DualGrading["Dual Grading Evaluator (Academic + Industry)"]
+        DualGrading["Joint Evaluation (Academic + Industry)"]
         AuditEngine["AI Syllabus Obsolescence Engine (Gemini 1.5 + Rules)"]
         TokenLedger["Skill Token Economy & Office Hours Scheduler"]
         MatchEngine["Skill Match & Recommendation Algorithm"]
@@ -177,7 +177,7 @@ sequenceDiagram
     Industry->>Faculty: Post Industry Challenge (Capstone / R&D)
     Faculty->>Student: Create Lab Unit & Onboard Student Team
     Student->>Faculty: Submit Milestone & Real-World Code Artifacts
-    Faculty->>Industry: Dual Grading Review
+    Faculty->>Industry: Joint Evaluation Review
     Industry->>Student: Grade Job Readiness & Sign-Off Proof of Work
     Note over Student,Industry: SHA-256 Hashed, Block Committed, QR Generated
     Student->>Student: PRI Engine Computes Verified Score (+Points)
@@ -204,8 +204,8 @@ All demo accounts are pre-configured with password: `Password@123`
 | Persona | Role | Seeded Email | Key Areas to Evaluate |
 |:---|:---|:---|:---|
 | **Aarav Sharma** | `STUDENT` | `aarav.sharma@student.edu` | **PRI Breakdown**, Proof of Work, Skill Decay, Reverse Placement, Portfolio QR |
-| **Dr. Rajesh Kumar** | `ACADEMICIAN` | `rajesh.kumar@faculty.edu` | **AI Syllabus Audit**, Dual Grading Console, Lab Units, Sabbatical Listings |
-| **Infosys Campus Lead** | `INDUSTRY` | `recruit@infosys.com` | **Post Challenges**, Reverse Placement Pitches, Mentor Slots, Dual Grading |
+| **Dr. Rajesh Kumar** | `ACADEMICIAN` | `rajesh.kumar@faculty.edu` | **AI Syllabus Audit**, Joint Evaluation Console, Lab Units, Sabbatical Listings |
+| **Infosys Campus Lead** | `INDUSTRY` | `recruit@infosys.com` | **Post Challenges**, Reverse Placement Pitches, Mentor Slots, Joint Evaluation |
 | **Dr. Lakshmi Narayanan** | `INSTITUTION` | `tpo@university.edu` | **Skill Gap Heatmap**, Placement Tracker, Accreditation Metrics, Partner MoUs |
 
 ### 3. Suggested 3-Minute Hackathon Evaluation Flow
@@ -310,7 +310,7 @@ SkillBridge/
 │   │   │   ├── proof-of-work/# Verifiable project proofs & blockchain explorer
 │   │   │   ├── reverse-placement/ # Reverse hiring marketplace (PRI 850+)
 │   │   │   ├── syllabus/     # AI-driven syllabus obsolescence audit
-│   │   │   ├── dual-grading/ # Academic & Industry evaluation console
+│   │   │   ├── dual-grading/ # Joint evaluation console (Academic & Industry)
 │   │   │   ├── challenges/   # Industry challenges & capstone marketplace
 │   │   │   ├── lab-units/    # Faculty-led incubator teams
 │   │   │   ├── heatmap/      # Institutional skill gap analytics

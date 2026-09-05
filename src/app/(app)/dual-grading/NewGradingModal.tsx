@@ -76,7 +76,7 @@ export default function NewGradingModal({
             </div>
             <div>
               <h2 className="text-lg font-bold text-slate-900 dark:text-slate-100">
-                Initiate Dual-Grading Session
+                Initiate Joint Evaluation Session
               </h2>
               <p className="text-xs text-slate-500 dark:text-slate-400">
                 Pair an active Industry Challenge with a Student Lab Unit for simultaneous review.
@@ -159,7 +159,7 @@ export default function NewGradingModal({
           {status?.success && (
             <div className="flex items-center gap-2 rounded-xl bg-emerald-50 p-3 text-xs text-emerald-700 dark:bg-emerald-950/40 dark:text-emerald-300">
               <CheckCircle2 className="size-4 shrink-0" />
-              <span>Dual-grading session created! Initializing review matrix...</span>
+              <span>Joint evaluation session created! Initializing review matrix...</span>
             </div>
           )}
 

@@ -106,7 +106,7 @@ export function AcademicianDashboard({
             Welcome back, {name}
           </h1>
           <p className="mt-1 text-sm text-slate-500 dark:text-slate-400">
-            {dateLabel} — Guide capstone lab units, evaluate dual-grading submissions, and patch curriculum gaps.
+            {dateLabel} — Guide capstone lab units, evaluate joint evaluation submissions, and patch curriculum gaps.
           </p>
 
           {/* Quick Action Navigation Chips */}
@@ -145,7 +145,7 @@ export function AcademicianDashboard({
               className="inline-flex items-center gap-2 rounded-xl border border-border-muted bg-white px-3.5 py-2 text-xs font-semibold text-slate-700 shadow-xs transition-all hover:border-emerald-200 hover:bg-slate-50 active:scale-[0.98] dark:bg-surface dark:text-slate-200 dark:hover:bg-slate-800"
             >
               <Scale className="size-4 text-amber-500" />
-              Dual Grading Console
+              Joint Evaluation Console
               <ArrowRight className="size-3.5" />
             </Link>
           </div>
@@ -176,7 +176,7 @@ export function AcademicianDashboard({
           sub="AI obsolescence tracking"
         />
         <StatCard
-          label="Dual Gradings Due"
+          label="Joint Evaluations Due"
           value={stats.dualGradingsCount}
           icon={Scale}
           tone="violet"
@@ -386,11 +386,11 @@ export function AcademicianDashboard({
               <span className="flex size-7 items-center justify-center rounded-lg bg-white/20">
                 <Scale className="size-4 text-emerald-200" />
               </span>
-              <h2 className="text-sm font-bold tracking-tight text-white">Dual-Grading & Accreditation</h2>
+              <h2 className="text-sm font-bold tracking-tight text-white">Joint Evaluation & Accreditation</h2>
             </div>
 
             <p className="mt-2 text-xs leading-relaxed text-emerald-100">
-              Dual-graded student projects count directly towards NBA Outcome-Based Education (OBE) metrics and NAAC Criteria 1.3. Prompt sign-offs boost your institution&apos;s PRI ranking.
+              Joint-evaluated student projects count directly towards NBA Outcome-Based Education (OBE) metrics and NAAC Criteria 1.3. Prompt sign-offs boost your institution&apos;s PRI ranking.
             </p>
 
             <div className="mt-4 space-y-2">
@@ -408,7 +408,7 @@ export function AcademicianDashboard({
               href="/dual-grading"
               className="mt-5 inline-flex w-full items-center justify-center gap-2 rounded-xl bg-white px-4 py-2.5 text-xs font-bold text-emerald-800 shadow-md transition-transform hover:scale-[1.02] active:scale-[0.98]"
             >
-              Open Dual Grading Console <ArrowRight className="size-3.5" />
+              Open Joint Evaluation Console <ArrowRight className="size-3.5" />
             </Link>
           </Card>
 
@@ -461,7 +461,7 @@ export function AcademicianDashboard({
                 "Clear pending sign-offs within 48 hours.",
                 "Review syllabus obsolescence index every term.",
                 "Assign lab units to real corporate challenges.",
-                "Input dual-grading academic marks upon completion.",
+                "Input joint evaluation academic marks upon completion.",
               ].map((step, idx) => (
                 <li key={step} className="flex items-start gap-2.5">
                   <span className="mt-0.5 flex size-5 shrink-0 items-center justify-center rounded-full bg-emerald-600 text-[10px] font-bold text-white">
