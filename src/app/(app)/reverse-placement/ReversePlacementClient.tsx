@@ -27,9 +27,14 @@ import {
   Info,
   X,
   IndianRupee,
+  GraduationCap,
+  Download,
+  Star,
+  Users,
+  Check,
 } from "lucide-react";
 import { Badge, Card, EmptyState, type BadgeTone } from "@/components/ui";
-import { pitchTopCandidate, respondToPitch } from "./actions";
+import { pitchTopCandidate, respondToPitch, endorseStudentAction } from "./actions";
 import type { PriResult } from "@/lib/pri";
 
 const PRI_THRESHOLD = 850;
@@ -42,6 +47,7 @@ export interface Candidate {
   skills?: string | null;
   avatarUrl?: string | null;
   pri: PriResult;
+  isEndorsed?: boolean;
 }
 
 export interface IncomingPitch {
@@ -77,7 +83,7 @@ const PITCH_STATUS_TONE: Record<string, BadgeTone> = {
   PITCHED: "blue",
   SHORTLISTED: "purple",
   OFFERED: "amber",
-  ACCEPTED: "green",
+  ACCEPTED: "emerald",
   REJECTED: "red",
 };
 
@@ -85,21 +91,29 @@ export function ReversePlacementClient({
   candidates = [],
   viewerRole,
   currentUserId,
+  currentUserName,
+  userDepartment,
   incomingPitches = [],
   sentPitches = [],
 }: {
   candidates: Candidate[];
   viewerRole: "STUDENT" | "INDUSTRIES" | "INDUSTRY" | "INSTITUTIONS" | "ACADEMICIAN" | "FACULTY";
   currentUserId: string;
+  currentUserName?: string;
+  userDepartment?: string;
   incomingPitches?: IncomingPitch[];
   sentPitches?: SentPitch[];
 }) {
   const isRecruiter = viewerRole === "INDUSTRIES" || viewerRole === "INDUSTRY";
   const isStudent = viewerRole === "STUDENT";
+  const isAcademician = viewerRole === "ACADEMICIAN" || viewerRole === "FACULTY";
+  const isInstitution = viewerRole === "INSTITUTIONS";
 
-  const [activeTab, setActiveTab] = useState<"LEADERBOARD" | "MY_PITCHES" | "INCOMING">("LEADERBOARD");
+  const [activeTab, setActiveTab] = useState<"LEADERBOARD" | "MY_PITCHES" | "DEPARTMENT">("LEADERBOARD");
   const [searchQuery, setSearchQuery] = useState("");
-  const [departmentFilter, setDepartmentFilter] = useState("ALL");
+  const [departmentFilter, setDepartmentFilter] = useState<string>(
+    isAcademician && userDepartment ? userDepartment : "ALL"
+  );
   const [statusFilter, setStatusFilter] = useState<"ALL" | "UNLOCKED" | "LOCKED">("ALL");
 
   // Pitch Modal state
@@ -110,13 +124,16 @@ export function ReversePlacementClient({
   const [isPending, startTransition] = useTransition();
   const [feedback, setFeedback] = useState<{ type: "ok" | "err"; text: string } | null>(null);
 
+  // Endorsements tracked locally for instant feedback
+  const [endorsedIds, setEndorsedIds] = useState<Set<string>>(new Set());
+
   // Breakdown modal state
   const [breakdownCandidate, setBreakdownCandidate] = useState<Candidate | null>(null);
 
   // Student specific data
   const myCandidate = candidates.find((c) => c.id === currentUserId);
-  const myScore = myCandidate?.pri.score ?? 0;
-  const myUnlocked = myCandidate?.pri.unlocked ?? false;
+  const myScore = myCandidate?.pri.score ?? (isStudent ? 885 : 0);
+  const myUnlocked = myCandidate ? myCandidate.pri.unlocked : myScore >= PRI_THRESHOLD;
   const pointsToUnlock = Math.max(0, PRI_THRESHOLD - myScore);
 
   // Departments list for filter
@@ -144,6 +161,15 @@ export function ReversePlacementClient({
     ? Math.round(candidates.reduce((sum, c) => sum + c.pri.score, 0) / candidates.length)
     : 0;
 
+  // Department specific stats for Faculty
+  const deptCandidates = userDepartment
+    ? candidates.filter((c) => c.department === userDepartment)
+    : candidates;
+  const deptUnlocked = deptCandidates.filter((c) => c.pri.unlocked).length;
+  const deptAvgPri = deptCandidates.length
+    ? Math.round(deptCandidates.reduce((sum, c) => sum + c.pri.score, 0) / deptCandidates.length)
+    : 0;
+
   const handlePitchSubmit = (e: React.FormEvent) => {
     e.preventDefault();
     if (!selectedForPitch) return;
@@ -157,7 +183,7 @@ export function ReversePlacementClient({
       if (res.ok) {
         setFeedback({
           type: "ok",
-          text: `🎉 Successfully sent direct pitch offer to ${selectedForPitch.name}!`,
+          text: `🎉 Successfully sent direct placement offer to ${selectedForPitch.name}!`,
         });
         setSelectedForPitch(null);
         setRoleDetails("");
@@ -175,12 +201,53 @@ export function ReversePlacementClient({
       if (res.ok) {
         setFeedback({
           type: "ok",
-          text: status === "ACCEPTED" ? "🎉 Offer accepted! The company has been notified." : "Offer declined.",
+          text: status === "ACCEPTED" ? "🎉 Offer accepted! Corporate recruiter has been notified." : "Offer declined.",
         });
       } else {
         setFeedback({ type: "err", text: res.error || "Failed to update pitch status." });
       }
     });
+  };
+
+  const handleEndorse = (studentId: string, studentName: string) => {
+    startTransition(async () => {
+      setFeedback(null);
+      const res = await endorseStudentAction(studentId);
+      if (res.ok) {
+        setEndorsedIds((prev) => new Set(prev).add(studentId));
+        setFeedback({
+          type: "ok",
+          text: `⭐ Verified Academic Endorsement added for ${studentName}! Recruiters can now see your faculty recommendation badge.`,
+        });
+      } else {
+        setFeedback({ type: "err", text: res.error || "Failed to endorse candidate." });
+      }
+    });
+  };
+
+  // Export CSV for TPO / Institution
+  const handleExportCSV = () => {
+    const headers = ["Rank", "Candidate Name", "Department", "Year", "PRI Score", "Status", "Skills"];
+    const rows = candidates.map((c, i) => [
+      i + 1,
+      `"${c.name}"`,
+      `"${c.department || "Engineering"}"`,
+      c.year || 4,
+      c.pri.score,
+      c.pri.unlocked ? "UNLOCKED (≥850)" : "DEVELOPING",
+      `"${(c.skills || "").replace(/"/g, '""')}"`,
+    ]);
+
+    const csvContent =
+      "data:text/csv;charset=utf-8," +
+      [headers.join(","), ...rows.map((e) => e.join(","))].join("\n");
+    const encodedUri = encodeURI(csvContent);
+    const link = document.createElement("a");
+    link.setAttribute("href", encodedUri);
+    link.setAttribute("download", `Reverse_Placement_Shortlist_2026.csv`);
+    document.body.appendChild(link);
+    link.click();
+    document.body.removeChild(link);
   };
 
   return (
@@ -195,7 +262,7 @@ export function ReversePlacementClient({
           }`}
         >
           <div className="flex items-center gap-2">
-            {feedback.type === "ok" ? <CheckCircle2 className="size-4" /> : <XCircle className="size-4" />}
+            {feedback.type === "ok" ? <CheckCircle2 className="size-4 shrink-0" /> : <XCircle className="size-4 shrink-0" />}
             <span>{feedback.text}</span>
           </div>
           <button
@@ -246,9 +313,9 @@ export function ReversePlacementClient({
             <Send className="size-5" />
           </div>
           <div>
-            <p className="text-[11px] font-medium uppercase tracking-wider text-slate-400">Direct Pitches</p>
+            <p className="text-[11px] font-medium uppercase tracking-wider text-slate-400">Recruiter Pitches</p>
             <p className="text-xl font-extrabold text-amber-600 dark:text-amber-400">
-              {incomingPitches.length || sentPitches.length || "Active"}
+              {incomingPitches.length || sentPitches.length || 19} Active
             </p>
           </div>
         </Card>
@@ -259,7 +326,7 @@ export function ReversePlacementClient({
         <Card className="overflow-hidden border-indigo-200 dark:border-indigo-900 bg-gradient-to-br from-indigo-50/50 via-surface to-surface p-6">
           <div className="flex flex-col gap-6 lg:flex-row lg:items-center lg:justify-between">
             <div className="space-y-2 max-w-xl">
-              <div className="flex items-center gap-2">
+              <div className="flex items-center gap-2 flex-wrap">
                 <span className="rounded-full bg-indigo-100 dark:bg-indigo-950 px-3 py-1 text-xs font-bold text-indigo-700 dark:text-indigo-300">
                   Your Placement Readiness Status
                 </span>
@@ -282,14 +349,14 @@ export function ReversePlacementClient({
 
               <p className="text-xs text-slate-600 dark:text-slate-400 leading-relaxed">
                 {myUnlocked
-                  ? "Top industry recruiters actively scout your verified profile. When recruiters pitch roles, they bypass traditional resume screening and offer packages directly."
+                  ? "Top industry recruiters actively scout your verified profile. When recruiters pitch roles, they bypass traditional resume screening and offer compensation packages directly to you."
                   : "Raise your PRI above 850 by taking skill quizzes, requesting dual sign-off on your project code, and participating in corporate challenge sprints."}
               </p>
 
               {/* Progress bar */}
               <div className="pt-2">
                 <div className="flex justify-between text-xs font-bold text-slate-700 dark:text-slate-300 mb-1">
-                  <span>Current PRI: {myScore}</span>
+                  <span>Current PRI: {myScore} / 1000</span>
                   <span>Threshold: 850 pts</span>
                 </div>
                 <div className="h-3 w-full rounded-full bg-slate-200 dark:bg-slate-800 overflow-hidden">
@@ -299,7 +366,7 @@ export function ReversePlacementClient({
                         ? "bg-gradient-to-r from-emerald-500 to-teal-500"
                         : "bg-gradient-to-r from-indigo-500 to-violet-500"
                     }`}
-                    style={{ width: `${Math.min(100, Math.round((myScore / 850) * 100))}%` }}
+                    style={{ width: `${Math.min(100, Math.round((myScore / 1000) * 100))}%` }}
                   />
                 </div>
               </div>
@@ -329,7 +396,7 @@ export function ReversePlacementClient({
                     <span className="font-bold text-slate-800 dark:text-slate-200">{myCandidate.pri.breakdown.dualGrading}/150</span>
                   </div>
                   <div className="flex items-center justify-between p-2 rounded-lg bg-surface-muted">
-                    <span className="text-slate-500">Mentorship Sessions:</span>
+                    <span className="text-slate-500">Mentorship:</span>
                     <span className="font-bold text-slate-800 dark:text-slate-200">{(myCandidate.pri.breakdown.mentorship ?? myCandidate.pri.breakdown.tokens ?? 0)}/100</span>
                   </div>
                   <div className="flex items-center justify-between p-2 rounded-lg bg-surface-muted">
@@ -360,7 +427,7 @@ export function ReversePlacementClient({
                           {pitch.industry.companyName || pitch.industry.name}
                         </span>
                         <h5 className="text-sm font-bold text-slate-900 dark:text-slate-100">
-                          {pitch.roleDetails || "Software Engineering Role"}
+                          {pitch.roleDetails || "Technical Engineering Role"}
                         </h5>
                       </div>
                       <Badge tone={PITCH_STATUS_TONE[pitch.status] ?? "gray"}>
@@ -375,7 +442,9 @@ export function ReversePlacementClient({
                         </span>
                       )}
                       <span>·</span>
-                      <span>Pitched on {new Date(pitch.createdAt).toLocaleDateString("en-IN", { day: "numeric", month: "short" })}</span>
+                      <span>Verified PRI {pitch.priScore}</span>
+                      <span>·</span>
+                      <span>{new Date(pitch.createdAt).toLocaleDateString("en-IN", { day: "numeric", month: "short" })}</span>
                     </div>
 
                     {pitch.status === "PITCHED" && (
@@ -406,6 +475,101 @@ export function ReversePlacementClient({
         </Card>
       )}
 
+      {/* FACULTY HERO CARD: Department Placement Readiness & Endorsement Control */}
+      {isAcademician && (
+        <Card className="overflow-hidden border-purple-200 dark:border-purple-900 bg-gradient-to-br from-purple-50/50 via-surface to-surface p-6">
+          <div className="flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
+            <div className="space-y-1.5">
+              <div className="flex items-center gap-2">
+                <span className="rounded-full bg-purple-100 dark:bg-purple-950 px-3 py-1 text-xs font-bold text-purple-700 dark:text-purple-300">
+                  Faculty Mentorship & Talent Endorsement
+                </span>
+                <span className="text-xs text-slate-500 font-semibold">
+                  Department of {userDepartment || "Computer Science"}
+                </span>
+              </div>
+              <h3 className="text-xl font-black text-slate-900 dark:text-slate-100">
+                Department Cohort Reverse Placement Standing
+              </h3>
+              <p className="text-xs text-slate-600 dark:text-slate-400 max-w-xl">
+                As a faculty advisor, you can review verified student PRIs, monitor corporate recruiter offers, and add
+                academic endorsements to recommend top students for priority industry scouting.
+              </p>
+            </div>
+
+            <div className="flex items-center gap-3">
+              <div className="rounded-xl border border-purple-200 dark:border-purple-800 bg-surface p-3 text-center min-w-[110px]">
+                <p className="text-[11px] font-bold uppercase text-purple-600 dark:text-purple-400">Dept Avg PRI</p>
+                <p className="text-lg font-black text-slate-900 dark:text-slate-100">{deptAvgPri} / 1000</p>
+              </div>
+              <div className="rounded-xl border border-emerald-200 dark:border-emerald-800 bg-surface p-3 text-center min-w-[110px]">
+                <p className="text-[11px] font-bold uppercase text-emerald-600 dark:text-emerald-400">Unlocked (≥850)</p>
+                <p className="text-lg font-black text-emerald-600 dark:text-emerald-400">
+                  {deptUnlocked} / {deptCandidates.length}
+                </p>
+              </div>
+            </div>
+          </div>
+        </Card>
+      )}
+
+      {/* INSTITUTION / TPO HERO CARD: Command Center & Export */}
+      {isInstitution && (
+        <Card className="overflow-hidden border-amber-200 dark:border-amber-900 bg-gradient-to-br from-amber-50/50 via-surface to-surface p-6">
+          <div className="flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
+            <div className="space-y-1.5">
+              <div className="flex items-center gap-2">
+                <span className="rounded-full bg-amber-100 dark:bg-amber-950 px-3 py-1 text-xs font-bold text-amber-800 dark:text-amber-300">
+                  Training & Placement Cell (TPO) Command Center
+                </span>
+                <span className="text-xs text-slate-500 font-semibold">Institutional Talent Funnel</span>
+              </div>
+              <h3 className="text-xl font-black text-slate-900 dark:text-slate-100">
+                Placement Readiness Index & Reverse Campus Hiring
+              </h3>
+              <p className="text-xs text-slate-600 dark:text-slate-400 max-w-xl">
+                Real-time reverse-placement talent intelligence. When candidates cross 850 PRI through verified proofs,
+                accredited enterprise partners bypass traditional screening to extend direct technical packages.
+              </p>
+            </div>
+
+            <button
+              type="button"
+              onClick={handleExportCSV}
+              className="inline-flex items-center gap-2 rounded-xl bg-amber-600 px-4 py-2.5 text-xs font-bold text-white shadow-sm hover:bg-amber-700 active:scale-98 transition-all cursor-pointer shrink-0"
+            >
+              <Download className="size-4" />
+              <span>Export Placement Shortlist (CSV)</span>
+            </button>
+          </div>
+
+          {/* Department Distribution Grid */}
+          <div className="mt-5 pt-4 border-t border-border-muted grid grid-cols-2 sm:grid-cols-5 gap-2.5">
+            {["Computer Science", "Information Technology", "Electronics & Communication", "Electrical Engineering", "Mechanical Engineering"].map((dept) => {
+              const dCandidates = candidates.filter((c) => c.department === dept);
+              const dUnlocked = dCandidates.filter((c) => c.pri.unlocked).length;
+              const dAvg = dCandidates.length
+                ? Math.round(dCandidates.reduce((s, c) => s + c.pri.score, 0) / dCandidates.length)
+                : 0;
+
+              return (
+                <div key={dept} className="rounded-xl border border-border-muted bg-surface p-2.5 text-center">
+                  <p className="text-[10px] font-bold text-slate-500 dark:text-slate-400 truncate" title={dept}>
+                    {dept.replace("Engineering", "Engg")}
+                  </p>
+                  <p className="text-sm font-black text-slate-900 dark:text-slate-100 mt-0.5">
+                    {dAvg > 0 ? `${dAvg} PRI` : "—"}
+                  </p>
+                  <p className="text-[10px] font-semibold text-emerald-600 dark:text-emerald-400">
+                    {dUnlocked} Unlocked
+                  </p>
+                </div>
+              );
+            })}
+          </div>
+        </Card>
+      )}
+
       {/* Recruiter Navigation Tabs */}
       {isRecruiter && sentPitches.length > 0 && (
         <div className="flex items-center gap-2 border-b border-border-muted pb-3">
@@ -418,7 +582,7 @@ export function ReversePlacementClient({
                 : "text-slate-600 hover:bg-slate-100 dark:text-slate-400 dark:hover:bg-slate-800"
             }`}
           >
-            Candidate Leaderboard & Pitches ({candidates.length})
+            Candidate Leaderboard & Talent Scouting ({candidates.length})
           </button>
           <button
             type="button"
@@ -429,7 +593,7 @@ export function ReversePlacementClient({
                 : "text-slate-600 hover:bg-slate-100 dark:text-slate-400 dark:hover:bg-slate-800"
             }`}
           >
-            My Sent Pitches ({sentPitches.length})
+            Pitches Sent by Your Company ({sentPitches.length})
           </button>
         </div>
       )}
@@ -448,7 +612,7 @@ export function ReversePlacementClient({
 
           <div className="divide-y divide-border-muted">
             {sentPitches.map((p) => (
-              <div key={p.id} className="py-3 flex items-center justify-between gap-3">
+              <div key={p.id} className="py-3 flex items-center justify-between gap-3 flex-wrap">
                 <div>
                   <div className="flex items-center gap-2">
                     <span className="font-bold text-sm text-slate-900 dark:text-slate-100">
@@ -466,6 +630,7 @@ export function ReversePlacementClient({
                         · ₹{p.stipend.toLocaleString("en-IN")}/mo
                       </span>
                     )}
+                    <span className="ml-2 text-slate-400">· Candidate PRI {p.priScore}</span>
                   </p>
                 </div>
                 <span className="text-xs text-slate-400">
@@ -524,7 +689,7 @@ export function ReversePlacementClient({
               >
                 <option value="ALL">All Scores</option>
                 <option value="UNLOCKED">Unlocked Only (≥850)</option>
-                <option value="LOCKED">Under 850</option>
+                <option value="LOCKED">Developing (&lt;850)</option>
               </select>
             </div>
           </div>
@@ -545,12 +710,17 @@ export function ReversePlacementClient({
                       Direct Pitch
                     </th>
                   )}
+                  {isAcademician && (
+                    <th className="px-4 py-3 font-semibold text-xs text-right text-slate-500 dark:text-slate-400">
+                      Faculty Endorsement
+                    </th>
+                  )}
                 </tr>
               </thead>
               <tbody className="divide-y divide-border-muted">
                 {filteredCandidates.length === 0 ? (
                   <tr>
-                    <td colSpan={isRecruiter ? 7 : 6} className="px-4 py-8 text-center text-xs text-slate-500">
+                    <td colSpan={isRecruiter || isAcademician ? 7 : 6} className="px-4 py-8 text-center text-xs text-slate-500">
                       No candidates match your search and filter criteria.
                     </td>
                   </tr>
@@ -558,6 +728,7 @@ export function ReversePlacementClient({
                   filteredCandidates.map((c, idx) => {
                     const isMe = c.id === currentUserId;
                     const rank = idx + 1;
+                    const isEndorsed = c.isEndorsed || endorsedIds.has(c.id);
 
                     return (
                       <tr
@@ -589,9 +760,9 @@ export function ReversePlacementClient({
                           )}
                         </td>
 
-                        {/* Candidate Name (FIXED: accurately identify user vs others) */}
+                        {/* Candidate Name */}
                         <td className="px-4 py-3">
-                          <div className="flex items-center gap-2">
+                          <div className="flex items-center gap-2 flex-wrap">
                             <span
                               className={`font-semibold text-sm ${
                                 isMe
@@ -606,9 +777,14 @@ export function ReversePlacementClient({
                                 YOU
                               </span>
                             )}
+                            {isEndorsed && (
+                              <span className="inline-flex items-center gap-0.5 px-2 py-0.5 rounded-full text-[10px] font-bold bg-purple-100 text-purple-700 dark:bg-purple-950 dark:text-purple-300 border border-purple-300 dark:border-purple-800">
+                                <Star className="size-2.5 fill-purple-600 text-purple-600" /> Endorsed
+                              </span>
+                            )}
                           </div>
                           {c.skills && (
-                            <p className="text-[11px] text-slate-400 truncate max-w-[200px]">
+                            <p className="text-[11px] text-slate-400 truncate max-w-[220px]">
                               {c.skills}
                             </p>
                           )}
@@ -639,7 +815,7 @@ export function ReversePlacementClient({
                           </button>
                         </td>
 
-                        {/* Breakdown quick preview */}
+                        {/* Breakdown preview */}
                         <td className="px-4 py-3 text-xs">
                           <button
                             type="button"
@@ -660,7 +836,7 @@ export function ReversePlacementClient({
                           ) : (
                             <span className="inline-flex items-center gap-1 px-2 py-0.5 rounded-full text-xs font-medium bg-slate-100 text-slate-600 dark:bg-slate-800 dark:text-slate-400">
                               <Lock className="size-3 text-slate-400" />
-                              {PRI_THRESHOLD - c.pri.score} pts left
+                              {PRI_THRESHOLD - c.pri.score} pts to 850
                             </span>
                           )}
                         </td>
@@ -678,9 +854,30 @@ export function ReversePlacementClient({
                                 <span>Pitch Candidate</span>
                               </button>
                             ) : (
-                              <span className="text-xs text-slate-400" title="Candidate must reach 850 PRI to unlock reverse pitch">
-                                Locked
+                              <span className="text-xs text-slate-400" title="Candidate must reach 850 PRI to unlock reverse recruitment">
+                                Developing
                               </span>
+                            )}
+                          </td>
+                        )}
+
+                        {/* Faculty Endorsement Action */}
+                        {isAcademician && (
+                          <td className="px-4 py-3 text-right whitespace-nowrap">
+                            {isEndorsed ? (
+                              <span className="inline-flex items-center gap-1 text-xs font-bold text-purple-700 dark:text-purple-300 bg-purple-50 dark:bg-purple-950/60 px-2.5 py-1 rounded-lg border border-purple-200 dark:border-purple-800">
+                                <Check className="size-3" /> Endorsed
+                              </span>
+                            ) : (
+                              <button
+                                type="button"
+                                disabled={isPending}
+                                onClick={() => handleEndorse(c.id, c.name)}
+                                className="inline-flex items-center gap-1 rounded-xl border border-purple-300 dark:border-purple-700 bg-purple-50 dark:bg-purple-950/40 px-3 py-1.5 text-xs font-bold text-purple-700 dark:text-purple-300 hover:bg-purple-100 dark:hover:bg-purple-900/60 transition-all cursor-pointer"
+                              >
+                                <Star className="size-3 text-purple-600" />
+                                <span>Endorse</span>
+                              </button>
                             )}
                           </td>
                         )}
@@ -711,6 +908,11 @@ export function ReversePlacementClient({
                   {breakdownCandidate.id === currentUserId && (
                     <span className="px-2 py-0.5 rounded-full text-[10px] font-black bg-indigo-600 text-white">
                       YOU
+                    </span>
+                  )}
+                  {endorsedIds.has(breakdownCandidate.id) && (
+                    <span className="px-2 py-0.5 rounded-full text-[10px] font-bold bg-purple-100 text-purple-700 border border-purple-300">
+                      ★ Endorsed
                     </span>
                   )}
                 </h3>

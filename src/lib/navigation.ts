@@ -39,6 +39,7 @@ const STUDENT_NAV: NavItem[] = [
 
 const ACADEMICIAN_NAV: NavItem[] = [
   { label: "Dashboard", href: "/dashboard", icon: LayoutDashboard },
+  { label: "Reverse Placement (Talent)", href: "/reverse-placement", icon: TrendingUp },
   { label: "AI Syllabus Gap Audit", href: "/syllabus", icon: BookOpen },
   { label: "R&D Lab Units", href: "/lab-units", icon: FlaskConical },
   { label: "Challenge Marketplace", href: "/challenges", icon: Sparkles },

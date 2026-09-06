@@ -2,6 +2,7 @@ import { redirect } from "next/navigation";
 import { getCurrentUser, normalizeRole } from "@/lib/auth";
 import { prisma, withRetry } from "@/lib/prisma";
 import { syncStudentSkillDecay } from "@/lib/skillDecaySync";
+import { computeStudentPri } from "@/app/(app)/reverse-placement/actions";
 import { DashboardContent, type DashboardViewProps } from "./DashboardContent";
 
 export default async function DashboardPage() {
@@ -90,6 +91,8 @@ export default async function DashboardPage() {
         }),
       ]));
 
+      const pri = await computeStudentPri(user.id);
+
       const data: DashboardViewProps = {
         role: "STUDENT",
         name: user.name,
@@ -102,6 +105,8 @@ export default async function DashboardPage() {
           slotsCount,
           applicationsCount,
           acceptedOffersCount,
+          priScore: pri.score,
+          priUnlocked: pri.unlocked,
         },
         recentProofs,
         availableChallenges,

@@ -24,9 +24,13 @@ import {
   ShieldCheck,
   FolderOpen,
   CheckCircle2,
+  TrendingUp,
+  Unlock,
+  Lock,
 } from "lucide-react";
 import { getCurrentUser } from "@/lib/auth";
 import { prisma } from "@/lib/prisma";
+import { computeStudentPri } from "@/app/(app)/reverse-placement/actions";
 import { ROLE_LABELS, ROLE_COLORS, type Role } from "@/lib/types";
 import { Avatar, Badge, Card, PageHeader, type BadgeTone } from "@/components/ui";
 
@@ -88,6 +92,8 @@ export default async function PublicProfilePage({ params }: { params: Promise<{ 
         }),
       ])
     : [[], [], [], [], []];
+
+  const studentPri = isStudent ? await computeStudentPri(userId) : null;
 
   const resumeDoc = documents.find(
     (d) =>
@@ -259,6 +265,71 @@ export default async function PublicProfilePage({ params }: { params: Promise<{ 
               : "Institutional Overview"}
           </h3>
           <p className="text-sm leading-relaxed text-slate-600 dark:text-slate-300">{p.bio}</p>
+        </Card>
+      )}
+
+      {isStudent && studentPri && (
+        <Card className="mt-6 p-5 border-indigo-200 dark:border-indigo-900 bg-gradient-to-br from-indigo-50/40 via-surface to-surface">
+          <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
+            <div>
+              <div className="flex items-center gap-2 mb-1">
+                <span className="text-xs font-bold uppercase tracking-wider text-indigo-700 dark:text-indigo-300">
+                  Verified Job Readiness
+                </span>
+                {studentPri.unlocked ? (
+                  <span className="inline-flex items-center gap-1 rounded-full bg-emerald-100 dark:bg-emerald-950 px-2 py-0.5 text-[11px] font-bold text-emerald-800 dark:text-emerald-300 border border-emerald-300 dark:border-emerald-800">
+                    <Unlock className="size-3" /> Reverse Placement Active
+                  </span>
+                ) : (
+                  <span className="inline-flex items-center gap-1 rounded-full bg-slate-100 dark:bg-slate-800 px-2 py-0.5 text-[11px] font-bold text-slate-600 dark:text-slate-400">
+                    <Lock className="size-3" /> Developing ({850 - studentPri.score} pts to unlock)
+                  </span>
+                )}
+              </div>
+              <h3 className="text-lg font-black text-slate-900 dark:text-slate-100 flex items-center gap-2">
+                <TrendingUp className="size-5 text-indigo-600 dark:text-indigo-400" />
+                <span>Placement Readiness Index: {studentPri.score} / 1000</span>
+              </h3>
+              <p className="text-xs text-slate-500 dark:text-slate-400 mt-0.5">
+                Objective multi-factor index combining technical skill assessments, code repositories, dual sign-offs, and challenge sprints.
+              </p>
+            </div>
+
+            <Link
+              href="/reverse-placement"
+              className="inline-flex items-center gap-1.5 rounded-xl bg-indigo-600 px-4 py-2 text-xs font-bold text-white hover:bg-indigo-700 transition-all shrink-0 self-start sm:self-auto"
+            >
+              <span>Reverse Placement Hub</span>
+              <ExternalLink className="size-3" />
+            </Link>
+          </div>
+
+          <div className="mt-4 pt-4 border-t border-border-muted grid grid-cols-2 sm:grid-cols-6 gap-2 text-center text-xs">
+            <div className="rounded-lg bg-surface-muted p-2">
+              <span className="text-[10px] text-slate-400 block font-semibold">Skills</span>
+              <span className="font-extrabold text-slate-900 dark:text-slate-100">{studentPri.breakdown.skills}/300</span>
+            </div>
+            <div className="rounded-lg bg-surface-muted p-2">
+              <span className="text-[10px] text-slate-400 block font-semibold">Projects</span>
+              <span className="font-extrabold text-slate-900 dark:text-slate-100">{studentPri.breakdown.projects}/250</span>
+            </div>
+            <div className="rounded-lg bg-surface-muted p-2">
+              <span className="text-[10px] text-slate-400 block font-semibold">Proof of Work</span>
+              <span className="font-extrabold text-slate-900 dark:text-slate-100">{studentPri.breakdown.proofOfWork}/150</span>
+            </div>
+            <div className="rounded-lg bg-surface-muted p-2">
+              <span className="text-[10px] text-slate-400 block font-semibold">Joint Eval</span>
+              <span className="font-extrabold text-slate-900 dark:text-slate-100">{studentPri.breakdown.dualGrading}/150</span>
+            </div>
+            <div className="rounded-lg bg-surface-muted p-2">
+              <span className="text-[10px] text-slate-400 block font-semibold">Mentorship</span>
+              <span className="font-extrabold text-slate-900 dark:text-slate-100">{(studentPri.breakdown.mentorship ?? studentPri.breakdown.tokens ?? 0)}/100</span>
+            </div>
+            <div className="rounded-lg bg-surface-muted p-2">
+              <span className="text-[10px] text-slate-400 block font-semibold">Challenges</span>
+              <span className="font-extrabold text-slate-900 dark:text-slate-100">{studentPri.breakdown.challenges}/50</span>
+            </div>
+          </div>
         </Card>
       )}
 

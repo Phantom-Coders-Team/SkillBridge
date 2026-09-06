@@ -31,8 +31,15 @@ const MAX_CHALLENGES = 50;
  * placement unlocks (recruiters can pitch the student directly).
  */
 export function calculatePri(inputs: PriInputs): PriResult {
-  const skillComponent = clampScore(inputs.skillScore, MAX_SKILL) * (inputs.skillScore / 100);
-  const projectComponent = clampUnit(Math.min(inputs.projectsCompleted, 5) / 5) * MAX_PROJECTS;
+  // Skill component: inputs.skillScore is typically 0..100 (percentage score).
+  // If > 100, it's already on the 0..MAX_SKILL scale.
+  const rawSkillScore = Number(inputs.skillScore || 0);
+  const skillComponent =
+    rawSkillScore > 100
+      ? clampScore(rawSkillScore, MAX_SKILL)
+      : clampUnit(rawSkillScore / 100) * MAX_SKILL;
+
+  const projectComponent = clampUnit(Math.min(inputs.projectsCompleted, 4) / 4) * MAX_PROJECTS;
   const powComponent = clampUnit(Math.min(inputs.proofOfWorkCount, 3) / 3) * MAX_POW;
   const dualComponent =
     inputs.dualGradingScore === null || inputs.dualGradingScore === undefined
@@ -40,7 +47,7 @@ export function calculatePri(inputs: PriInputs): PriResult {
       : clampUnit(inputs.dualGradingScore / 100) * MAX_DUAL;
   const mentorSlotsCount = inputs.mentorshipSlots ?? inputs.tokenBalance ?? 0;
   const mentorshipComponent = clampUnit(Math.min(mentorSlotsCount, 2) / 2) * MAX_MENTORSHIP;
-  const challengeComponent = clampUnit(Math.min(inputs.challengeCompletions, 5) / 5) * MAX_CHALLENGES;
+  const challengeComponent = clampUnit(Math.min(inputs.challengeCompletions, 2) / 2) * MAX_CHALLENGES;
 
   const breakdown: Record<string, number> = {
     skills: Math.round(skillComponent),
@@ -52,22 +59,18 @@ export function calculatePri(inputs: PriInputs): PriResult {
     challenges: Math.round(challengeComponent),
   };
 
-  const maxScore =
-    (inputs.skillScore >= 0 ? MAX_SKILL : 0) +
-    MAX_PROJECTS +
-    MAX_POW +
-    (inputs.dualGradingScore !== null && inputs.dualGradingScore !== undefined ? MAX_DUAL : 0) +
-    MAX_MENTORSHIP +
-    MAX_CHALLENGES;
+  const maxScore = 1000;
 
   // Compute total based on distinct components (excluding the legacy tokens alias)
-  const score =
+  const rawScore =
     breakdown.skills +
     breakdown.projects +
     breakdown.proofOfWork +
     breakdown.dualGrading +
     breakdown.mentorship +
     breakdown.challenges;
+
+  const score = Math.min(1000, Math.max(0, rawScore));
 
   return {
     score,

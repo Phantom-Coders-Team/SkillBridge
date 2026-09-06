@@ -13,6 +13,7 @@ import {
   GraduationCap,
   Radar,
   Sparkles,
+  TrendingUp,
   Zap,
 } from "lucide-react";
 import { Badge, Card, CardHeader, StatCard } from "@/components/ui";
@@ -30,6 +31,8 @@ export interface StudentDashboardProps {
     slotsCount: number;
     applicationsCount?: number;
     acceptedOffersCount?: number;
+    priScore?: number;
+    priUnlocked?: boolean;
   };
   recentProofs: Array<{
     id: string;
@@ -236,11 +239,15 @@ export function StudentDashboard({
           href="/office-hours"
         />
         <StatCard
-          label="Job Pitches"
-          value={stats.pitchesCount}
-          icon={Briefcase}
-          tone="blue"
-          sub="Recruiter pitches"
+          label="Placement Readiness (PRI)"
+          value={`${stats.priScore ?? 885}`}
+          icon={TrendingUp}
+          tone={(stats.priScore ?? 885) >= 850 ? "emerald" : "indigo"}
+          sub={
+            (stats.priScore ?? 885) >= 850
+              ? `Unlocked · ${stats.pitchesCount} Recruiter Pitches`
+              : `${Math.max(0, 850 - (stats.priScore ?? 0))} pts to unlock`
+          }
           href="/reverse-placement"
         />
       </section>

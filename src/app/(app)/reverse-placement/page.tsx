@@ -9,36 +9,60 @@ import {
   type IncomingPitch,
   type SentPitch,
 } from "./ReversePlacementClient";
-import { EmptyState, PageHeader } from "@/components/ui";
+import { PageHeader } from "@/components/ui";
 import type { PriResult } from "@/lib/pri";
 
 export default async function ReversePlacementPage() {
   const user = await getCurrentUser();
   if (!user) redirect("/login");
 
-  if (user.role === "ACADEMICIAN" || user.role === "FACULTY") {
-    return (
-      <div className="mx-auto max-w-3xl">
-        <EmptyState
-          icon={Trophy}
-          title="Academician view unavailable"
-          description="Reverse campus placement is available to students, institutions, and industry recruiters."
-        />
-      </div>
-    );
-  }
+  // Determine effective role
+  const effectiveRole: "STUDENT" | "INDUSTRIES" | "INDUSTRY" | "INSTITUTIONS" | "ACADEMICIAN" | "FACULTY" =
+    user.role === "TPO" || user.role === "INSTITUTION"
+      ? "INSTITUTIONS"
+      : user.role === "FACULTY"
+      ? "ACADEMICIAN"
+      : user.role === "INDUSTRY"
+      ? "INDUSTRIES"
+      : (user.role as "STUDENT" | "INDUSTRIES" | "INDUSTRY" | "INSTITUTIONS" | "ACADEMICIAN" | "FACULTY");
 
-  const effectiveRole = user.role === "TPO" ? "INSTITUTIONS" : user.role;
   const isStudent = user.role === "STUDENT";
   const isRecruiter = user.role === "INDUSTRIES" || user.role === "INDUSTRY";
+  const isAcademician = user.role === "ACADEMICIAN" || user.role === "FACULTY";
+  const isInstitution = user.role === "INSTITUTIONS" || user.role === "INSTITUTION" || user.role === "TPO";
 
-  const [students, incomingPitchesRaw, sentPitchesRaw] = await Promise.all([
+  // Fetch candidates: Prioritize active students with assessments, projects, proofs, or pitches
+  const [activeStudents, moreStudents, currentUserStudent, incomingPitchesRaw, sentPitchesRaw] = await Promise.all([
     prisma.user.findMany({
-      where: { role: "STUDENT", profile: { isNot: null } },
+      where: {
+        role: "STUDENT",
+        profile: { isNot: null },
+        OR: [
+          { assessments: { some: {} } },
+          { projects: { some: {} } },
+          { proofsOfWork: { some: {} } },
+          { studentPitches: { some: {} } },
+        ],
+      },
       include: { profile: true },
-      take: 60,
-      orderBy: { createdAt: "desc" },
+      take: 45,
+      orderBy: { updatedAt: "desc" },
     }),
+    prisma.user.findMany({
+      where: {
+        role: "STUDENT",
+        profile: { isNot: null },
+      },
+      include: { profile: true },
+      take: 20,
+      orderBy: { createdAt: "asc" },
+    }),
+    isStudent
+      ? prisma.user.findUnique({
+          where: { id: user.id },
+          include: { profile: true },
+        })
+      : null,
     isStudent
       ? prisma.jobPitch.findMany({
           where: { studentId: user.id },
@@ -52,6 +76,27 @@ export default async function ReversePlacementPage() {
             },
           },
           orderBy: { createdAt: "desc" },
+        })
+      : isAcademician || isInstitution
+      ? prisma.jobPitch.findMany({
+          include: {
+            industry: {
+              select: {
+                id: true,
+                name: true,
+                profile: { select: { companyName: true, location: true } },
+              },
+            },
+            student: {
+              select: {
+                id: true,
+                name: true,
+                profile: { select: { department: true } },
+              },
+            },
+          },
+          orderBy: { createdAt: "desc" },
+          take: 50,
         })
       : [],
     isRecruiter
@@ -71,8 +116,24 @@ export default async function ReversePlacementPage() {
       : [],
   ]);
 
+  // Combine and deduplicate candidates, ensuring the current student is included
+  const candidateMap = new Map<string, typeof activeStudents[number]>();
+  if (currentUserStudent) {
+    candidateMap.set(currentUserStudent.id, currentUserStudent);
+  }
+  for (const s of activeStudents) {
+    candidateMap.set(s.id, s);
+  }
+  for (const s of moreStudents) {
+    if (!candidateMap.has(s.id) && candidateMap.size < 55) {
+      candidateMap.set(s.id, s);
+    }
+  }
+
+  const studentList = Array.from(candidateMap.values());
+
   const candidates: Candidate[] = await Promise.all(
-    students.map(async (s) => {
+    studentList.map(async (s) => {
       const pri: PriResult = await computeStudentPri(s.id);
       return {
         id: s.id,
@@ -92,7 +153,7 @@ export default async function ReversePlacementPage() {
     id: p.id,
     roleDetails: p.roleDetails,
     stipend: p.stipend,
-    priScore: p.priScore,
+    priScore: p.priScore > 1 ? Math.round(p.priScore) : Math.round(p.priScore * 1000),
     status: p.status,
     createdAt: p.createdAt.toISOString(),
     industry: {
@@ -107,7 +168,7 @@ export default async function ReversePlacementPage() {
     id: p.id,
     roleDetails: p.roleDetails,
     stipend: p.stipend,
-    priScore: p.priScore,
+    priScore: p.priScore > 1 ? Math.round(p.priScore) : Math.round(p.priScore * 1000),
     status: p.status,
     createdAt: p.createdAt.toISOString(),
     student: {
@@ -116,6 +177,13 @@ export default async function ReversePlacementPage() {
       department: p.student.profile?.department || null,
     },
   }));
+
+  // Fetch logged in user's profile for department info
+  const userProfile = await prisma.profile.findUnique({
+    where: { userId: user.id },
+    select: { department: true },
+  });
+  const userDepartment = userProfile?.department || "Computer Science";
 
   return (
     <div className="mx-auto max-w-6xl">
@@ -129,8 +197,10 @@ export default async function ReversePlacementPage() {
       />
       <ReversePlacementClient
         candidates={sorted}
-        viewerRole={effectiveRole as React.ComponentProps<typeof ReversePlacementClient>["viewerRole"]}
+        viewerRole={effectiveRole}
         currentUserId={user.id}
+        currentUserName={user.name}
+        userDepartment={userDepartment}
         incomingPitches={serializedIncomingPitches}
         sentPitches={serializedSentPitches}
       />
