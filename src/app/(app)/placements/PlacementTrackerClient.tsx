@@ -39,14 +39,22 @@ import {
   MapPin,
   Handshake,
   ExternalLink,
+  GraduationCap,
+  UserCheck,
+  FileText,
+  Download,
+  ArrowUpDown,
 } from "lucide-react";
 import Link from "next/link";
 import { Badge, Card, type BadgeTone } from "@/components/ui";
 import {
   YEARLY_PLACEMENT_DATA,
   matchCorporatePartner,
+  getStudentsForCompany,
+  getAllPlacedStudents,
   type YearlyPlacementData,
   type CompanyPlacementRecord,
+  type PlacedStudentData,
 } from "@/lib/placementYearlyData";
 
 const STATUS_TONE: Record<string, BadgeTone> = {
@@ -234,6 +242,26 @@ export function PlacementTrackerClient({
   const [formCtcRange, setFormCtcRange] = useState("");
   const [formAvgCtcLpa, setFormAvgCtcLpa] = useState<number>(25.0);
   const [formLocation, setFormLocation] = useState("");
+  const [formStudentNames, setFormStudentNames] = useState("");
+
+  // Viewing company placed students roster modal
+  const [viewingCompanyStudents, setViewingCompanyStudents] = useState<{
+    company: CompanyPlacementRecord;
+    yearTag: string;
+  } | null>(null);
+  const [companyStudentSearch, setCompanyStudentSearch] = useState("");
+
+  // Master Placed Students Directory filters & pagination
+  const [studentSearch, setStudentSearch] = useState("");
+  const [studentBatchFilter, setStudentBatchFilter] = useState("all");
+  const [studentCompanyFilter, setStudentCompanyFilter] = useState("all");
+  const [studentDeptFilter, setStudentDeptFilter] = useState("all");
+  const [studentTierFilter, setStudentTierFilter] = useState("all");
+  const [studentSortBy, setStudentSortBy] = useState<
+    "package_desc" | "package_asc" | "cgpa_desc" | "name_asc" | "roll_asc"
+  >("package_desc");
+  const [studentPage, setStudentPage] = useState(1);
+  const STUDENTS_PER_PAGE = 10;
 
   // Load from localStorage on client mount after initial hydration
   useEffect(() => {
@@ -242,7 +270,19 @@ export function PlacementTrackerClient({
       if (saved) {
         const parsed = JSON.parse(saved);
         if (Array.isArray(parsed) && parsed.length > 0) {
-          setTimeout(() => setYearlyData(parsed), 0);
+          // Reconcile student counts so placedStudents always strictly matches the sum of company counts
+          const reconciled = parsed.map((yd: YearlyPlacementData) => {
+            const actualSum = yd.companies.reduce((sum, c) => sum + c.placedCount, 0);
+            return {
+              ...yd,
+              placedStudents: actualSum > 0 ? actualSum : yd.placedStudents,
+              placementRate:
+                yd.eligibleStudents > 0
+                  ? Math.min(100, Math.round((actualSum / yd.eligibleStudents) * 1000) / 10)
+                  : yd.placementRate,
+            };
+          });
+          setTimeout(() => setYearlyData(reconciled), 0);
         }
       }
     } catch {}
@@ -256,6 +296,12 @@ export function PlacementTrackerClient({
       localStorage.setItem("skillbridge_yearly_placement_data", JSON.stringify(yearlyData));
     } catch {}
   }, [yearlyData, isLoaded]);
+
+  // Keep student directory batch filter in sync with selected year at top
+  useEffect(() => {
+    setStudentBatchFilter(selectedYear);
+    setStudentPage(1);
+  }, [selectedYear]);
 
   // Current year record
   const currentYearData = useMemo(() => {
@@ -311,11 +357,32 @@ export function PlacementTrackerClient({
   }, [selectedYear, currentYearData, categoryFilter, searchQuery, yearlyData, corporatePartners]);
 
   // Metrics calculation
-  const totalEligibleCurrent = currentYearData?.eligibleStudents || 500;
-  const totalPlacedCurrent = currentYearData?.placedStudents || 0;
-  const currentRate = currentYearData?.placementRate || 0;
-  const avgPackage = currentYearData?.avgCtcLpa || 0;
-  const highestPackage = currentYearData?.highestCtcLpa || 0;
+  const totalEligibleCurrent =
+    selectedYear === "all"
+      ? yearlyData.reduce((acc, d) => acc + d.eligibleStudents, 0)
+      : currentYearData?.eligibleStudents || 550;
+
+  const totalPlacedCurrent =
+    selectedYear === "all"
+      ? yearlyData.reduce((acc, d) => acc + d.placedStudents, 0)
+      : currentYearData?.placedStudents || 0;
+
+  const currentRate =
+    totalEligibleCurrent > 0
+      ? Math.round((totalPlacedCurrent / totalEligibleCurrent) * 1000) / 10
+      : 0;
+
+  const avgPackage =
+    selectedYear === "all"
+      ? Math.round(
+          (yearlyData.reduce((acc, d) => acc + d.avgCtcLpa, 0) / (yearlyData.length || 1)) * 10
+        ) / 10
+      : currentYearData?.avgCtcLpa || 0;
+
+  const highestPackage =
+    selectedYear === "all"
+      ? Math.max(...yearlyData.map((d) => d.highestCtcLpa))
+      : currentYearData?.highestCtcLpa || 0;
 
   // Chart data sorted chronologically
   const chartData = useMemo(() => {
@@ -346,6 +413,7 @@ export function PlacementTrackerClient({
     setFormCtcRange("₹28 - ₹42 LPA");
     setFormAvgCtcLpa(32.5);
     setFormLocation("Bengaluru, Karnataka");
+    setFormStudentNames("");
     setIsModalOpen(true);
   }
 
@@ -366,6 +434,11 @@ export function PlacementTrackerClient({
     setFormCtcRange(comp.ctcRange);
     setFormAvgCtcLpa(comp.avgCtcLpa);
     setFormLocation(comp.location);
+    const existingNames =
+      comp.students && comp.students.length > 0
+        ? comp.students.map((s: PlacedStudentData) => s.studentName).join(", ")
+        : getStudentsForCompany(comp, yearTag).slice(0, 6).map((s: PlacedStudentData) => s.studentName).join(", ");
+    setFormStudentNames(existingNames);
     setIsModalOpen(true);
   }
 
@@ -390,6 +463,48 @@ export function PlacementTrackerClient({
       .map((r) => r.trim())
       .filter(Boolean);
 
+    // Build custom student records if provided
+    let customStudents: PlacedStudentData[] | undefined = undefined;
+    if (formStudentNames.trim()) {
+      const names = formStudentNames
+        .split(/[,;\n]+/)
+        .map((n) => n.trim())
+        .filter(Boolean);
+
+      if (names.length > 0) {
+        const batchYearNum = parseInt(targetYear.slice(0, 4)) || 2025;
+        const rollYear = (batchYearNum - 3).toString().slice(-2);
+
+        customStudents = names.map((name, idx) => {
+          const stInitials =
+            name
+              .split(/\s+/)
+              .map((w) => w[0])
+              .join("")
+              .slice(0, 2)
+              .toUpperCase() || "ST";
+
+          return {
+            id: `pl-custom-${Date.now()}-${idx + 1}`,
+            studentName: name,
+            rollNumber: `${rollYear}CS${String(101 + idx).slice(-3)}`,
+            department: "Computer Science & Engineering",
+            companyName: formCompanyName.trim(),
+            role: parsedRoles[idx % Math.max(1, parsedRoles.length)] || "Software Engineer",
+            packageLpa: Number(formAvgCtcLpa) || 15.0,
+            academicYear: targetYear,
+            tier: formCategory,
+            cgpa: 9.0,
+            placementDate: `Batch ${targetYear}`,
+            offerType: "Full-Time (Direct)",
+            status: "Verified",
+            initials: stInitials,
+            location: formLocation.trim() || "India",
+          };
+        });
+      }
+    }
+
     const updatedRecord: CompanyPlacementRecord = {
       companyName: formCompanyName.trim(),
       initials,
@@ -399,6 +514,7 @@ export function PlacementTrackerClient({
       ctcRange: formCtcRange.trim() || `₹${formAvgCtcLpa} LPA`,
       avgCtcLpa: Number(formAvgCtcLpa) || 15.0,
       location: formLocation.trim() || "India",
+      students: customStudents,
     };
 
     setYearlyData((prevData) => {
@@ -526,6 +642,144 @@ export function PlacementTrackerClient({
     }
   }
 
+  // Master Placed Students calculation
+  const allPlacedStudents = useMemo(() => {
+    return getAllPlacedStudents(yearlyData);
+  }, [yearlyData]);
+
+  // Unique batches, companies, and departments for filters
+  const availableBatches = useMemo(() => yearlyData.map((d) => d.year), [yearlyData]);
+  const availableCompanies = useMemo(() => {
+    const comps = new Set<string>();
+    yearlyData.forEach((yd) => yd.companies.forEach((c) => comps.add(c.companyName)));
+    return Array.from(comps).sort();
+  }, [yearlyData]);
+  const availableDepts = [
+    "Computer Science & Engineering",
+    "Information Technology",
+    "Electronics & Communication",
+    "Artificial Intelligence & Data Science",
+    "Electrical Engineering",
+    "Mechanical Engineering",
+  ];
+
+  // Filtered & Sorted Placed Students for Directory
+  const filteredPlacedStudents = useMemo(() => {
+    let list = allPlacedStudents;
+
+    if (studentBatchFilter !== "all") {
+      list = list.filter((s: PlacedStudentData) => s.academicYear === studentBatchFilter);
+    }
+
+    if (studentCompanyFilter !== "all") {
+      list = list.filter((s: PlacedStudentData) => s.companyName.toLowerCase() === studentCompanyFilter.toLowerCase());
+    }
+
+    if (studentDeptFilter !== "all") {
+      list = list.filter((s: PlacedStudentData) => s.department.toLowerCase().includes(studentDeptFilter.toLowerCase()));
+    }
+
+    if (studentTierFilter !== "all") {
+      list = list.filter((s: PlacedStudentData) => s.tier === studentTierFilter);
+    }
+
+    if (studentSearch.trim()) {
+      const q = studentSearch.toLowerCase();
+      list = list.filter(
+        (s: PlacedStudentData) =>
+          s.studentName.toLowerCase().includes(q) ||
+          s.rollNumber.toLowerCase().includes(q) ||
+          s.companyName.toLowerCase().includes(q) ||
+          s.role.toLowerCase().includes(q) ||
+          s.department.toLowerCase().includes(q)
+      );
+    }
+
+    return [...list].sort((a: PlacedStudentData, b: PlacedStudentData) => {
+      if (studentSortBy === "package_desc") return b.packageLpa - a.packageLpa;
+      if (studentSortBy === "package_asc") return a.packageLpa - b.packageLpa;
+      if (studentSortBy === "cgpa_desc") return b.cgpa - a.cgpa;
+      if (studentSortBy === "name_asc") return a.studentName.localeCompare(b.studentName);
+      if (studentSortBy === "roll_asc") return a.rollNumber.localeCompare(b.rollNumber);
+      return 0;
+    });
+  }, [
+    allPlacedStudents,
+    studentBatchFilter,
+    studentCompanyFilter,
+    studentDeptFilter,
+    studentTierFilter,
+    studentSearch,
+    studentSortBy,
+  ]);
+
+  // Paginated Placed Students
+  const totalStudentPages = Math.ceil(filteredPlacedStudents.length / STUDENTS_PER_PAGE) || 1;
+  const paginatedPlacedStudents = useMemo(() => {
+    const start = (studentPage - 1) * STUDENTS_PER_PAGE;
+    return filteredPlacedStudents.slice(start, start + STUDENTS_PER_PAGE);
+  }, [filteredPlacedStudents, studentPage]);
+
+  // Placed students for selected company modal
+  const companyStudentsList = useMemo(() => {
+    if (!viewingCompanyStudents) return [];
+    const baseList = getStudentsForCompany(
+      viewingCompanyStudents.company,
+      viewingCompanyStudents.yearTag
+    );
+    if (!companyStudentSearch.trim()) return baseList;
+    const q = companyStudentSearch.toLowerCase();
+    return baseList.filter(
+      (s: PlacedStudentData) =>
+        s.studentName.toLowerCase().includes(q) ||
+        s.rollNumber.toLowerCase().includes(q) ||
+        s.department.toLowerCase().includes(q) ||
+        s.role.toLowerCase().includes(q)
+    );
+  }, [viewingCompanyStudents, companyStudentSearch]);
+
+  // Export to CSV helper
+  const handleExportCSV = (
+    studentsToExport: PlacedStudentData[],
+    filename = "SkillBridge_Verified_Placed_Students.csv"
+  ) => {
+    if (!studentsToExport.length) return;
+    const headers = [
+      "Student Name",
+      "Roll Number",
+      "Department",
+      "Company",
+      "Role",
+      "Package (LPA)",
+      "Batch / Year",
+      "Tier",
+      "CGPA",
+      "Offer Type",
+      "Status",
+    ];
+    const rows = studentsToExport.map((s) => [
+      `"${s.studentName.replace(/"/g, '""')}"`,
+      `"${s.rollNumber}"`,
+      `"${s.department.replace(/"/g, '""')}"`,
+      `"${s.companyName.replace(/"/g, '""')}"`,
+      `"${s.role.replace(/"/g, '""')}"`,
+      s.packageLpa,
+      `"${s.academicYear}"`,
+      `"${s.tier}"`,
+      s.cgpa,
+      `"${s.offerType}"`,
+      `"${s.status}"`,
+    ]);
+    const csvContent = [headers.join(","), ...rows.map((r) => r.join(","))].join("\n");
+    const blob = new Blob([csvContent], { type: "text/csv;charset=utf-8;" });
+    const url = URL.createObjectURL(blob);
+    const link = document.createElement("a");
+    link.setAttribute("href", url);
+    link.setAttribute("download", filename);
+    document.body.appendChild(link);
+    link.click();
+    document.body.removeChild(link);
+  };
 
 
   return (
@@ -565,7 +819,7 @@ export function PlacementTrackerClient({
             </div>
           </div>
           <div className="mt-2 text-[11px] text-slate-500 dark:text-slate-400">
-            Batch {currentYearData?.year || selectedYear} eligible pool
+            Batch {selectedYear === "all" ? "All Cohorts (Cumulative)" : currentYearData?.year || selectedYear} eligible pool
           </div>
         </div>
 
@@ -1268,6 +1522,19 @@ export function PlacementTrackerClient({
                           style={{ width: `${Math.min(100, pctOfBatch * 2.5)}%` }}
                         />
                       </div>
+
+                      {/* View Placed Students button */}
+                      <button
+                        type="button"
+                        onClick={() => {
+                          setViewingCompanyStudents({ company: comp, yearTag: comp.yearTag });
+                          setCompanyStudentSearch("");
+                        }}
+                        className="mt-2.5 w-full flex items-center justify-center gap-1.5 rounded-lg border border-indigo-200 bg-indigo-50/80 px-2.5 py-1.5 text-[11px] font-bold text-indigo-700 hover:bg-indigo-100 hover:border-indigo-300 dark:border-indigo-800/60 dark:bg-indigo-950/40 dark:text-indigo-300 dark:hover:bg-indigo-900/50 transition-all cursor-pointer shadow-2xs"
+                      >
+                        <GraduationCap className="size-3.5 text-indigo-600 dark:text-indigo-400" />
+                        <span>View Placed Students ({comp.placedCount})</span>
+                      </button>
                     </div>
 
                     {/* Roles Offered */}
@@ -1336,7 +1603,636 @@ export function PlacementTrackerClient({
         )}
       </div>
 
-      {/* 4. ACTIVE LIVE OFFERS & RECENT PITCHES */}
+      {/* 4. COMPANY PLACED STUDENTS ROSTER MODAL */}
+      {viewingCompanyStudents && (
+        <div
+          role="dialog"
+          aria-modal="true"
+          className="fixed inset-0 z-50 flex items-center justify-center bg-black/60 p-4 backdrop-blur-xs animate-in fade-in duration-150"
+          onClick={() => setViewingCompanyStudents(null)}
+        >
+          <div
+            onClick={(e) => e.stopPropagation()}
+            className="relative flex w-full max-w-4xl max-h-[90vh] flex-col overflow-hidden rounded-2xl border border-border-muted bg-surface text-foreground shadow-2xl transition-all"
+          >
+            {/* Header */}
+            <div className="flex shrink-0 items-center justify-between border-b border-border-muted px-6 py-4 bg-surface-subtle/30">
+              <div className="flex items-center gap-3">
+                <span className="flex size-11 shrink-0 items-center justify-center rounded-xl bg-indigo-600 font-bold text-sm text-white shadow-md">
+                  {viewingCompanyStudents.company.initials}
+                </span>
+                <div>
+                  <div className="flex items-center gap-2 flex-wrap">
+                    <h3 className="text-base font-bold text-slate-900 dark:text-slate-100">
+                      {viewingCompanyStudents.company.companyName}
+                    </h3>
+                    <span
+                      className={`rounded-md border px-2 py-0.5 text-[10px] font-bold ${
+                        CATEGORY_TONE[viewingCompanyStudents.company.category] || ""
+                      }`}
+                    >
+                      {viewingCompanyStudents.company.category}
+                    </span>
+                    <span className="font-mono text-[10px] font-bold text-slate-500 dark:text-slate-400 bg-surface px-1.5 py-0.5 rounded border border-border-muted">
+                      Batch {viewingCompanyStudents.yearTag}
+                    </span>
+                    {getMatchedPartner(viewingCompanyStudents.company.companyName) && (
+                      <span className="inline-flex items-center gap-1 rounded-md bg-indigo-50 dark:bg-indigo-950/50 px-2 py-0.5 text-[10px] font-bold text-indigo-700 dark:text-indigo-300 border border-indigo-200 dark:border-indigo-800">
+                        <Handshake className="size-3" />
+                        Accredited Partner
+                      </span>
+                    )}
+                  </div>
+                  <p className="text-xs text-slate-500 dark:text-slate-400 mt-0.5 flex items-center gap-2">
+                    <span>{viewingCompanyStudents.company.location}</span>
+                    <span>•</span>
+                    <span>Package: {viewingCompanyStudents.company.ctcRange}</span>
+                    <span>•</span>
+                    <span className="text-emerald-600 dark:text-emerald-400 font-semibold">
+                      Avg ₹{viewingCompanyStudents.company.avgCtcLpa} LPA
+                    </span>
+                  </p>
+                </div>
+              </div>
+              <div className="flex items-center gap-2">
+                <button
+                  type="button"
+                  onClick={() =>
+                    handleExportCSV(
+                      companyStudentsList,
+                      `${viewingCompanyStudents.company.companyName.replace(/\s+/g, "_")}_Placed_Students.csv`
+                    )
+                  }
+                  className="inline-flex items-center gap-1.5 rounded-xl border border-border-muted bg-surface px-3 py-1.5 text-xs font-semibold text-slate-700 hover:bg-surface-subtle dark:text-slate-200 cursor-pointer shadow-2xs"
+                  title="Export this company's placed students to CSV"
+                >
+                  <Download className="size-3.5 text-slate-500" />
+                  <span className="hidden sm:inline">Export CSV</span>
+                </button>
+                <button
+                  type="button"
+                  onClick={() => setViewingCompanyStudents(null)}
+                  className="flex size-8 cursor-pointer items-center justify-center rounded-lg text-slate-400 hover:bg-slate-100 hover:text-slate-600 dark:hover:bg-slate-800 dark:hover:text-slate-200"
+                >
+                  <X className="size-5" />
+                </button>
+              </div>
+            </div>
+
+            {/* Sub-bar with search & stats */}
+            <div className="flex flex-col sm:flex-row items-center justify-between gap-3 border-b border-border-muted px-6 py-3 bg-surface">
+              <div className="relative w-full sm:w-80">
+                <Search className="absolute left-3 top-1/2 -translate-y-1/2 size-3.5 text-slate-400" />
+                <input
+                  type="text"
+                  placeholder="Search student, roll number, branch..."
+                  value={companyStudentSearch}
+                  onChange={(e) => setCompanyStudentSearch(e.target.value)}
+                  className="h-9 w-full rounded-xl border border-border-muted bg-surface-subtle pl-9 pr-3 text-xs text-slate-900 focus:border-indigo-500 focus:outline-none dark:text-slate-100"
+                />
+                {companyStudentSearch && (
+                  <button
+                    type="button"
+                    onClick={() => setCompanyStudentSearch("")}
+                    className="absolute right-2.5 top-1/2 -translate-y-1/2 text-slate-400 hover:text-slate-600"
+                  >
+                    <X className="size-3" />
+                  </button>
+                )}
+              </div>
+              <div className="flex items-center gap-3 text-xs text-slate-500 w-full sm:w-auto justify-between sm:justify-end">
+                <span className="font-semibold text-slate-900 dark:text-slate-100">
+                  Showing {companyStudentsList.length} of {viewingCompanyStudents.company.placedCount} Placed Candidates
+                </span>
+                <span className="rounded-full bg-emerald-100 dark:bg-emerald-950/60 px-2 py-0.5 text-[10px] font-bold text-emerald-700 dark:text-emerald-300">
+                  100% Verified
+                </span>
+              </div>
+            </div>
+
+            {/* Students list */}
+            <div className="flex-1 overflow-y-auto p-6">
+              {companyStudentsList.length === 0 ? (
+                <div className="py-12 text-center text-xs text-slate-400">
+                  No students found matching "{companyStudentSearch}".
+                </div>
+              ) : (
+                <div className="grid grid-cols-1 md:grid-cols-2 gap-3.5">
+                  {companyStudentsList.map((st: PlacedStudentData) => (
+                    <div
+                      key={st.id}
+                      className="rounded-xl border border-border-muted bg-surface-subtle/30 p-3.5 transition-all hover:border-indigo-300 dark:hover:border-indigo-700/60 hover:shadow-xs flex flex-col justify-between gap-3"
+                    >
+                      <div className="flex items-start justify-between gap-2.5">
+                        <div className="flex items-center gap-3 min-w-0">
+                          <div className="flex size-10 shrink-0 items-center justify-center rounded-full bg-gradient-to-br from-indigo-500 to-purple-600 font-bold text-xs text-white shadow-xs">
+                            {st.initials || "ST"}
+                          </div>
+                          <div className="min-w-0">
+                            <h4 className="text-xs font-bold text-slate-900 dark:text-slate-100 truncate">
+                              {st.studentName}
+                            </h4>
+                            <div className="flex items-center gap-2 text-[11px] text-slate-500 dark:text-slate-400">
+                              <span className="font-mono font-semibold">{st.rollNumber}</span>
+                              <span>•</span>
+                              <span className="truncate">{st.department}</span>
+                            </div>
+                          </div>
+                        </div>
+
+                        <span className="shrink-0 rounded-full bg-emerald-50 dark:bg-emerald-950/50 px-2 py-0.5 text-[10px] font-bold text-emerald-700 dark:text-emerald-400 border border-emerald-200 dark:border-emerald-800/60">
+                          ₹{st.packageLpa} LPA
+                        </span>
+                      </div>
+
+                      <div className="flex items-center justify-between text-[11px] border-t border-border-muted/60 pt-2.5 mt-1 text-slate-600 dark:text-slate-400">
+                        <div className="flex items-center gap-1.5 font-medium truncate">
+                          <Briefcase className="size-3 text-slate-400 shrink-0" />
+                          <span className="truncate">{st.role}</span>
+                        </div>
+                        <div className="flex items-center gap-2 shrink-0 font-medium text-[10px]">
+                          <span className="rounded bg-surface px-1.5 py-0.5 border border-border-muted text-slate-500 font-mono">
+                            CGPA {st.cgpa}
+                          </span>
+                          <span className="rounded bg-indigo-50 dark:bg-indigo-950/40 px-1.5 py-0.5 text-indigo-700 dark:text-indigo-300 font-semibold">
+                            {st.offerType.includes("PPO") ? "PPO" : "Full-Time"}
+                          </span>
+                        </div>
+                      </div>
+                    </div>
+                  ))}
+                </div>
+              )}
+            </div>
+
+            {/* Footer */}
+            <div className="flex items-center justify-between border-t border-border-muted px-6 py-3 bg-surface-subtle/30 text-xs text-slate-500">
+              <div className="flex items-center gap-2">
+                <CheckCircle2 className="size-4 text-emerald-600 dark:text-emerald-400" />
+                <span>All candidates institutional placement cell verified with official offer letters.</span>
+              </div>
+              <button
+                type="button"
+                onClick={() => setViewingCompanyStudents(null)}
+                className="rounded-xl border border-border-muted bg-surface px-4 py-1.5 text-xs font-semibold text-slate-700 hover:bg-surface-subtle dark:text-slate-200 cursor-pointer"
+              >
+                Close
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
+
+      {/* 4. VERIFIED PLACED STUDENTS DIRECTORY */}
+      <div className="space-y-4 pt-4 border-t border-border-muted/80">
+        <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3">
+          <div>
+            <div className="flex items-center gap-2">
+              <span className="flex size-7 items-center justify-center rounded-lg bg-indigo-50 dark:bg-indigo-950/60 text-indigo-600 dark:text-indigo-400">
+                <GraduationCap className="size-4" />
+              </span>
+              <h2 className="text-lg font-bold text-slate-900 dark:text-slate-100">
+                Verified Placed Students Directory
+              </h2>
+              <span className="rounded-full bg-indigo-100 dark:bg-indigo-950/60 px-2.5 py-0.5 text-xs font-bold text-indigo-700 dark:text-indigo-300 border border-indigo-200 dark:border-indigo-800/60">
+                {filteredPlacedStudents.length} Students
+              </span>
+            </div>
+            <p className="text-xs text-slate-500 dark:text-slate-400 mt-1">
+              Institutional student placement roster with roll numbers, academic departments, hiring companies, package breakdown, and verified credentials.
+            </p>
+          </div>
+
+          <div className="flex items-center gap-2 self-start sm:self-auto">
+            <button
+              type="button"
+              onClick={() =>
+                handleExportCSV(
+                  filteredPlacedStudents,
+                  `SkillBridge_Placed_Students_${studentBatchFilter !== "all" ? studentBatchFilter : "All_Batches"}.csv`
+                )
+              }
+              className="inline-flex items-center gap-1.5 rounded-xl border border-border-muted bg-surface px-3.5 py-2 text-xs font-semibold text-slate-700 hover:bg-surface-subtle dark:text-slate-200 transition-all cursor-pointer shadow-2xs"
+              title="Download filtered student directory as CSV"
+            >
+              <Download className="size-3.5 text-indigo-600 dark:text-indigo-400" />
+              <span>Export CSV Roster</span>
+            </button>
+          </div>
+        </div>
+
+        {/* Directory KPI Quick Bar */}
+        <div className="grid grid-cols-2 sm:grid-cols-4 gap-3">
+          <div className="rounded-xl border border-border-muted bg-surface p-3 shadow-2xs">
+            <span className="text-[10px] font-semibold uppercase tracking-wider text-slate-400">
+              Total In Directory
+            </span>
+            <p className="text-lg font-bold text-slate-900 dark:text-slate-100">
+              {filteredPlacedStudents.length} Candidates
+            </p>
+            <span className="text-[10px] text-slate-400">Across verified departments</span>
+          </div>
+
+          <div className="rounded-xl border border-border-muted bg-surface p-3 shadow-2xs">
+            <span className="text-[10px] font-semibold uppercase tracking-wider text-purple-500">
+              Super Dream Offers
+            </span>
+            <p className="text-lg font-bold text-purple-600 dark:text-purple-400">
+              {filteredPlacedStudents.filter((s) => s.tier === "Super Dream").length} Offers
+            </p>
+            <span className="text-[10px] text-slate-400">≥ ₹20 LPA CTC</span>
+          </div>
+
+          <div className="rounded-xl border border-border-muted bg-surface p-3 shadow-2xs">
+            <span className="text-[10px] font-semibold uppercase tracking-wider text-indigo-500">
+              Dream Offers
+            </span>
+            <p className="text-lg font-bold text-indigo-600 dark:text-indigo-400">
+              {filteredPlacedStudents.filter((s) => s.tier === "Dream").length} Offers
+            </p>
+            <span className="text-[10px] text-slate-400">₹10 – ₹20 LPA CTC</span>
+          </div>
+
+          <div className="rounded-xl border border-border-muted bg-surface p-3 shadow-2xs">
+            <span className="text-[10px] font-semibold uppercase tracking-wider text-emerald-500">
+              Average CTC
+            </span>
+            <p className="text-lg font-bold text-emerald-600 dark:text-emerald-400">
+              ₹
+              {filteredPlacedStudents.length > 0
+                ? Math.round(
+                    (filteredPlacedStudents.reduce((sum, s) => sum + s.packageLpa, 0) /
+                      filteredPlacedStudents.length) *
+                      10
+                  ) / 10
+                : 0}{" "}
+              LPA
+            </p>
+            <span className="text-[10px] text-slate-400">Filtered cohort mean</span>
+          </div>
+        </div>
+
+        {/* Directory Multi-Faceted Filters */}
+        <div className="rounded-2xl border border-border-muted bg-surface p-4 shadow-2xs space-y-3">
+          <div className="flex flex-col lg:flex-row items-stretch lg:items-center gap-2.5">
+            {/* Search Input */}
+            <div className="relative flex-1">
+              <Search className="absolute left-3 top-1/2 -translate-y-1/2 size-4 text-slate-400" />
+              <input
+                type="text"
+                placeholder="Search by student name, roll number, company, department, or role..."
+                value={studentSearch}
+                onChange={(e) => {
+                  setStudentSearch(e.target.value);
+                  setStudentPage(1);
+                }}
+                className="h-9 w-full rounded-xl border border-border-muted bg-surface-subtle pl-9 pr-8 text-xs text-slate-900 focus:border-indigo-500 focus:outline-none dark:text-slate-100"
+              />
+              {studentSearch && (
+                <button
+                  type="button"
+                  onClick={() => setStudentSearch("")}
+                  className="absolute right-2.5 top-1/2 -translate-y-1/2 text-slate-400 hover:text-slate-600"
+                >
+                  <X className="size-3.5" />
+                </button>
+              )}
+            </div>
+
+            {/* Academic Batch Filter */}
+            <div className="flex items-center gap-1.5 shrink-0">
+              <label className="text-[11px] font-semibold text-slate-500 dark:text-slate-400 whitespace-nowrap">
+                Batch:
+              </label>
+              <select
+                value={studentBatchFilter}
+                onChange={(e) => {
+                  setStudentBatchFilter(e.target.value);
+                  setStudentPage(1);
+                }}
+                className="h-9 rounded-xl border border-border-muted bg-surface-subtle px-2.5 text-xs text-slate-900 focus:border-indigo-500 focus:outline-none dark:text-slate-100"
+              >
+                <option value="all">All Batches</option>
+                {availableBatches.map((b) => (
+                  <option key={b} value={b}>
+                    {b}
+                  </option>
+                ))}
+              </select>
+            </div>
+
+            {/* Company Filter */}
+            <div className="flex items-center gap-1.5 shrink-0">
+              <label className="text-[11px] font-semibold text-slate-500 dark:text-slate-400 whitespace-nowrap">
+                Company:
+              </label>
+              <select
+                value={studentCompanyFilter}
+                onChange={(e) => {
+                  setStudentCompanyFilter(e.target.value);
+                  setStudentPage(1);
+                }}
+                className="h-9 max-w-[150px] sm:max-w-xs truncate rounded-xl border border-border-muted bg-surface-subtle px-2.5 text-xs text-slate-900 focus:border-indigo-500 focus:outline-none dark:text-slate-100"
+              >
+                <option value="all">All Companies</option>
+                {availableCompanies.map((c) => (
+                  <option key={c} value={c}>
+                    {c}
+                  </option>
+                ))}
+              </select>
+            </div>
+
+            {/* Department Filter */}
+            <div className="flex items-center gap-1.5 shrink-0">
+              <label className="text-[11px] font-semibold text-slate-500 dark:text-slate-400 whitespace-nowrap">
+                Branch:
+              </label>
+              <select
+                value={studentDeptFilter}
+                onChange={(e) => {
+                  setStudentDeptFilter(e.target.value);
+                  setStudentPage(1);
+                }}
+                className="h-9 max-w-[140px] sm:max-w-xs truncate rounded-xl border border-border-muted bg-surface-subtle px-2.5 text-xs text-slate-900 focus:border-indigo-500 focus:outline-none dark:text-slate-100"
+              >
+                <option value="all">All Branches</option>
+                {availableDepts.map((d) => (
+                  <option key={d} value={d}>
+                    {d}
+                  </option>
+                ))}
+              </select>
+            </div>
+
+            {/* Tier Filter */}
+            <div className="flex items-center gap-1.5 shrink-0">
+              <label className="text-[11px] font-semibold text-slate-500 dark:text-slate-400 whitespace-nowrap">
+                Tier:
+              </label>
+              <select
+                value={studentTierFilter}
+                onChange={(e) => {
+                  setStudentTierFilter(e.target.value);
+                  setStudentPage(1);
+                }}
+                className="h-9 rounded-xl border border-border-muted bg-surface-subtle px-2.5 text-xs text-slate-900 focus:border-indigo-500 focus:outline-none dark:text-slate-100"
+              >
+                <option value="all">All Tiers</option>
+                <option value="Super Dream">Super Dream</option>
+                <option value="Dream">Dream</option>
+                <option value="Core / R&D">Core / R&D</option>
+                <option value="Mass / IT Services">Mass</option>
+              </select>
+            </div>
+
+            {/* Sort By */}
+            <div className="flex items-center gap-1.5 shrink-0">
+              <label className="text-[11px] font-semibold text-slate-500 dark:text-slate-400 whitespace-nowrap">
+                Sort:
+              </label>
+              <select
+                value={studentSortBy}
+                onChange={(e) => setStudentSortBy(e.target.value as any)}
+                className="h-9 rounded-xl border border-border-muted bg-surface-subtle px-2.5 text-xs text-slate-900 focus:border-indigo-500 focus:outline-none dark:text-slate-100"
+              >
+                <option value="package_desc">Package: High to Low</option>
+                <option value="package_asc">Package: Low to High</option>
+                <option value="cgpa_desc">CGPA: High to Low</option>
+                <option value="name_asc">Name: A to Z</option>
+                <option value="roll_asc">Roll Number</option>
+              </select>
+            </div>
+
+            {/* Reset Filters button */}
+            {(studentSearch ||
+              studentBatchFilter !== "all" ||
+              studentCompanyFilter !== "all" ||
+              studentDeptFilter !== "all" ||
+              studentTierFilter !== "all") && (
+              <button
+                type="button"
+                onClick={() => {
+                  setStudentSearch("");
+                  setStudentBatchFilter("all");
+                  setStudentCompanyFilter("all");
+                  setStudentDeptFilter("all");
+                  setStudentTierFilter("all");
+                  setStudentPage(1);
+                }}
+                className="inline-flex items-center gap-1 rounded-xl border border-border-muted bg-surface-subtle px-2.5 py-1.5 text-xs font-semibold text-slate-500 hover:text-slate-800 dark:hover:text-slate-200 transition-all cursor-pointer shrink-0"
+              >
+                <RotateCcw className="size-3" />
+                <span>Reset</span>
+              </button>
+            )}
+          </div>
+        </div>
+
+        {/* Directory Data Table */}
+        {filteredPlacedStudents.length === 0 ? (
+          <div className="rounded-2xl border border-dashed border-border-muted bg-surface p-12 text-center text-xs text-slate-400">
+            <GraduationCap className="mx-auto size-8 text-slate-300 dark:text-slate-600 mb-2" />
+            <p className="font-semibold text-slate-600 dark:text-slate-300">
+              No placed students match your criteria.
+            </p>
+            <p className="mt-1 text-slate-400">
+              Try modifying your search keywords or clearing active filters.
+            </p>
+          </div>
+        ) : (
+          <Card className="overflow-hidden shadow-card">
+            <div className="overflow-x-auto">
+              <table className="w-full text-left text-sm">
+                <thead className="border-b border-border-muted bg-slate-50/80 dark:bg-slate-800/50 text-xs font-semibold text-slate-600 dark:text-slate-300">
+                  <tr>
+                    <th className="px-5 py-3.5">Student &amp; Roll No</th>
+                    <th className="px-5 py-3.5">Placed Company &amp; Role</th>
+                    <th className="px-5 py-3.5">Department</th>
+                    <th className="px-5 py-3.5">Package (LPA)</th>
+                    <th className="px-5 py-3.5">CGPA</th>
+                    <th className="px-5 py-3.5">Batch &amp; Tier</th>
+                    <th className="px-5 py-3.5">Status</th>
+                  </tr>
+                </thead>
+                <tbody className="divide-y border-border-muted text-xs">
+                  {paginatedPlacedStudents.map((st) => {
+                    const matchedPartner = getMatchedPartner(st.companyName);
+
+                    return (
+                      <tr
+                        key={st.id}
+                        className="transition-colors hover:bg-slate-50/60 dark:hover:bg-slate-800/40"
+                      >
+                        {/* Student Name & Roll No */}
+                        <td className="px-5 py-3">
+                          <div className="flex items-center gap-3">
+                            <div className="flex size-9 shrink-0 items-center justify-center rounded-full bg-gradient-to-br from-indigo-500 to-purple-600 font-bold text-xs text-white shadow-2xs">
+                              {st.initials || "ST"}
+                            </div>
+                            <div>
+                              <p className="font-bold text-slate-900 dark:text-slate-100">
+                                {st.studentName}
+                              </p>
+                              <p className="font-mono text-[11px] text-slate-400">
+                                {st.rollNumber}
+                              </p>
+                            </div>
+                          </div>
+                        </td>
+
+                        {/* Placed Company & Role */}
+                        <td className="px-5 py-3">
+                          <div className="space-y-0.5">
+                            <div className="flex items-center gap-1.5">
+                              <span className="font-bold text-slate-900 dark:text-slate-100">
+                                {st.companyName}
+                              </span>
+                              {matchedPartner && (
+                                <Link
+                                  href={`/partners?search=${encodeURIComponent(matchedPartner)}`}
+                                  title="Accredited Corporate Partner"
+                                  className="text-indigo-600 hover:text-indigo-700 dark:text-indigo-400"
+                                >
+                                  <Handshake className="size-3.5" />
+                                </Link>
+                              )}
+                            </div>
+                            <p className="text-[11px] text-slate-500 dark:text-slate-400 font-medium">
+                              {st.role}
+                            </p>
+                          </div>
+                        </td>
+
+                        {/* Department */}
+                        <td className="px-5 py-3">
+                          <span className="rounded-md bg-slate-100 dark:bg-slate-800 px-2 py-0.5 text-[11px] font-medium text-slate-700 dark:text-slate-300">
+                            {st.department}
+                          </span>
+                        </td>
+
+                        {/* Package */}
+                        <td className="px-5 py-3 font-semibold">
+                          <span className="inline-flex items-center gap-0.5 text-emerald-600 dark:text-emerald-400 font-bold text-xs bg-emerald-50 dark:bg-emerald-950/40 px-2 py-0.5 rounded-md border border-emerald-200 dark:border-emerald-800/50">
+                            <IndianRupee className="size-3" />
+                            {st.packageLpa} LPA
+                          </span>
+                        </td>
+
+                        {/* CGPA */}
+                        <td className="px-5 py-3">
+                          <span className="font-mono font-semibold text-slate-700 dark:text-slate-300">
+                            {st.cgpa.toFixed(2)}
+                          </span>
+                        </td>
+
+                        {/* Batch & Tier */}
+                        <td className="px-5 py-3">
+                          <div className="flex flex-col gap-1">
+                            <span className="font-mono text-[10px] font-bold text-slate-500 dark:text-slate-400">
+                              Batch {st.academicYear}
+                            </span>
+                            <span
+                              className={`rounded-md border px-1.5 py-0.5 text-[9px] font-bold w-fit ${
+                                CATEGORY_TONE[st.tier] || ""
+                              }`}
+                            >
+                              {st.tier}
+                            </span>
+                          </div>
+                        </td>
+
+                        {/* Status & Offer Type */}
+                        <td className="px-5 py-3">
+                          <div className="space-y-1">
+                            <span className="inline-flex items-center gap-1 text-[11px] font-semibold text-emerald-600 dark:text-emerald-400">
+                              <CheckCircle2 className="size-3.5" />
+                              <span>{st.status}</span>
+                            </span>
+                            <p className="text-[10px] text-slate-400">
+                              {st.offerType}
+                            </p>
+                          </div>
+                        </td>
+                      </tr>
+                    );
+                  })}
+                </tbody>
+              </table>
+            </div>
+
+            {/* Pagination Controls */}
+            <div className="flex flex-col sm:flex-row items-center justify-between gap-3 border-t border-border-muted px-5 py-3.5 bg-slate-50/50 dark:bg-slate-800/30 text-xs text-slate-500">
+              <div>
+                Showing{" "}
+                <span className="font-semibold text-slate-900 dark:text-slate-100">
+                  {Math.min(
+                    (studentPage - 1) * STUDENTS_PER_PAGE + 1,
+                    filteredPlacedStudents.length
+                  )}
+                </span>{" "}
+                to{" "}
+                <span className="font-semibold text-slate-900 dark:text-slate-100">
+                  {Math.min(studentPage * STUDENTS_PER_PAGE, filteredPlacedStudents.length)}
+                </span>{" "}
+                of{" "}
+                <span className="font-semibold text-slate-900 dark:text-slate-100">
+                  {filteredPlacedStudents.length}
+                </span>{" "}
+                placed students
+              </div>
+
+              <div className="flex items-center gap-1.5">
+                <button
+                  type="button"
+                  disabled={studentPage <= 1}
+                  onClick={() => setStudentPage((p) => Math.max(1, p - 1))}
+                  className="rounded-lg border border-border-muted bg-surface px-2.5 py-1 text-xs font-semibold text-slate-600 hover:bg-surface-subtle disabled:opacity-40 dark:text-slate-300 cursor-pointer disabled:cursor-not-allowed"
+                >
+                  Previous
+                </button>
+
+                <div className="flex items-center gap-1">
+                  {Array.from({ length: Math.min(5, totalStudentPages) }, (_, i) => {
+                    let pageNum = i + 1;
+                    if (totalStudentPages > 5 && studentPage > 3) {
+                      pageNum = studentPage - 2 + i;
+                      if (pageNum > totalStudentPages) {
+                        pageNum = totalStudentPages - (4 - i);
+                      }
+                    }
+                    return (
+                      <button
+                        key={pageNum}
+                        type="button"
+                        onClick={() => setStudentPage(pageNum)}
+                        className={`size-7 rounded-lg text-xs font-bold transition-all cursor-pointer ${
+                          studentPage === pageNum
+                            ? "bg-indigo-600 text-white shadow-xs"
+                            : "border border-border-muted bg-surface text-slate-600 hover:bg-surface-subtle dark:text-slate-300"
+                        }`}
+                      >
+                        {pageNum}
+                      </button>
+                    );
+                  })}
+                </div>
+
+                <button
+                  type="button"
+                  disabled={studentPage >= totalStudentPages}
+                  onClick={() => setStudentPage((p) => Math.min(totalStudentPages, p + 1))}
+                  className="rounded-lg border border-border-muted bg-surface px-2.5 py-1 text-xs font-semibold text-slate-600 hover:bg-surface-subtle disabled:opacity-40 dark:text-slate-300 cursor-pointer disabled:cursor-not-allowed"
+                >
+                  Next
+                </button>
+              </div>
+            </div>
+          </Card>
+        )}
+      </div>
+
+      {/* 5. ACTIVE LIVE OFFERS & RECENT PITCHES */}
       <div className="space-y-4">
         <div className="flex items-center justify-between">
           <div>
@@ -1595,6 +2491,28 @@ export function PlacementTrackerClient({
                   placeholder="e.g. Bengaluru, Karnataka or Pan-India"
                   className="h-10 w-full rounded-xl border border-border-muted bg-surface-subtle px-3 text-xs text-slate-900 focus:border-indigo-500 focus:outline-none dark:text-slate-100"
                 />
+              </div>
+
+              {/* Row 6: Placed Student Names & Data */}
+              <div>
+                <div className="flex items-center justify-between mb-1">
+                  <label className="block text-xs font-semibold text-slate-700 dark:text-slate-300">
+                    Placed Student Names (Optional)
+                  </label>
+                  <span className="text-[10px] text-slate-400">
+                    Separate by commas or newlines
+                  </span>
+                </div>
+                <textarea
+                  rows={3}
+                  value={formStudentNames}
+                  onChange={(e) => setFormStudentNames(e.target.value)}
+                  placeholder="e.g. Aarav Sharma, Priya Patel, Meera Krishnan, Vikram Singh"
+                  className="w-full rounded-xl border border-border-muted bg-surface-subtle p-3 text-xs text-slate-900 focus:border-indigo-500 focus:outline-none dark:text-slate-100"
+                />
+                <p className="mt-1 text-[11px] text-slate-500 dark:text-slate-400">
+                  Enter candidate names placed in this company. If left blank, realistic student records will be auto-generated for the cohort.
+                </p>
               </div>
 
               {/* Modal Actions */}

@@ -36,6 +36,8 @@ export default async function ReversePlacementPage() {
     prisma.user.findMany({
       where: { role: "STUDENT", profile: { isNot: null } },
       include: { profile: true },
+      take: 60,
+      orderBy: { createdAt: "desc" },
     }),
     isStudent
       ? prisma.jobPitch.findMany({

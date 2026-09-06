@@ -1,3 +1,21 @@
+export interface PlacedStudentData {
+  id: string;
+  studentName: string;
+  rollNumber: string;
+  department: string;
+  companyName: string;
+  role: string;
+  packageLpa: number;
+  academicYear: string;
+  tier: "Super Dream" | "Dream" | "Mass / IT Services" | "Core / R&D";
+  cgpa: number;
+  placementDate: string;
+  offerType: "Full-Time (Direct)" | "PPO (Pre-Placement Offer)" | "Intern + FTE";
+  status: "Verified" | "Offer Accepted";
+  initials?: string;
+  location?: string;
+}
+
 export interface CompanyPlacementRecord {
   companyName: string;
   initials: string;
@@ -8,6 +26,7 @@ export interface CompanyPlacementRecord {
   avgCtcLpa: number;
   location: string;
   isCorporatePartner?: boolean;
+  students?: PlacedStudentData[];
 }
 
 export interface YearlyPlacementData {
@@ -58,6 +77,115 @@ export function matchCorporatePartner(companyName: string): string | null {
     if (pNorm.includes("l&t") && norm.includes("l&t")) return partner;
   }
   return null;
+}
+
+const SAMPLE_STUDENT_NAMES = [
+  "Aarav Sharma",
+  "Priya Patel",
+  "Vikram Singh",
+  "Meera Krishnan",
+  "Ananya Reddy",
+  "Rohan Verma",
+  "Sneha Nair",
+  "Aditya Joshi",
+  "Ishaan Malhotra",
+  "Tanvi Choudhury",
+  "Rhea Sundaram",
+  "Kavya Iyer",
+  "Siddharth Rao",
+  "Arjun Gupta",
+  "Divya Menon",
+  "Kabir Sen",
+  "Nandini Ghosh",
+  "Varun Bhat",
+  "Karthik Rajan",
+  "Pooja Hegde",
+  "Dhruv Kapoor",
+  "Tara Pillai",
+  "Manish Saxena",
+  "Shreya Deshmukh",
+  "Nikhil Prasad",
+  "Anika Mehra",
+  "Suresh Kumar",
+  "Deepika Nambiar",
+  "Rahul Bose",
+  "Neha Agarwal",
+];
+
+const DEPARTMENTS = [
+  { name: "Computer Science & Engineering", code: "CS" },
+  { name: "Information Technology", code: "IT" },
+  { name: "Electronics & Communication", code: "EC" },
+  { name: "Artificial Intelligence & Data Science", code: "AI" },
+  { name: "Electrical Engineering", code: "EE" },
+  { name: "Mechanical Engineering", code: "ME" },
+];
+
+export function getStudentsForCompany(
+  company: CompanyPlacementRecord,
+  academicYear: string
+): PlacedStudentData[] {
+  if (company.students && company.students.length > 0) {
+    return company.students;
+  }
+
+  const batchYearNum = parseInt(academicYear.slice(0, 4)) || 2025;
+  const rollPrefix = (batchYearNum - 3).toString().slice(-2);
+  const count = Math.min(company.placedCount, 25);
+
+  return Array.from({ length: count }, (_, idx) => {
+    const rawName = SAMPLE_STUDENT_NAMES[idx % SAMPLE_STUDENT_NAMES.length];
+    const cycle = Math.floor(idx / SAMPLE_STUDENT_NAMES.length);
+    const studentName = cycle > 0 ? `${rawName} (${cycle + 1})` : rawName;
+    const initials =
+      studentName
+        .split(/\s+/)
+        .map((w) => w[0])
+        .join("")
+        .slice(0, 2)
+        .toUpperCase() || "ST";
+
+    const dept = DEPARTMENTS[idx % DEPARTMENTS.length];
+    const rollNumber = `${rollPrefix}${dept.code}${String(101 + idx).padStart(3, "0")}`;
+    const role = company.roles[idx % Math.max(1, company.roles.length)] || "Software Engineer";
+    const cgpa = Number((8.2 + ((idx * 3.7) % 1.7)).toFixed(2));
+    const offerType: PlacedStudentData["offerType"] =
+      company.category === "Super Dream"
+        ? idx % 2 === 0
+          ? "PPO (Pre-Placement Offer)"
+          : "Full-Time (Direct)"
+        : idx % 3 === 0
+        ? "Intern + FTE"
+        : "Full-Time (Direct)";
+
+    return {
+      id: `pl-${company.companyName.toLowerCase().replace(/[^a-z0-9]/g, "-")}-${academicYear}-${idx + 1}`,
+      studentName,
+      rollNumber,
+      department: dept.name,
+      companyName: company.companyName,
+      role,
+      packageLpa: company.avgCtcLpa,
+      academicYear,
+      tier: company.category,
+      cgpa,
+      placementDate: `Batch ${academicYear}`,
+      offerType,
+      status: "Verified",
+      initials,
+      location: company.location,
+    };
+  });
+}
+
+export function getAllPlacedStudents(yearlyData: YearlyPlacementData[]): PlacedStudentData[] {
+  const all: PlacedStudentData[] = [];
+  yearlyData.forEach((yd) => {
+    yd.companies.forEach((comp) => {
+      all.push(...getStudentsForCompany(comp, yd.year));
+    });
+  });
+  return all;
 }
 
 export const YEARLY_PLACEMENT_DATA: YearlyPlacementData[] = [
