@@ -4,6 +4,7 @@ import { ClipboardCheck, ClipboardList, ListChecks } from "lucide-react";
 import { getCurrentUser } from "@/lib/auth";
 import { prisma } from "@/lib/prisma";
 import { Badge, Card, EmptyState, PageHeader, type BadgeTone } from "@/components/ui";
+import { syncStudentSkillDecay } from "@/lib/skillDecaySync";
 import { SkillDecayEngine, type SkillEntry } from "./SkillDecayEngine";
 import SkillQuestionnaire from "./SkillQuestionnaire";
 import SkillMappingHub from "./SkillMappingHub";
@@ -20,6 +21,9 @@ export default async function SkillsPage() {
   if (!user) redirect("/login");
 
   if (user.role === "STUDENT") {
+    // Automatically update skill decay statuses in the database according to date
+    await syncStudentSkillDecay(user.id);
+
     const [assessments, learningPrograms] = await Promise.all([
       prisma.skillAssessment.findMany({
         where: { studentId: user.id },

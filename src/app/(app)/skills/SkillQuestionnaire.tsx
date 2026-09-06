@@ -1,6 +1,7 @@
 "use client";
 
-import { useState, useTransition } from "react";
+import { useEffect, useState, useTransition } from "react";
+import { useRouter } from "next/navigation";
 import { CheckCircle2, Loader2, RotateCcw, Sparkles, Target } from "lucide-react";
 import { submitSkillQuestionnaire } from "./actions";
 import { SkillDiagnosticModal } from "./SkillDiagnosticModal";
@@ -42,6 +43,7 @@ const RATING_LABEL: Record<number, string> = {
 };
 
 export default function SkillQuestionnaire({ selected }: { selected: string[] }) {
+  const router = useRouter();
   // Store selected skills with an optional self-rated target, without hardcoding verified 60s
   const [ratings, setRatings] = useState<Record<string, number>>(() => {
     const init: Record<string, number> = {};
@@ -54,6 +56,18 @@ export default function SkillQuestionnaire({ selected }: { selected: string[] })
     }
     return init;
   });
+
+  useEffect(() => {
+    setRatings((prev) => {
+      const updated = { ...prev };
+      for (const s of selected) {
+        if (updated[s] === undefined) {
+          updated[s] = 60;
+        }
+      }
+      return updated;
+    });
+  }, [selected]);
 
   const [pending, startTransition] = useTransition();
   const [message, setMessage] = useState<string>("");
@@ -90,6 +104,11 @@ export default function SkillQuestionnaire({ selected }: { selected: string[] })
     startTransition(async () => {
       const result = await submitSkillQuestionnaire(payload);
       setMessage(result.message);
+      try {
+        router.refresh();
+      } catch {
+        // fallback
+      }
     });
   }
 
@@ -226,7 +245,12 @@ export default function SkillQuestionnaire({ selected }: { selected: string[] })
         onClose={() => setDiagnosticOpen(false)}
         skillsToTest={skillsToTest}
         onComplete={() => {
-          // Revalidation happens automatically in server action
+          try {
+            router.refresh();
+          } catch {
+            // fallback
+          }
+          setMessage("Diagnostic assessment completed! Scores verified and updated on the Skill Radar.");
         }}
       />
     </div>

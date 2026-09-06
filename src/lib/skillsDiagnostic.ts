@@ -516,7 +516,399 @@ export const SKILL_QUESTION_BANK: Record<string, DiagnosticQuestion[]> = {
       difficulty: "beginner",
     },
   ],
+
+  Java: [
+    {
+      id: "java-1",
+      skillName: "Java",
+      question: "What is the primary difference between `==` and `.equals()` when comparing two String objects in Java?",
+      options: [
+        "`==` compares memory references, while `.equals()` evaluates value equality",
+        "`.equals()` checks whether two strings share the same hash code",
+        "`==` throws a NullPointerException if either operand is null",
+        "They are completely interchangeable for Strings in modern JVMs",
+      ],
+      correctIndex: 0,
+      explanation: "In Java, `==` tests object reference identity, whereas `String.equals()` compares character sequence equality.",
+      difficulty: "beginner",
+    },
+    {
+      id: "java-2",
+      skillName: "Java",
+      question: "What is the role of the `volatile` keyword in Java concurrent programming?",
+      options: [
+        "It locks the variable so only one thread can modify it at a time",
+        "It prevents the variable from being serialized by ObjectOutputStream",
+        "It guarantees visibility of changes to variables across threads by bypassing CPU thread caches",
+        "It forces the JVM to allocate the variable inside stack memory",
+      ],
+      correctIndex: 2,
+      explanation: "`volatile` establishes a happens-before relationship, guaranteeing that reads/writes happen directly against main memory rather than thread-local CPU caches.",
+      difficulty: "intermediate",
+    },
+    {
+      id: "java-3",
+      skillName: "Java",
+      question: "Which concurrent collection in `java.util.concurrent` provides thread-safe operations with lock striping instead of full-table locking?",
+      options: ["Hashtable", "ConcurrentHashMap", "Collections.synchronizedMap()", "TreeMap"],
+      correctIndex: 1,
+      explanation: "`ConcurrentHashMap` uses bucket-level synchronization (and CAS operations), avoiding whole-table synchronization locks.",
+      difficulty: "intermediate",
+    },
+  ],
+
+  "C++": [
+    {
+      id: "cpp-1",
+      skillName: "C++",
+      question: "What is the core tenet of RAII (Resource Acquisition Is Initialization) in modern C++?",
+      options: [
+        "Resources are acquired in constructors and released automatically in destructors when scope ends",
+        "All heap memory allocations must be initialized to zero on program startup",
+        "Variables must be declared with `auto` to guarantee type safety",
+        "Global pointers must be freed explicitly before `main()` terminates",
+      ],
+      correctIndex: 0,
+      explanation: "RAII ties resource lifetimes (memory, sockets, file handles) to object scope, ensuring automatic release during stack unwinding.",
+      difficulty: "intermediate",
+    },
+    {
+      id: "cpp-2",
+      skillName: "C++",
+      question: "Which smart pointer in C++11 models single, exclusive ownership of a dynamic heap object?",
+      options: ["std::shared_ptr", "std::weak_ptr", "std::unique_ptr", "std::auto_ptr"],
+      correctIndex: 2,
+      explanation: "`std::unique_ptr` maintains strict unique ownership without reference counting overhead, preventing double-free errors.",
+      difficulty: "beginner",
+    },
+    {
+      id: "cpp-3",
+      skillName: "C++",
+      question: "What does the `virtual` keyword on a member function achieve in C++?",
+      options: [
+        "It forces the compiler to inline the function",
+        "It enables dynamic dispatch via a virtual method table (vtable) at runtime",
+        "It prevents derived classes from overriding the method",
+        "It marks the method as pure static",
+      ],
+      correctIndex: 1,
+      explanation: "Virtual functions permit runtime polymorphism; invocations through base pointers resolve to the derived class implementation via the vtable.",
+      difficulty: "intermediate",
+    },
+  ],
+
+  Go: [
+    {
+      id: "go-1",
+      skillName: "Go",
+      question: "How do concurrent Goroutines safely communicate and synchronize in idiomatic Go?",
+      options: [
+        "By communicating through typed channels rather than sharing mutable memory",
+        "By using global mutexes on every package variable",
+        "By creating separate OS threads for every function call",
+        "By sharing static global arrays",
+      ],
+      correctIndex: 0,
+      explanation: "The Go proverb states: 'Do not communicate by sharing memory; instead, share memory by communicating' via channels.",
+      difficulty: "beginner",
+    },
+    {
+      id: "go-2",
+      skillName: "Go",
+      question: "What happens when sending to an unbuffered channel in Go if no goroutine is actively receiving from it?",
+      options: [
+        "The message is silently dropped",
+        "The sender goroutine blocks until a receiver is ready",
+        "The runtime panics with a ChannelOverflowError",
+        "The message is queued in a temporary OS socket",
+      ],
+      correctIndex: 1,
+      explanation: "Unbuffered channel sends block until another goroutine executes a corresponding receive, ensuring synchronous rendezvous.",
+      difficulty: "intermediate",
+    },
+    {
+      id: "go-3",
+      skillName: "Go",
+      question: "What is the zero value of pointers, slices, maps, channels, and interfaces in Go?",
+      options: ["undefined", "0", "nil", "null"],
+      correctIndex: 2,
+      explanation: "In Go, reference and interface types default to `nil` when declared without an initial value.",
+      difficulty: "beginner",
+    },
+  ],
+
+  "Next.js": [
+    {
+      id: "next-1",
+      skillName: "Next.js",
+      question: "In the Next.js App Router, what is the default behavior of React components inside the `app` directory?",
+      options: [
+        "They are React Server Components (RSC) by default, running exclusively on the server",
+        "They are Client Components requiring full client JavaScript bundling",
+        "They are static HTML pages without hydration capabilities",
+        "They only execute inside Service Workers",
+      ],
+      correctIndex: 0,
+      explanation: "In the App Router, components default to React Server Components (RSC), delivering zero client-side JavaScript for those components.",
+      difficulty: "beginner",
+    },
+    {
+      id: "next-2",
+      skillName: "Next.js",
+      question: "What is the purpose of Server Actions in Next.js?",
+      options: [
+        "To replace CSS stylesheets with server stylesheets",
+        "To allow client forms and event handlers to asynchronously execute secure server-side logic without boilerplate API routes",
+        "To execute cron jobs during build time only",
+        "To prevent any database queries from running",
+      ],
+      correctIndex: 1,
+      explanation: "Server Actions are asynchronous functions marked with `'use server'` that enable client forms or hooks to directly mutate data and trigger revalidation.",
+      difficulty: "intermediate",
+    },
+    {
+      id: "next-3",
+      skillName: "Next.js",
+      question: "Which function clears the Data Cache and triggers on-demand revalidation of a specific route in Next.js?",
+      options: ["cache.clear()", "window.location.reload()", "revalidatePath()", "flushRoute()"],
+      correctIndex: 2,
+      explanation: "`revalidatePath('/route')` purges cached server renders and triggers fresh data rendering on subsequent visits.",
+      difficulty: "intermediate",
+    },
+  ],
+
+  AWS: [
+    {
+      id: "aws-1",
+      skillName: "AWS",
+      question: "Which AWS storage service provides object storage with 99.999999999% (11 9s) of data durability?",
+      options: ["Amazon EBS", "Amazon S3", "Amazon EFS", "AWS Storage Gateway"],
+      correctIndex: 1,
+      explanation: "Amazon Simple Storage Service (Amazon S3) is built to provide 99.999999999% durability across multiple availability zones.",
+      difficulty: "beginner",
+    },
+    {
+      id: "aws-2",
+      skillName: "AWS",
+      question: "In an AWS VPC, which component allows private subnet instances to initiate outbound requests to the internet while preventing unsolicited inbound traffic?",
+      options: ["NAT Gateway", "Internet Gateway directly on private subnets", "VPC Peering", "Security Group default egress rule"],
+      correctIndex: 0,
+      explanation: "A Network Address Translation (NAT) Gateway translates private IP traffic out through an elastic IP, blocking external inbound initiations.",
+      difficulty: "intermediate",
+    },
+    {
+      id: "aws-3",
+      skillName: "AWS",
+      question: "What is the core execution and billing paradigm of AWS Lambda?",
+      options: [
+        "Provisioning persistent virtual machines billed monthly",
+        "Running Docker daemons on dedicated bare-metal hosts",
+        "Serverless event-driven execution billed per millisecond of compute time",
+        "Compiling code directly into FPGA hardware",
+      ],
+      correctIndex: 2,
+      explanation: "AWS Lambda executes application code in response to events (HTTP, S3, SQS) and charges solely for compute milliseconds consumed.",
+      difficulty: "beginner",
+    },
+  ],
+
+  Kubernetes: [
+    {
+      id: "k8s-1",
+      skillName: "Kubernetes",
+      question: "What is the fundamental, smallest deployable compute object in Kubernetes?",
+      options: ["Container", "Pod", "Node", "Service"],
+      correctIndex: 1,
+      explanation: "A Pod is the smallest execution unit in Kubernetes, encapsulating one or more tightly coupled containers sharing network and storage namespaces.",
+      difficulty: "beginner",
+    },
+    {
+      id: "k8s-2",
+      skillName: "Kubernetes",
+      question: "Which Kubernetes controller maintains the desired pod replica count and facilitates declarative rolling updates?",
+      options: ["Deployment", "DaemonSet", "Job", "Ingress"],
+      correctIndex: 0,
+      explanation: "A Deployment declarative controller manages ReplicaSets to ensure the requested number of pods are healthy and orchestrates zero-downtime rolling updates.",
+      difficulty: "intermediate",
+    },
+    {
+      id: "k8s-3",
+      skillName: "Kubernetes",
+      question: "What Kubernetes object provides a stable virtual IP (ClusterIP) and internal DNS entry to route traffic to ephemeral pod IPs?",
+      options: ["ConfigMap", "PersistentVolume", "Service", "Namespace"],
+      correctIndex: 2,
+      explanation: "A Kubernetes Service provides an abstract, stable endpoint that load-balances traffic across dynamic pods matching a selector.",
+      difficulty: "intermediate",
+    },
+  ],
+
+  "HTML/CSS": [
+    {
+      id: "htmlcss-1",
+      skillName: "HTML/CSS",
+      question: "In CSS Flexbox, which property controls alignment of child items perpendicular to the main axis?",
+      options: ["justify-content", "align-items", "flex-direction", "place-content"],
+      correctIndex: 1,
+      explanation: "`align-items` aligns flex items along the cross axis, whereas `justify-content` aligns items along the main axis.",
+      difficulty: "beginner",
+    },
+    {
+      id: "htmlcss-2",
+      skillName: "HTML/CSS",
+      question: "What is the impact of setting `box-sizing: border-box` on an HTML element?",
+      options: [
+        "Padding and border are included inside the declared width and height, preventing layout explosion",
+        "Margins are included inside the element width",
+        "It removes all borders from the element",
+        "It forces the element to display as inline-block",
+      ],
+      correctIndex: 0,
+      explanation: "`border-box` incorporates padding and border within the specified dimensions, making responsive sizing intuitive and predictable.",
+      difficulty: "beginner",
+    },
+    {
+      id: "htmlcss-3",
+      skillName: "HTML/CSS",
+      question: "Which HTML5 semantic element is most appropriate for independent, distributable content like a forum post, blog entry, or news card?",
+      options: ["<div>", "<aside>", "<article>", "<section>"],
+      correctIndex: 2,
+      explanation: "The `<article>` element represents a complete, self-contained composition that is intended to be independently distributable or reusable.",
+      difficulty: "beginner",
+    },
+  ],
+
+  Linux: [
+    {
+      id: "linux-1",
+      skillName: "Linux",
+      question: "Which octal file permission mode gives Read, Write, and Execute (`rwx`) to the owner, and Read and Execute (`r-x`) to group and others?",
+      options: ["755", "644", "777", "700"],
+      correctIndex: 0,
+      explanation: "Owner `rwx` = 4+2+1 = 7; Group `r-x` = 4+0+1 = 5; Others `r-x` = 4+0+1 = 5. Hence mode `755`.",
+      difficulty: "intermediate",
+    },
+    {
+      id: "linux-2",
+      skillName: "Linux",
+      question: "Which signal does `kill -9 <PID>` dispatch that cannot be trapped, caught, or ignored by a process?",
+      options: ["SIGINT", "SIGTERM", "SIGKILL", "SIGHUP"],
+      correctIndex: 2,
+      explanation: "`SIGKILL` (signal 9) instructs the kernel to immediately abort the process without allowing signal handlers to run.",
+      difficulty: "beginner",
+    },
+  ],
+
+  "CI/CD": [
+    {
+      id: "cicd-1",
+      skillName: "CI/CD",
+      question: "What is the core objective of Continuous Integration (CI)?",
+      options: [
+        "To immediately deploy code directly to live production servers without testing",
+        "To frequently merge code branches into mainline and execute automated tests to catch regressions early",
+        "To eliminate the need for version control branches",
+        "To manually inspect every line of code in weekly committee meetings",
+      ],
+      correctIndex: 1,
+      explanation: "Continuous Integration automates builds and automated test runs on each commit, ensuring code integration bugs are caught immediately.",
+      difficulty: "beginner",
+    },
+    {
+      id: "cicd-2",
+      skillName: "CI/CD",
+      question: "In blue/green deployment strategy, what enables near-zero downtime and instant rollback?",
+      options: [
+        "Updating servers in-place one by one while keeping traffic active",
+        "Having two identical production environments and instantly switching router/load-balancer traffic from Blue to Green",
+        "Shutting down all instances for 5 minutes during database migration",
+        "Compiling binaries on production servers during peak hours",
+      ],
+      correctIndex: 1,
+      explanation: "Blue/Green maintains two environments; once Green is validated, traffic is switched via routing, with Blue ready for instant rollback if issues arise.",
+      difficulty: "intermediate",
+    },
+  ],
+
+  "Deep Learning": [
+    {
+      id: "dl-1",
+      skillName: "Deep Learning",
+      question: "Which core architectural mechanism in Transformer models allows them to process all sequence tokens in parallel while learning pairwise dependencies?",
+      options: ["Recurrent hidden state passing", "Self-Attention mechanism", "Max pooling across time", "Convolutional stride filtering"],
+      correctIndex: 1,
+      explanation: "Multi-Head Self-Attention calculates query-key similarity matrices across all token positions simultaneously, replacing sequential recurrence.",
+      difficulty: "intermediate",
+    },
+    {
+      id: "dl-2",
+      skillName: "Deep Learning",
+      question: "Why does the ReLU (Rectified Linear Unit) activation function alleviate the vanishing gradient problem in deep networks?",
+      options: [
+        "Its derivative is 1 for all positive activations, preventing exponential decay of backpropagated gradients",
+        "It bounds all outputs between 0 and 1",
+        "It computes complex trigonometric transforms",
+        "It normalizes weights to zero mean automatically",
+      ],
+      correctIndex: 0,
+      explanation: "Because $d/dx[max(0, x)] = 1$ for $x > 0$, ReLU does not saturate for large positive inputs like Sigmoid or Tanh, preserving gradient flow.",
+      difficulty: "intermediate",
+    },
+  ],
 };
+
+/**
+ * Case-insensitive helper to look up curated questions with aliases.
+ */
+export function findCuratedQuestionsForSkill(skillName: string): DiagnosticQuestion[] | undefined {
+  if (!skillName) return undefined;
+  const norm = skillName.trim().toLowerCase();
+
+  for (const [key, questions] of Object.entries(SKILL_QUESTION_BANK)) {
+    if (key.toLowerCase() === norm) {
+      return questions;
+    }
+  }
+
+  // Common aliases & partial matching
+  if (norm === "js" || norm === "javascript") return SKILL_QUESTION_BANK["JavaScript"];
+  if (norm === "ts" || norm === "typescript") return SKILL_QUESTION_BANK["TypeScript"];
+  if (norm === "py" || norm === "python") return SKILL_QUESTION_BANK["Python"];
+  if (norm.includes("html") || norm.includes("css")) return SKILL_QUESTION_BANK["HTML/CSS"];
+  if (norm.includes("next")) return SKILL_QUESTION_BANK["Next.js"];
+  if (norm.includes("node")) return SKILL_QUESTION_BANK["Node.js"];
+  if (norm.includes("react")) return SKILL_QUESTION_BANK["React"];
+  if (norm.includes("docker")) return SKILL_QUESTION_BANK["Docker"];
+  if (norm.includes("k8s") || norm.includes("kubernetes")) return SKILL_QUESTION_BANK["Kubernetes"];
+  if (norm.includes("aws") || norm.includes("cloud")) return SKILL_QUESTION_BANK["AWS"];
+  if (norm.includes("deep learning") || norm === "dl") return SKILL_QUESTION_BANK["Deep Learning"];
+  if (norm.includes("machine learning") || norm === "ml") return SKILL_QUESTION_BANK["Machine Learning"];
+  if (norm.includes("ui") || norm.includes("ux") || norm.includes("design") || norm.includes("figma")) {
+    return SKILL_QUESTION_BANK["UI/UX Design"];
+  }
+  if (norm.includes("postgres") || norm.includes("mysql") || norm.includes("sql")) {
+    return SKILL_QUESTION_BANK["SQL"];
+  }
+  if (norm.includes("devops") || norm.includes("ci/cd") || norm.includes("pipeline")) {
+    return SKILL_QUESTION_BANK["CI/CD"];
+  }
+  if (norm.includes("linux") || norm.includes("bash") || norm.includes("shell")) {
+    return SKILL_QUESTION_BANK["Linux"];
+  }
+  if (norm.includes("java") && !norm.includes("javascript")) {
+    return SKILL_QUESTION_BANK["Java"];
+  }
+  if (norm.includes("c++") || norm === "cpp") {
+    return SKILL_QUESTION_BANK["C++"];
+  }
+  if (norm === "go" || norm.includes("golang")) {
+    return SKILL_QUESTION_BANK["Go"];
+  }
+  if (norm.includes("data") || norm.includes("analytics") || norm.includes("statistics")) {
+    return SKILL_QUESTION_BANK["Data Analysis"];
+  }
+
+  return undefined;
+}
 
 /**
  * Generate diagnostic questions for a list of skills.
@@ -528,11 +920,18 @@ export function generateDiagnosticQuestionsForSkills(
 ): DiagnosticQuestion[] {
   const result: DiagnosticQuestion[] = [];
 
-  for (const skill of skillNames) {
-    const curated = SKILL_QUESTION_BANK[skill];
+  for (const rawSkill of skillNames) {
+    const skill = rawSkill.trim();
+    if (!skill) continue;
+
+    const curated = findCuratedQuestionsForSkill(skill);
     if (curated && curated.length > 0) {
-      // Pick up to questionsPerSkill
-      const slice = curated.slice(0, questionsPerSkill);
+      // Pick up to questionsPerSkill, ensuring skillName on each question reflects the queried skill name
+      const slice = curated.slice(0, questionsPerSkill).map((q, idx) => ({
+        ...q,
+        id: `${q.id}-${skill.toLowerCase().replace(/[^a-z0-9]/g, "-")}-${idx}`,
+        skillName: skill,
+      }));
       result.push(...slice);
     } else {
       // Generate domain-focused diagnostic questions for custom / AYUSH / other skills
@@ -540,9 +939,9 @@ export function generateDiagnosticQuestionsForSkills(
         {
           id: `diag-${skill.toLowerCase().replace(/[^a-z0-9]/g, "-")}-1`,
           skillName: skill,
-          question: `In industry practice, what represents the gold standard for verifying and benchmarking proficiency in ${skill}?`,
+          question: `In professional practice, what represents the gold standard for verifying and benchmarking proficiency in ${skill}?`,
           options: [
-            `Peer-reviewed artifact verification, reproducible benchmarks, and domain testing`,
+            `Peer-reviewed artifact verification, reproducible benchmarks, and domain diagnostic testing`,
             `Casual self-declaration on social media profiles without work proofs`,
             `Solely relying on theoretical definitions without practical implementations`,
             `Unverified third-party claims with no verifiable repository or sign-off`,
@@ -554,7 +953,7 @@ export function generateDiagnosticQuestionsForSkills(
         {
           id: `diag-${skill.toLowerCase().replace(/[^a-z0-9]/g, "-")}-2`,
           skillName: skill,
-          question: `When designing workflows or pipelines in ${skill}, which principle ensures operational robustness and consistency?`,
+          question: `When designing workflows or production pipelines in ${skill}, which principle ensures operational robustness and consistency?`,
           options: [
             `Hardcoding configurations directly into business logic`,
             `Modular architecture, continuous validation, and automated error handling`,
@@ -568,7 +967,7 @@ export function generateDiagnosticQuestionsForSkills(
         {
           id: `diag-${skill.toLowerCase().replace(/[^a-z0-9]/g, "-")}-3`,
           skillName: skill,
-          question: `Which methodology best prevents skill decay and ensures continuous compliance in ${skill}?`,
+          question: `Which methodology best prevents skill decay and ensures continuous market readiness in ${skill}?`,
           options: [
             `One-time certification without continuing education or real project exposure`,
             `Periodic diagnostic re-evaluations, live project proofs of work, and peer sign-offs`,

@@ -466,29 +466,31 @@ async function main() {
 
   // ----- SKILL ASSESSMENTS -----
   const skillAssessments = [
-    [studentUserIds[0], "Machine Learning", 92, "ACTIVE"],
-    [studentUserIds[0], "Python", 95, "ACTIVE"],
-    [studentUserIds[0], "React", 78, "STALE"],
-    [studentUserIds[0], "SQL", 74, "EXPIRED"],
-    [studentUserIds[0], "Docker", 84, "RECERTIFIED"],
-    [studentUserIds[1], "Java", 88, "STALE"],
-    [studentUserIds[1], "Spring Boot", 74, "ACTIVE"],
-    [studentUserIds[2], "Embedded C", 90, "ACTIVE"],
-    [studentUserIds[3], "CAD Modeling", 85, "STALE"],
-    [studentUserIds[4], "Flutter", 91, "ACTIVE"],
-    [studentUserIds[5], "Data Analysis", 80, "ACTIVE"],
-    [studentUserIds[7], "Go", 87, "ACTIVE"],
+    // [studentId, skill, score, decayStatus, daysAgoVerified, daysAgoAssessed]
+    [studentUserIds[0], "Machine Learning", 92, "ACTIVE", 7, 7],      // Fresh (<=45d)
+    [studentUserIds[0], "Python", 95, "ACTIVE", 14, 14],             // Fresh (<=45d)
+    [studentUserIds[0], "React", 78, "STALE", 62, 62],               // Decaying (46-90d)
+    [studentUserIds[0], "SQL", 74, "EXPIRED", 108, 108],             // Expired (>90d threshold)
+    [studentUserIds[0], "Docker", 84, "RECERTIFIED", 2, 2],          // Refreshed (recent test)
+    [studentUserIds[0], "TypeScript", 68, "STALE", null, 1],         // Decaying (unverified self-declaration)
+    [studentUserIds[1], "Java", 88, "STALE", 58, 58],
+    [studentUserIds[1], "Spring Boot", 74, "ACTIVE", 10, 10],
+    [studentUserIds[2], "Embedded C", 90, "ACTIVE", 12, 12],
+    [studentUserIds[3], "CAD Modeling", 85, "STALE", 70, 70],
+    [studentUserIds[4], "Flutter", 91, "ACTIVE", 5, 5],
+    [studentUserIds[5], "Data Analysis", 80, "ACTIVE", 20, 20],
+    [studentUserIds[7], "Go", 87, "ACTIVE", 15, 15],
   ] as const;
 
-  for (const [sid, skill, score, decay] of skillAssessments) {
+  for (const [sid, skill, score, decay, daysVerified, daysAssessed] of skillAssessments) {
     await prisma.skillAssessment.create({
       data: {
         studentId: sid as string,
         skillName: skill as string,
         score: score as number,
-        verifiedAt: new Date(Date.now() - Math.floor(Math.random() * 60) * 86400000),
+        verifiedAt: daysVerified !== null ? new Date(Date.now() - (daysVerified as number) * 86400000) : null,
         decayStatus: decay,
-        lastAssessedAt: new Date(Date.now() - Math.floor(Math.random() * 30) * 86400000),
+        lastAssessedAt: new Date(Date.now() - (daysAssessed as number) * 86400000),
       },
     });
   }

@@ -251,6 +251,61 @@ export async function submitSkillQuestionnaire(
   };
 }
 
+import { syncStudentSkillDecay } from "@/lib/skillDecaySync";
+
+/**
+ * Server action to explicitly sync and recalculate all skill decay statuses
+ * according to dates for the currently authenticated student.
+ */
+export async function syncSkillDecayStatusesAction(): Promise<{ ok: boolean; message: string }> {
+  const user = await getCurrentUser();
+  if (!user || user.role !== "STUDENT") {
+    return { ok: false, message: "Only students can sync skill decay." };
+  }
+
+  await syncStudentSkillDecay(user.id);
+  revalidatePath("/skills");
+  revalidatePath("/dashboard");
+
+  return { ok: true, message: "Skill decay statuses updated according to verification dates." };
+}
+
+/**
+ * Test & Demonstration helper: Set a skill assessment's verification date to X days in the past,
+ * allowing instant demonstration of how decay triggers STALE (tested 46-90d ago) or EXPIRED (>90d ago).
+ */
+export async function simulateSkillDecayAction(
+  skillId: string,
+  daysInPast: number
+): Promise<{ ok: boolean; message: string }> {
+  const user = await getCurrentUser();
+  if (!user || user.role !== "STUDENT") {
+    return { ok: false, message: "Only students can modify skill assessments." };
+  }
+
+  const pastDate = new Date();
+  pastDate.setDate(pastDate.getDate() - daysInPast);
+
+  const status: DecayStatus = daysInPast > 90 ? "EXPIRED" : daysInPast > 45 ? "STALE" : "ACTIVE";
+
+  await prisma.skillAssessment.updateMany({
+    where: { id: skillId, studentId: user.id },
+    data: {
+      verifiedAt: pastDate,
+      decayStatus: status,
+      lastAssessedAt: pastDate,
+    },
+  });
+
+  revalidatePath("/skills");
+  revalidatePath("/dashboard");
+
+  return {
+    ok: true,
+    message: `Skill simulated as tested ${daysInPast} days ago (${status}).`,
+  };
+}
+
 /**
  * Backward-compatible helper for legacy callers.
  */
@@ -259,6 +314,8 @@ export async function runReCertificationDiagnostic(): Promise<RecertResult> {
   if (!user || user.role !== "STUDENT") {
     return { refreshed: 0, skills: [], message: "Only students can take the diagnostic." };
   }
+
+  await syncStudentSkillDecay(user.id);
 
   const assessments = await prisma.skillAssessment.findMany({
     where: { studentId: user.id },
@@ -275,3 +332,4 @@ export async function runReCertificationDiagnostic(): Promise<RecertResult> {
     message: "Please use the interactive diagnostic test to evaluate your skills.",
   };
 }
+

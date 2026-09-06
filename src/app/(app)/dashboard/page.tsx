@@ -1,6 +1,7 @@
 import { redirect } from "next/navigation";
 import { getCurrentUser, normalizeRole } from "@/lib/auth";
 import { prisma, withRetry } from "@/lib/prisma";
+import { syncStudentSkillDecay } from "@/lib/skillDecaySync";
 import { DashboardContent, type DashboardViewProps } from "./DashboardContent";
 
 export default async function DashboardPage() {
@@ -17,6 +18,9 @@ export default async function DashboardPage() {
 
   switch (effectiveRole) {
     case "STUDENT": {
+      // Sync skill decay statuses according to date before rendering stats
+      await syncStudentSkillDecay(user.id);
+
       const [
         projectsCount,
         proofsCount,
@@ -57,7 +61,7 @@ export default async function DashboardPage() {
           orderBy: { createdAt: "desc" },
           take: 3,
         }),
-        prisma.skillAssessment.count({ where: { studentId: user.id, decayStatus: "ACTIVE" } }),
+        prisma.skillAssessment.count({ where: { studentId: user.id, decayStatus: { in: ["ACTIVE", "RECERTIFIED"] } } }),
         prisma.skillAssessment.count({ where: { studentId: user.id, decayStatus: "STALE" } }),
         prisma.skillAssessment.count({ where: { studentId: user.id, decayStatus: "EXPIRED" } }),
         prisma.internshipApplication.count({ where: { studentId: user.id } }),
