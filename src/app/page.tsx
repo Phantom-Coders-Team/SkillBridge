@@ -82,23 +82,6 @@ const PORTALS = [
     href: "/signup?role=INDUSTRY",
     cta: "Enter as industry →",
   },
-  {
-    role: "INSTITUTION",
-    kicker: "// INSTITUTION",
-    title: "Drive outcomes across all cohorts.",
-    tone: "border-emerald-500/30 hover:border-emerald-500/70 bg-gradient-to-b from-emerald-500/[0.04] to-surface",
-    kickerColor: "text-emerald-600 dark:text-emerald-400",
-    dotColor: "bg-emerald-500",
-    btnTone: "border-emerald-500/40 hover:bg-emerald-600 hover:text-white text-emerald-700 dark:text-emerald-300",
-    bullets: [
-      "Skill deficit heatmap across all departments",
-      "Placement records and verified hiring telemetry",
-      "AI-assisted syllabus gap analysis and curriculum patches",
-      "Accreditation-ready audit records and exports",
-    ],
-    href: "/signup?role=INSTITUTION",
-    cta: "Enter as institution →",
-  },
 ];
 
 const LIFECYCLE_PHASES = [
@@ -344,25 +327,25 @@ export default async function Home() {
         </section>
 
         {/* ================================================================
-            SECTION 01: FOUR DOORS, ONE PLATFORM (ROLES)
+            SECTION 01: THREE DOORS, ONE PLATFORM (ROLES)
         ================================================================ */}
         <section id="roles" className="mt-28 sm:mt-36">
           <Reveal>
             <div className="max-w-2xl">
               <span className="font-mono text-xs font-semibold tracking-wider text-indigo-600 dark:text-indigo-400 uppercase">
-                01 / FOUR DOORS, ONE PLATFORM
+                01 / THREE DOORS, ONE PLATFORM
               </span>
               <h2 className="mt-3 text-3xl font-extrabold tracking-tight text-slate-900 dark:text-white sm:text-5xl">
                 Pick your side of the bridge.
               </h2>
               <p className="mt-3 text-base text-slate-600 dark:text-slate-400 sm:text-lg leading-relaxed">
-                Role-based portals for Student, Academician, Industry, and Institution — each with an end-to-end workflow built
+                Role-based portals for Student, Academician, and Industry — each with an end-to-end workflow built
                 specifically for them.
               </p>
             </div>
           </Reveal>
 
-          <div className="mt-12 grid grid-cols-1 gap-6 sm:grid-cols-2 lg:grid-cols-4">
+          <div className="mt-12 grid grid-cols-1 gap-6 md:grid-cols-3">
             {PORTALS.map((p, i) => (
               <Reveal key={p.role} delay={i * 100}>
                 <div
@@ -456,32 +439,78 @@ export default async function Home() {
         ================================================================ */}
         <section id="institutions" className="mt-32 sm:mt-40">
           <Reveal>
-            <div className="rounded-[2.5rem] border border-border-muted bg-gradient-to-b from-indigo-500/[0.03] via-surface/90 to-surface p-8 sm:p-12 lg:p-14 backdrop-blur-md dark:border-border-muted dark:from-indigo-500/[0.05] dark:via-surface/90 dark:to-surface">
-              <span className="font-mono text-xs font-semibold tracking-wider text-indigo-600 dark:text-indigo-400 uppercase">
-                03 / INSTITUTIONS &amp; POLICYMAKERS
-              </span>
-
-              <h2 className="mt-3 text-3xl font-extrabold tracking-tight text-slate-900 dark:text-white sm:text-5xl">
-                The whole bridge, visible from above.
-              </h2>
-
-              <p className="mt-3 max-w-2xl text-base text-slate-600 dark:text-slate-400 sm:text-lg leading-relaxed">
-                Dashboards replace end-of-year spreadsheets with live, cohort-level insight into verified competencies,
-                internships, and enterprise placements.
-              </p>
-
-
-              {/* Capability Capsules */}
-              <div className="mt-8 flex flex-wrap gap-2.5">
-                {INSTITUTION_CAPSULES.map((capsule) => (
-                  <span
-                    key={capsule.label}
-                    className="inline-flex items-center gap-2 rounded-full border border-border-muted bg-surface/90 px-3.5 py-1.5 text-xs font-medium text-slate-700 dark:text-slate-300 shadow-xs"
-                  >
-                    <capsule.icon className="size-3.5 text-indigo-500" />
-                    <span>{capsule.label}</span>
+            <div className="rounded-[2.5rem] border border-border-muted bg-gradient-to-b from-emerald-500/[0.03] via-surface/90 to-surface p-8 sm:p-12 lg:p-14 backdrop-blur-md dark:border-border-muted dark:from-emerald-500/[0.05] dark:via-surface/90 dark:to-surface">
+              <div className="grid grid-cols-1 lg:grid-cols-12 gap-8 lg:gap-12 items-center">
+                <div className="lg:col-span-7">
+                  <span className="font-mono text-xs font-semibold tracking-wider text-emerald-600 dark:text-emerald-400 uppercase">
+                    03 / INSTITUTIONS &amp; POLICYMAKERS
                   </span>
-                ))}
+
+                  <h2 className="mt-3 text-3xl font-extrabold tracking-tight text-slate-900 dark:text-white sm:text-5xl">
+                    The whole bridge, visible from above.
+                  </h2>
+
+                  <p className="mt-4 text-base text-slate-600 dark:text-slate-400 sm:text-lg leading-relaxed">
+                    Dashboards replace end-of-year spreadsheets with live, cohort-level insight into verified competencies,
+                    internships, and enterprise placements.
+                  </p>
+
+                  {/* Capability Capsules */}
+                  <div className="mt-8 flex flex-wrap gap-2.5">
+                    {INSTITUTION_CAPSULES.map((capsule) => (
+                      <span
+                        key={capsule.label}
+                        className="inline-flex items-center gap-2 rounded-full border border-border-muted bg-surface/90 px-3.5 py-1.5 text-xs font-medium text-slate-700 dark:text-slate-300 shadow-xs"
+                      >
+                        <capsule.icon className="size-3.5 text-emerald-500" />
+                        <span>{capsule.label}</span>
+                      </span>
+                    ))}
+                  </div>
+                </div>
+
+                {/* Institution Portal Card */}
+                <div className="lg:col-span-5">
+                  <div className="flex flex-col justify-between rounded-3xl border border-emerald-500/30 bg-surface/85 p-7 sm:p-8 backdrop-blur-md shadow-xl shadow-emerald-500/5 transition-all duration-300 hover:border-emerald-500/60 dark:bg-surface/70">
+                    <div>
+                      <span className="font-mono text-xs font-bold tracking-wider text-emerald-600 dark:text-emerald-400 uppercase">
+                        {"// INSTITUTION"}
+                      </span>
+
+                      <h3 className="mt-3 text-xl font-bold text-slate-900 dark:text-white leading-snug">
+                        Drive outcomes across all cohorts.
+                      </h3>
+
+                      <ul className="mt-6 space-y-3.5 text-xs sm:text-sm text-slate-600 dark:text-slate-300 leading-relaxed">
+                        <li className="flex items-start gap-2.5">
+                          <span className="mt-1.5 size-1.5 shrink-0 rounded-full bg-emerald-500" />
+                          <span>Skill deficit heatmap across all departments</span>
+                        </li>
+                        <li className="flex items-start gap-2.5">
+                          <span className="mt-1.5 size-1.5 shrink-0 rounded-full bg-emerald-500" />
+                          <span>Placement records and verified hiring telemetry</span>
+                        </li>
+                        <li className="flex items-start gap-2.5">
+                          <span className="mt-1.5 size-1.5 shrink-0 rounded-full bg-emerald-500" />
+                          <span>AI-assisted syllabus gap analysis and curriculum patches</span>
+                        </li>
+                        <li className="flex items-start gap-2.5">
+                          <span className="mt-1.5 size-1.5 shrink-0 rounded-full bg-emerald-500" />
+                          <span>Accreditation-ready audit records and exports</span>
+                        </li>
+                      </ul>
+                    </div>
+
+                    <div className="mt-8 pt-4 border-t border-border-muted/60">
+                      <Link
+                        href="/signup?role=INSTITUTION"
+                        className="inline-flex h-11 w-full items-center justify-center gap-2 rounded-xl bg-gradient-to-r from-emerald-600 to-teal-600 px-5 text-xs font-semibold text-white shadow-md shadow-emerald-600/20 transition-all hover:from-emerald-500 hover:to-teal-500 active:scale-[0.99]"
+                      >
+                        Enter as institution →
+                      </Link>
+                    </div>
+                  </div>
+                </div>
               </div>
             </div>
           </Reveal>
