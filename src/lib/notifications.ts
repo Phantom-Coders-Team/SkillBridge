@@ -39,7 +39,9 @@ interface DbNotificationRow {
   created_at?: string | Date | null;
 }
 
-const STORAGE_FILE = path.join(process.cwd(), "notifications.json");
+const STORAGE_FILE = fs.existsSync(path.join(process.cwd(), ".notifications.json"))
+  ? path.join(process.cwd(), ".notifications.json")
+  : path.join(process.cwd(), "notifications.json");
 
 let notificationsMemory: AppNotification[] = [];
 

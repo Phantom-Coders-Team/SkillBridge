@@ -8,10 +8,28 @@ export default async function HeatmapPage() {
   if (!user) redirect("/login");
 
   const normalizedRole = normalizeRole(user.role);
-  if (normalizedRole !== "INSTITUTION") {
+  const canView = normalizedRole === "INSTITUTION" || normalizedRole === "ACADEMICIAN";
+  if (!canView) {
     return (
-      <div className="mx-auto max-w-3xl rounded-2xl border border-border-muted bg-surface p-8 text-center text-sm text-slate-500 dark:text-slate-400 shadow-card">
-        Only institution representatives can view the skill deficit heatmap.
+      <div className="mx-auto max-w-3xl rounded-2xl border border-border-muted bg-surface p-8 text-center text-sm text-slate-500 dark:text-slate-400 shadow-card space-y-3">
+        <p className="font-semibold text-slate-800 dark:text-slate-200">
+          The Department Skill Deficit Heatmap is designed for Institutional TPOs and Academic Leadership.
+        </p>
+        <p className="text-xs text-slate-500 dark:text-slate-400">
+          {normalizedRole === "STUDENT"
+            ? "As a student, you can track your personal skill fresh-rate and radar under your Skill Radar page."
+            : "Switch to the Institution TPO persona or Academician persona from the bottom demo switcher to test this live."}
+        </p>
+        {normalizedRole === "STUDENT" && (
+          <div className="pt-2">
+            <a
+              href="/skills"
+              className="inline-flex items-center gap-2 rounded-xl bg-indigo-600 px-4 py-2 text-xs font-semibold text-white shadow-xs hover:bg-indigo-700 transition-colors"
+            >
+              Go to My Skill Radar →
+            </a>
+          </div>
+        )}
       </div>
     );
   }

@@ -9,9 +9,29 @@ export default async function OfficeHoursPage() {
   if (!user) redirect("/login");
 
   if (user.role !== "STUDENT") {
+    const isIndustry = user.role === "INDUSTRY" || user.role === "INDUSTRIES";
     return (
-      <div className="mx-auto max-w-3xl rounded-2xl border border-border-muted bg-surface p-8 text-center text-sm text-slate-500 dark:text-slate-400 shadow-card">
-        1:1 Industry Mentorship and Code Clinics are open to students.
+      <div className="mx-auto max-w-3xl rounded-2xl border border-border-muted bg-surface p-8 text-center text-sm text-slate-500 dark:text-slate-400 shadow-card space-y-4">
+        <p className="font-semibold text-slate-800 dark:text-slate-200">
+          1:1 Industry Mentorship and Code Clinics are student-facing booking sessions.
+        </p>
+        {isIndustry ? (
+          <div>
+            <p className="text-xs text-slate-500 mb-3">
+              As an Industry Partner, you can publish and manage your open consultation slots from your host portal.
+            </p>
+            <a
+              href="/mentor-slots"
+              className="inline-flex items-center gap-2 rounded-xl bg-indigo-600 px-4 py-2 text-xs font-semibold text-white shadow-xs hover:bg-indigo-700 transition-colors"
+            >
+              Manage &amp; Host Mentor Slots →
+            </a>
+          </div>
+        ) : (
+          <p className="text-xs text-slate-400">
+            Switch to the Student persona from the demo switcher below to test booking live clinic slots.
+          </p>
+        )}
       </div>
     );
   }
