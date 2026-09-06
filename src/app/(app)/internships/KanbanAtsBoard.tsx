@@ -14,6 +14,7 @@ import {
   Building2,
   ExternalLink,
   Sparkles,
+  CheckCircle2,
 } from "lucide-react";
 import MatchBadge from "./MatchBadge";
 import { InterviewerScorecardModal } from "./InterviewerScorecardModal";
@@ -25,6 +26,7 @@ const PIPELINE_COLUMNS = [
   { key: "SHORTLISTED", label: "Shortlisted", icon: Star, color: "text-purple-600 bg-purple-50 border-purple-200 dark:bg-purple-950/40 dark:border-purple-900/40 dark:text-purple-300" },
   { key: "INTERVIEW", label: "Interview", icon: Video, color: "text-amber-600 bg-amber-50 border-amber-200 dark:bg-amber-950/40 dark:border-amber-900/40 dark:text-amber-300" },
   { key: "OFFERED", label: "Offered", icon: Award, color: "text-emerald-600 bg-emerald-50 border-emerald-200 dark:bg-emerald-950/40 dark:border-emerald-900/40 dark:text-emerald-300" },
+  { key: "ACCEPTED", label: "Hired / Placed", icon: CheckCircle2, color: "text-teal-600 bg-teal-50 border-teal-200 dark:bg-teal-950/40 dark:border-teal-900/40 dark:text-teal-300" },
   { key: "REJECTED", label: "Rejected", icon: XCircle, color: "text-slate-500 bg-slate-50 border-slate-200 dark:bg-slate-900/40 dark:border-slate-800 dark:text-slate-400" },
 ];
 
@@ -57,6 +59,8 @@ export function KanbanAtsBoard({
         return { key: "INTERVIEW", label: "Schedule Interview" };
       case "INTERVIEW":
         return { key: "OFFERED", label: "Extend Offer" };
+      case "OFFERED":
+        return { key: "ACCEPTED", label: "Confirm Hire" };
       default:
         return null;
     }
@@ -68,7 +72,8 @@ export function KanbanAtsBoard({
         const Icon = col.icon;
         const colApplicants = applicants.filter((a) => {
           const s = a.status.toUpperCase();
-          if (col.key === "OFFERED") return s === "OFFERED" || s === "ACCEPTED" || s === "APPROVED";
+          if (col.key === "ACCEPTED") return s === "ACCEPTED" || s === "COMPLETED" || s === "APPROVED";
+          if (col.key === "OFFERED") return s === "OFFERED";
           return s === col.key;
         });
 

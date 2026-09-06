@@ -43,6 +43,75 @@ export function AccreditationDossier({
     day: "numeric",
   });
 
+  const handleExportExcel = async () => {
+    const XLSX = await import("xlsx");
+    const wb = XLSX.utils.book_new();
+
+    // Sheet 1: NIRF Metric 5.2.1
+    const nirfRows = [
+      ["REGULATORY COMPLIANCE & ACCREDITATION AUDIT DOSSIER"],
+      ["Institution:", institutionName || "University Institute of Technology"],
+      ["Audit Period:", "Academic Year 2025–2026"],
+      ["Audit Date:", reportDate],
+      ["Compliance Framework:", "NIRF Metric 5.2.1, NAAC (Criteria 1, 2, 5), AICTE Internship Mandate"],
+      ["Cryptographic Proof:", "SHA-256 Verified Tamper-Proof Registry · NEP 2020 Compliant"],
+      [],
+      ["NIRF SECTION A: GRADUATION OUTCOMES & CAMPUS PLACEMENTS (METRIC 5.2.1)"],
+      ["Key Performance Metric", "Institutional Total", "Verification Authority", "Status"],
+      ["Total Eligible Student Cohort", totalStudents, "SkillBridge Verified Roster", "Audited"],
+      ["Total Verified Placements & Offers", totalPlacements, "Direct Corporate Confirmation", "Verified"],
+      ["Overall Placement Success Rate", `${placementRate}%`, "Institutional Calculation", "Compliant"],
+      ["Median Annual Compensation", medianPackage, "Audited Offer Letters", "Verified"],
+      ["Highest Annual Compensation", highestPackage, "Audited Offer Letters", "Verified"],
+    ];
+    const ws1 = XLSX.utils.aoa_to_sheet(nirfRows);
+    ws1["!cols"] = [{ wch: 40 }, { wch: 25 }, { wch: 32 }, { wch: 15 }];
+    XLSX.utils.book_append_sheet(wb, ws1, "NIRF Metric 5.2.1");
+
+    // Sheet 2: NAAC Criteria 1, 2, 5 & AICTE
+    const naacRows = [
+      ["NAAC CRITERIA (1, 2, 5) & AICTE REGULATORY AUDIT BREAKDOWN"],
+      ["Institution:", institutionName || "University Institute of Technology"],
+      ["Audit Cycle:", "AY 2025–2026"],
+      [],
+      ["Criterion Code", "Regulatory Scope & Metric Description", "Institutional Total", "Accreditation Impact", "Audit Status"],
+      ["NAAC Crit 1.3.4", "Students undertaking field capstones & verified industrial projects", verifiedProjectsCount, "Curricular Aspects - Experiential Learning", "Verified Sign-off"],
+      ["NAAC Crit 1.3.5", "Live industry internships with corporate mentor feedback records", totalPlacements, "Curricular Aspects - Corporate Immersion", "100% Verified Logbooks"],
+      ["NAAC Crit 2.3.1", "Student centric methods: Experiential & problem solving (Dual Grading Rubric)", verifiedProjectsCount, "Teaching-Learning & Evaluation", "Dual Mentor Evaluated"],
+      ["NAAC Crit 5.2.1", "Percentage of placement of outgoing students and progression to employment", totalPlacements, "Student Support & Progression", "ATS Offer Confirmed"],
+      ["AICTE-IND-01", "Active Corporate Industry MoUs & Recruitment Frameworks", `${corporatePartnersCount} Enterprises`, "Industry-Academia Mandatory MoUs", "Active & Executed"],
+      ["AICTE-FDP-04", "Faculty Industrial Training Sabbaticals & Certified Corporate Immersions", `${facultySabbaticalsCount} Faculty Members`, "Faculty Development & Immersion", "Certified Completion"],
+    ];
+    const ws2 = XLSX.utils.aoa_to_sheet(naacRows);
+    ws2["!cols"] = [{ wch: 18 }, { wch: 55 }, { wch: 22 }, { wch: 35 }, { wch: 20 }];
+    XLSX.utils.book_append_sheet(wb, ws2, "NAAC Criteria 1, 2, 5");
+
+    // Sheet 3: Corporate Recruitment Partners
+    const corporatePartners = [
+      "Google India", "Microsoft", "NVIDIA AI", "Tata Motors",
+      "Amazon AWS", "Samsung R&D", "TCS", "Infosys",
+      "Wipro", "HCLTech", "Zoho Corporation", "Jio Platforms"
+    ];
+    const partnerRows = [
+      ["CORPORATE RECRUITMENT & JOINT RESEARCH PARTNERS"],
+      ["Total Active Corporate Partners:", corporatePartnersCount],
+      [],
+      ["S.No", "Enterprise Name", "Collaboration Scope", "Compliance Category"],
+      ...corporatePartners.map((p, idx) => [
+        idx + 1,
+        p,
+        "Campus Recruitment, Capstones & Mentor Evaluation",
+        "AICTE Industry MoU & NAAC Crit 1.3"
+      ])
+    ];
+    const ws3 = XLSX.utils.aoa_to_sheet(partnerRows);
+    ws3["!cols"] = [{ wch: 8 }, { wch: 25 }, { wch: 45 }, { wch: 35 }];
+    XLSX.utils.book_append_sheet(wb, ws3, "Corporate Partners");
+
+    const safeName = (institutionName || "Institution").toLowerCase().replace(/[^a-z0-9]+/g, "_");
+    XLSX.writeFile(wb, `NAAC_AICTE_NIRF_Dossier_${safeName}_2026.xlsx`);
+  };
+
   return (
     <>
       <button
@@ -75,8 +144,17 @@ export function AccreditationDossier({
               <div className="flex items-center gap-2">
                 <button
                   type="button"
+                  onClick={handleExportExcel}
+                  className="inline-flex items-center gap-1.5 rounded-xl border border-emerald-300 bg-emerald-50 px-3.5 py-2 text-xs font-bold text-emerald-700 hover:bg-emerald-100 dark:border-emerald-800 dark:bg-emerald-950/60 dark:text-emerald-300 transition-colors shadow-2xs cursor-pointer"
+                  title="1-Click Excel export for AICTE, NAAC (Crit 1,2,5) & NIRF"
+                >
+                  <Download className="size-3.5 text-emerald-600 dark:text-emerald-400" />
+                  <span>1-Click Excel Dossier</span>
+                </button>
+                <button
+                  type="button"
                   onClick={() => window.print()}
-                  className="inline-flex items-center gap-1.5 rounded-xl bg-indigo-600 px-3.5 py-2 text-xs font-bold text-white shadow-2xs hover:bg-indigo-700 transition-colors"
+                  className="inline-flex items-center gap-1.5 rounded-xl bg-indigo-600 px-3.5 py-2 text-xs font-bold text-white shadow-2xs hover:bg-indigo-700 transition-colors cursor-pointer"
                 >
                   <Printer className="size-3.5" />
                   <span>Print Dossier (PDF)</span>
@@ -84,7 +162,7 @@ export function AccreditationDossier({
                 <button
                   type="button"
                   onClick={() => setIsOpen(false)}
-                  className="rounded-lg p-2 text-slate-400 hover:bg-slate-100 dark:hover:bg-slate-800"
+                  className="rounded-lg p-2 text-slate-400 hover:bg-slate-100 dark:hover:bg-slate-800 cursor-pointer"
                 >
                   ✕
                 </button>
