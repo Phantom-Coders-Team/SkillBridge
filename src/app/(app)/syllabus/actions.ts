@@ -13,8 +13,9 @@ export async function applyPatchModule(input: {
   department?: string;
 }): Promise<{ ok: boolean; message: string }> {
   const user = await getCurrentUser();
-  if (!user || (user.role !== "ACADEMICIAN" && user.role !== "FACULTY")) {
-    return { ok: false, message: "Only academicians can apply industry patch modules." };
+  const allowedRoles = ["ACADEMICIAN", "FACULTY", "INSTITUTION", "ADMIN"];
+  if (!user || !allowedRoles.includes(user.role)) {
+    return { ok: false, message: "Only academicians and institutions can commit industry patch modules to the Board of Studies curriculum." };
   }
 
   const today = new Date().toISOString().slice(0, 10);
