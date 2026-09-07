@@ -73,7 +73,7 @@ const ROLE_PITCHES: Record<
     description:
       "Showcase proof of work, sync GitHub footprints, apply to vetted internships, and book 1:1 industry mentorship sessions.",
     features: [
-      "1:1 Industry Mentorship & Live Code Clinics",
+      "1:1 Industry Mentorship",
       "GitHub repository & programming language footprint sync",
       "Direct internship & job applications with live tracking",
       "Real-time interview scheduling & calendar invitations",
