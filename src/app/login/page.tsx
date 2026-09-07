@@ -36,7 +36,7 @@ const FEATURES = [
   "Verifiable proof of work & credentials",
   "Capstone and R&D challenge marketplace",
   "Joint evaluation placements with live PRI scores",
-  "1:1 Industry mentorship & live code clinics",
+  "1:1 Industry mentorship ",
 ];
 
 export default function LoginPage() {
