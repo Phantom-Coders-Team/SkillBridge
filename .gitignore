@@ -55,3 +55,20 @@ next-env.d.ts
 
 # agents and ide tools
 .agents/
+.claude/
+agent/
+AGENTS.md
+CLAUDE.md
+
+# internal design notes & specifications
+design-system/
+
+# runtime mock & local notification stores
+.notifications.json
+notifications.json
+
+# archives & scratch files
+*.zip
+check-verify.ts
+make-token.ts
+
